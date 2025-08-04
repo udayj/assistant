@@ -1,0 +1,27 @@
+{
+  "GetQuotation": {
+    "items": [
+      {
+        "product": {
+          "Cable": {
+            "PowerControl": {
+              "LT": {
+                "conductor": "Copper",
+                "core_size": "4",
+                "sqmm": "95",
+                "armoured": true
+              }
+            }
+          }
+        },
+        "brand": "KEI",
+        "tag": "latest",
+        "discount": 0,
+        "loading_frls": 0,
+        "loading_pvc": 0,
+        "quantity": 100
+      }
+    ],
+    "delivery_charges": 0
+  }
+}
