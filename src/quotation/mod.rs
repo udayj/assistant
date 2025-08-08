@@ -47,7 +47,7 @@ pub struct QuotationService {
 }
 
 impl QuotationService {
-    pub fn generate_quotation(&self, request: QuotationRequest) -> Option<QuotationResponse> {
+    pub fn generate_quotation(&self, quotation_number:&str, date: &str, request: QuotationRequest) -> Option<QuotationResponse> {
         let mut quoted_items = Vec::new();
         let mut basic_total = 0.0;
 

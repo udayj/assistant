@@ -194,6 +194,15 @@ quotation service would have reference to price module and price lists which wer
 so main has a config
 that then creates configs for all other services with necessary data to perform the tasks
 
+tags
+core and sqmm matching
+pdf formatting
+refactoring
+error handling
+logging
+template for metal prices
+whatsapp communication module
+
 QuoteItem {
     product: Product,
     brand: String,

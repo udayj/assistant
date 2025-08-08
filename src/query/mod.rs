@@ -167,3 +167,24 @@ eg. ";
 }
 
 // TODO - update prompt to include proper specific tags for each item type
+// search normalized sizes - handle float in size spec etc.
+// proper error message irrespective of original message
+// pdf formatting
+// dynamic quote no. and date - done
+// size of item field
+// pagination
+// sorting of items in quote
+// Salutation - thanks etc. - done
+// Rs. symbol - done
+// Delivery charges only if  > 0 - done
+// GST specify - done
+// no decimal in qty
+// exact 2 decimals in quote
+
+// just prices
+// type of response - text, pdf or both
+
+// quotation qty decimal, price decimal
+// item field, pagination, totals formatting, lines
+
+// what happens if program gets user message but faces an error while responding - will program get same message again ?

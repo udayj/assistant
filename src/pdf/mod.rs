@@ -1,18 +1,23 @@
-use printpdf::*;
-use std::fs::File;
-use std::io::BufWriter;
+use crate::prices::item_prices::Description;
 use crate::quotation::QuotationResponse;
 use ::image::codecs::jpeg::JpegDecoder;
 use ::image::io::Reader as ImageReader;
+use printpdf::*;
+use std::fs::File;
+use std::io::BufWriter;
 use std::path::Path;
-use crate::prices::item_prices::Description;
 
-pub fn create_quotation_pdf(quotation: &QuotationResponse, filename: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn create_quotation_pdf(
+    quotation_number: &str,
+    date: &str,
+    quotation: &QuotationResponse,
+    filename: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let (doc, page1, layer1) = PdfDocument::new("Quotation", Mm(210.0), Mm(297.0), "Layer 1");
     let current_layer = doc.get_page(page1).get_layer(layer1);
-    
+
     // Load and add header image
-     // Load the image to get dimensions
+    // Load the image to get dimensions
     let img_info = ImageReader::open("assets/header.jpg")?.decode()?.to_rgb8();
 
     // Get image dimensions in pixels
@@ -44,22 +49,29 @@ pub fn create_quotation_pdf(quotation: &QuotationResponse, filename: &str) -> Re
 
     // Add the header image
     img.add_to_layer(current_layer.clone(), transform);
-    
+
     // Fonts
     let font = doc.add_builtin_font(BuiltinFont::Helvetica)?;
     let font_bold = doc.add_builtin_font(BuiltinFont::HelveticaBold)?;
-    
+
     // Quotation details
-    current_layer.use_text("Quotation No: QUO-2025-001", 12.0, Mm(10.0), Mm(220.0), &font);
-    current_layer.use_text("Date: 03-Aug-2025", 12.0, Mm(10.0), Mm(210.0), &font);
-    
+    current_layer.use_text(quotation_number, 10.0, Mm(10.0), Mm(220.0), &font);
+    current_layer.use_text(date, 10.0, Mm(157.0), Mm(220.0), &font);
+
+    current_layer.use_text(
+        "Thank you for enquiry. Please find the quotation below for your consideration",
+        10.0,
+        Mm(10.0),
+        Mm(205.0),
+        &font,
+    );
     // Table headers
     let header_y = Mm(190.0);
     current_layer.use_text("Item", 10.0, Mm(10.0), header_y, &font_bold);
-    current_layer.use_text("Qty", 10.0, Mm(120.0), header_y, &font_bold);
-    current_layer.use_text("Rate", 10.0, Mm(140.0), header_y, &font_bold);
+    current_layer.use_text("Qty (Mtr)", 10.0, Mm(120.0), header_y, &font_bold);
+    current_layer.use_text("Rate/mtr.", 10.0, Mm(140.0), header_y, &font_bold);
     current_layer.use_text("Amount", 10.0, Mm(170.0), header_y, &font_bold);
-    
+
     // Table items
     let mut y_pos = 180.0;
     for item in &quotation.items {
@@ -71,23 +83,74 @@ pub fn create_quotation_pdf(quotation: &QuotationResponse, filename: &str) -> Re
             extras.push("pvc".to_string());
         }
         //let item_desc = format!("{:?}", ); // Simple debug format
-        current_layer.use_text(&item.product.get_description(extras), 9.0, Mm(10.0), Mm(y_pos), &font);
-        current_layer.use_text(&format!("{:.0}", item.quantity_mtrs), 9.0, Mm(120.0), Mm(y_pos), &font);
-        current_layer.use_text(&format!("{:.2}", item.price), 9.0, Mm(140.0), Mm(y_pos), &font);
-        current_layer.use_text(&format!("{:.2}", item.amount), 9.0, Mm(170.0), Mm(y_pos), &font);
+        current_layer.use_text(
+            &item.product.get_description(extras),
+            9.0,
+            Mm(10.0),
+            Mm(y_pos),
+            &font,
+        );
+        current_layer.use_text(
+            &format!("{:.0}", item.quantity_mtrs),
+            9.0,
+            Mm(120.0),
+            Mm(y_pos),
+            &font,
+        );
+        current_layer.use_text(
+            &format!("{:.2}", item.price),
+            9.0,
+            Mm(140.0),
+            Mm(y_pos),
+            &font,
+        );
+        current_layer.use_text(
+            &format!("{:.2}", item.amount),
+            9.0,
+            Mm(170.0),
+            Mm(y_pos),
+            &font,
+        );
         y_pos -= 10.0;
     }
-    
+
     // Totals
     y_pos -= 10.0;
-    current_layer.use_text(&format!("Basic Total: {:.2}", quotation.basic_total), 10.0, Mm(140.0), Mm(y_pos), &font_bold);
+    current_layer.use_text(
+        &format!("Sub Total: Rs.{:.2}", quotation.basic_total),
+        10.0,
+        Mm(140.0),
+        Mm(y_pos),
+        &font_bold,
+    );
+
+    if quotation.delivery_charges > 0.0 {
+        y_pos -= 10.0;
+        current_layer.use_text(
+            &format!("Delivery Charges: Rs.{:.2}", quotation.delivery_charges),
+            10.0,
+            Mm(140.0),
+            Mm(y_pos),
+            &font,
+        );
+    }
     y_pos -= 10.0;
-    current_layer.use_text(&format!("Delivery Charges: {:.2}", quotation.delivery_charges), 10.0, Mm(140.0), Mm(y_pos), &font);
+    current_layer.use_text(
+        &format!("GST @ 18%: Rs.{:.2}", quotation.taxes),
+        10.0,
+        Mm(140.0),
+        Mm(y_pos),
+        &font,
+    );
     y_pos -= 10.0;
-    current_layer.use_text(&format!("Taxes (18%): {:.2}", quotation.taxes), 10.0, Mm(140.0), Mm(y_pos), &font);
-    y_pos -= 10.0;
-    current_layer.use_text(&format!("Grand Total: {:.2}", quotation.grand_total), 10.0, Mm(140.0), Mm(y_pos), &font_bold);
-    
+    current_layer.use_text(
+        &format!("Total: Rs.{:.2}", quotation.grand_total),
+        10.0,
+        Mm(140.0),
+        Mm(y_pos),
+        &font_bold,
+    );
+
     // Save PDF
     doc.save(&mut BufWriter::new(File::create(filename)?))?;
     Ok(())

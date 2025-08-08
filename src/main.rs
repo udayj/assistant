@@ -10,6 +10,8 @@ use assistant::query::get_query;
 use assistant::quotation::QuoteItem;
 use assistant::quotation::{QuotationRequest, QuotationService};
 use assistant::pdf::create_quotation_pdf;
+use chrono::{Datelike,Local};
+use rand::prelude::*;
 
 #[tokio::main]
 async fn main() {
@@ -17,12 +19,12 @@ async fn main() {
     service_manager.spawn::<PriceService>();
     let price_service = PriceService::new().await;
     //price_service.fetch_price("copper").await.unwrap();
-    let json_data = std::fs::read_to_string("kei_single_core.json").unwrap();
+    let json_data = std::fs::read_to_string("pricelist.json").unwrap();
     let price_list: PriceList = serde_json::from_str(&json_data).unwrap();
 
-    println!("price list:{:#?}", price_list);
+    //println!("price list:{:#?}", price_list);
     println!("Deserialized successfully");
-    return;
+    //return;
     // Create pricing system
     let pricing_system = PricingSystem::from_price_list(price_list);
 
@@ -68,11 +70,33 @@ async fn main() {
         delivery_charges: 500.0,
     };
     let file_content = std::fs::read_to_string("sample_response.json").unwrap();
+    let date = Local::now().date_naive();
+    let formatted_date = date.format("%Y%m%d").to_string();
     let quotation_response = serde_json::from_str(&file_content).unwrap();
-    let _ = create_quotation_pdf(&quotation_response, "quotation.pdf").unwrap();
+    let mut random_gen = rand::rng();
+    let random_q_num = random_gen.random_range(1000..=9999);
+    let quotation_number = format!("Ref: Q-{}-{}",formatted_date, random_q_num);
+    let now = Local::now();
+    
+    // Get day, month, and year
+    let day = now.day();
+    let month = now.format("%B"); // Full month name, e.g., "August"
+    let year = now.year();
+    
+    // Determine the ordinal suffix for the day
+    let suffix = match day {
+        1 | 21 | 31 => "st",
+        2 | 22 => "nd",
+        3 | 23 => "rd",
+        _ => "th",
+    };
+    
+    // Format the date as a string
+    let quotation_date = format!("{}{} {}, {}", day, suffix, month, year);
+    let _ = create_quotation_pdf(&quotation_number, &quotation_date, &quotation_response, "quotation.pdf").unwrap();
     return;
     let quotation_response = quotation_service
-                .generate_quotation(quotation_request)
+                .generate_quotation(&quotation_number, &quotation_date, quotation_request)
                 .expect("Failed to generate quotation");
     println!("quotation response:{:#?}", quotation_response);
 
@@ -89,7 +113,7 @@ async fn main() {
     match query_request {
         Query::GetQuotation(quotation_request) => {
             let quotation_response = quotation_service
-                .generate_quotation(quotation_request)
+                .generate_quotation(&quotation_number, &quotation_date, quotation_request)
                 .expect("Failed to generate quotation");
             println!("quotation response:{:#?}", quotation_response);
         },
