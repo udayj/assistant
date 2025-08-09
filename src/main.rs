@@ -69,6 +69,7 @@ async fn main() {
         ],
         delivery_charges: 500.0,
     };
+    
     let file_content = std::fs::read_to_string("sample_response.json").unwrap();
     let date = Local::now().date_naive();
     let formatted_date = date.format("%Y%m%d").to_string();

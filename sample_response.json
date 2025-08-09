@@ -1,46 +1,193 @@
 {
     "items": [
-      {
-          "product": {
-            "Cable": {
-              "PowerControl": {
-                "LT": {
-                    "conductor": "Copper",
-                    "core_size": "3",
-                    "sqmm": "2.5",
-                    "armoured": true
-                  
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
                 }
-              }
-            }
-          },
-          "quantity_mtrs": 50.0,
-          "price": 400.0,
-          "amount": 20000.0,
-          "loading_pvc": 0.0,
-          "loading_frls": 0.0
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "Flexible": {
+                            "core_size": "4",
+                            "sqmm": "2.5",
+                            "flexible_type": "FR"
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 100.0,
+            "price": 80.0,
+            "amount": 8000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },{
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+        {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
+        },
+         {
+            "product": {
+                "Cable": {
+                    "PowerControl": {
+                        "LT": {
+                            "conductor": "Copper",
+                            "core_size": "3",
+                            "sqmm": "2.5",
+                            "armoured": true
+                        }
+                    }
+                }
+            },
+            "quantity_mtrs": 50.0,
+            "price": 400.0,
+            "amount": 20000.0,
+            "loading_pvc": 0.0,
+            "loading_frls": 0.0
         }
-,
-      {
-        
-          "product": {
-            "Cable": {
-              "PowerControl": {
-                "Flexible": {
-                    "core_size": "4",
-                    "sqmm": "2.5",
-                    "flexible_type": "FR"
-                  
-                }
-              }
-            }
-          },
-          "quantity_mtrs": 100.0,
-          "price": 80.0,
-          "amount": 8000.0,
-          "loading_pvc": 0.0,
-          "loading_frls": 0.0
-      }
     ],
     "basic_total": 28000.0,
     "delivery_charges": 0.0,

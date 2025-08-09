@@ -53,12 +53,13 @@ impl QuotationService {
 
         for item in request.items {
             println!("processing:{:#?}", item);
-            let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
+            let mut listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
             println!("found price:{} for item:{:#?}", listed_price, item);
-            let price = listed_price
+            let mut price = listed_price
                 * (1.0 - item.discount)
                 * (1.0 + item.loading_frls)
                 * (1.0 + item.loading_pvc);
+            price = (price * 100.0).round()/100.0;
 
             let amount = price * item.quantity;
             basic_total += amount;
@@ -75,8 +76,8 @@ impl QuotationService {
 
         let total_with_delivery = basic_total + request.delivery_charges;
         let taxes = total_with_delivery * 0.18;
-        let grand_total = total_with_delivery + taxes;
-
+        let grand_total = (total_with_delivery + taxes).round();
+    
         Some(QuotationResponse {
             items: quoted_items,
             basic_total,

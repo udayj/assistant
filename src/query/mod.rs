@@ -169,11 +169,11 @@ eg. ";
 // TODO - update prompt to include proper specific tags for each item type
 // search normalized sizes - handle float in size spec etc.
 // proper error message irrespective of original message
-// pdf formatting
+// pdf formatting - done
 // dynamic quote no. and date - done
-// size of item field
-// pagination
-// sorting of items in quote
+// size of item field - done
+// pagination - done
+// sorting of items in quote - deferred
 // Salutation - thanks etc. - done
 // Rs. symbol - done
 // Delivery charges only if  > 0 - done
@@ -188,3 +188,20 @@ eg. ";
 // item field, pagination, totals formatting, lines
 
 // what happens if program gets user message but faces an error while responding - will program get same message again ?
+
+// extra line in last row - done
+// no salution required on 2nd page - done
+// too much whitespace below table before splitting to next page - can accomodate more items - done
+// table should start earlier from 2nd page onwards - done
+// understand pdf generation code
+
+// decimals - done
+// normalized search
+// insert accepted tags - the tags act like selectors for price lists - for instance, user could specify 
+// give price for 3 c x 2.5 cu armd 100 M and 4 core x 2.5 cu armd 200 m - use feb 2025 price list and give disc 70%
+// then feb 2025 becomes the tag because it will help idetify which price list to use to get the base price internally
+// acceptable tags are given as follows
+// the sizes of cables should not have trailing 0s in the value for instance, 3.5 Core should not be written as 3.50
+// similarly 4 core should not be written as 4.0
+// however, 0.75 sq. mm can be written with 1 leading decimal
+// use claude itself to make the prompt clear
