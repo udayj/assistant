@@ -1,6 +1,20 @@
-use crate::prices::item_prices::{PricingSystem, Product};
+use crate::{
+    configuration::PriceListConfig,
+    prices::item_prices::{PriceList, PricingSystem, Product},
+};
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::fs;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum QuotationError {
+    #[error("Error reading pricelist file")]
+    FileReadError,
+
+    #[error("Error parsing pricelist file")]
+    PricelistParseError,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct QuoteItem {
@@ -23,10 +37,10 @@ pub struct QuotationRequest {
 pub struct QuotedItem {
     pub product: Product,
     pub quantity_mtrs: f32,
-    pub price: f32,  // price = listed_price*(1-discount)*(1+loading_frls)*(1+loading_pvc)
+    pub price: f32, // price = listed_price*(1-discount)*(1+loading_frls)*(1+loading_pvc)
     pub amount: f32, // amount = price*qty
     pub loading_pvc: f32,
-    pub loading_frls: f32
+    pub loading_frls: f32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -39,27 +53,43 @@ pub struct QuotationResponse {
     pub grand_total: f32, // grand_total = total_with_delivery + taxes
 }
 pub struct QuotationService {
-    /*
-       brand key-> multiple tags
-       multiple tags-> brand
-    */
     pub pricelists: HashMap<String, Vec<PricingSystem>>,
 }
 
 impl QuotationService {
-    pub fn generate_quotation(&self, quotation_number:&str, date: &str, request: QuotationRequest) -> Option<QuotationResponse> {
+    pub fn new(pricelist_configs: Vec<PriceListConfig>) -> Result<Self, QuotationError> {
+        let mut pricelists = HashMap::new();
+
+        for pricelist_config in pricelist_configs {
+            let json_pricelist = fs::read_to_string(pricelist_config.pricelist)
+                .map_err(|_| QuotationError::FileReadError)?;
+            let pricelist: PriceList = serde_json::from_str(&json_pricelist)
+                .map_err(|_| QuotationError::PricelistParseError)?;
+            let pricing_system = PricingSystem::from_price_list(pricelist);
+            let key = pricelist_config.brand.to_lowercase().trim().to_string();
+            let brand_pricing_systems = pricelists
+                .entry(key)
+                .or_insert_with(|| Vec::<PricingSystem>::new());
+            brand_pricing_systems.push(pricing_system);
+        }
+        Ok(Self { pricelists })
+    }
+}
+
+impl QuotationService {
+    pub fn generate_quotation(&self, request: QuotationRequest) -> Option<QuotationResponse> {
         let mut quoted_items = Vec::new();
         let mut basic_total = 0.0;
 
         for item in request.items {
             println!("processing:{:#?}", item);
-            let mut listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
+            let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
             println!("found price:{} for item:{:#?}", listed_price, item);
             let mut price = listed_price
                 * (1.0 - item.discount)
                 * (1.0 + item.loading_frls)
                 * (1.0 + item.loading_pvc);
-            price = (price * 100.0).round()/100.0;
+            price = (price * 100.0).round() / 100.0;
 
             let amount = price * item.quantity;
             basic_total += amount;
@@ -70,14 +100,14 @@ impl QuotationService {
                 price,
                 amount,
                 loading_frls: item.loading_frls,
-                loading_pvc: item.loading_pvc
+                loading_pvc: item.loading_pvc,
             });
         }
 
         let total_with_delivery = basic_total + request.delivery_charges;
         let taxes = total_with_delivery * 0.18;
         let grand_total = (total_with_delivery + taxes).round();
-    
+
         Some(QuotationResponse {
             items: quoted_items,
             basic_total,
@@ -95,103 +125,3 @@ impl QuotationService {
             .find_map(|pricing_system| pricing_system.get_price(product, tag))
     }
 }
-
-/*
-    You are a query understanding agent for electrical items' related queries. User queries can be of 3 types as per following Rust type
-    #[derive(Debug, Deserialize)]
-    enum Query {
-    MetalPricing,
-    GetPriceList(PriceList),
-    GetQuotation(QuotationRequest),
-    UnsupportedQuery
-}
-#[derive(Debug, Deserialize)]
-struct PriceList {
-    brand: String,
-    tag: String
-}
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
-pub enum Product {
-    Cable(Cable),
-}
-
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
-pub enum Cable {
-    PowerControl(PowerControl),
-
-    Telephone {
-        pair_size: String,
-        conductor_mm: String,
-    },
-    Coaxial(CoaxialType),
-    Submersible {
-        core_size: String,
-        sqmm: String,
-    },
-    Solar {
-        solar_type: SolarType,
-        sqmm: String,
-    },
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-enum SolarType {
-    BS,
-    EN,
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-enum CoaxialType {
-    RG6,
-    RG11,
-    RG59,
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-pub enum PowerControl {
-    LT(LT),
-    HT(HT),
-    Flexible(Flexible),
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-pub struct LT {
-    pub conductor: Conductor,
-    pub core_size: String,
-    pub sqmm: String,
-    pub armoured: bool,
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-pub struct HT {
-    pub conductor: Conductor,
-    pub voltage_grade: String,
-    pub core_size: String,
-    pub sqmm: String,
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-struct Flexible {
-    core_size: String,
-    sqmm: String,
-    flexible_type: FlexibleType,
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-enum FlexibleType {
-    FR,
-    FRLSH,
-    HRFR,
-    ZHFR
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-pub enum Conductor {
-    Copper,
-    Aluminium,
-}
-
-User can either ask for metal prices, or ask for price lists or ask for quotations for electrical items. 
-You need to understand what the user wants and return your response as a JSON string that can be deserialized into the Query type. Do not return anything else in the response.
-
-*/

@@ -1,0 +1,15 @@
+{
+    "pricelists" :[
+        {
+            "pricelist":"assets/processed_pricelists/kei_armoured_lt.json",
+            "brand":"kei"
+        }
+    ],
+    "metal_pricing" : {
+        "al_url":"https://www.5paisa.com/commodity-trading/mcx-aluminium-price",
+        "cu_url":"https://www.5paisa.com/commodity-trading/mcx-copper-price"
+    },
+    "claude" : {
+        "system_prompt": "assets/claude/system_prompt.txt"
+    }
+}

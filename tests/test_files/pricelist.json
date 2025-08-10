@@ -1,0 +1,94 @@
+{
+  "brand": "kei",
+  "tags": ["latest", "july 2025"],
+  "prices": [
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 400
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "HT": {
+              "conductor": "Aluminium",
+              "voltage_grade": "11kV",
+              "core_size": "3",
+              "sqmm": "25"
+            }
+          }
+        }
+      },
+      "price": 125.75
+    },
+    {
+      "product": {
+        "Cable": {
+          "Coaxial": "RG6"
+        }
+      },
+      "price": 12.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "Telephone": {
+            "pair_size": "10",
+            "conductor_mm": "0.5"
+          }
+        }
+      },
+      "price": 8.95
+    },
+    {
+      "product": {
+        "Cable": {
+          "Solar": {
+            "solar_type": "EN",
+            "sqmm": "4"
+          }
+        }
+      },
+      "price": 22.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 18.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 20.0
+    }
+  ]
+}

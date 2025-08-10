@@ -1,0 +1,3881 @@
+{
+  "brand": "kei",
+  "tags": [
+    "Industrial Multi Strand Cables",
+    "Flexible PVC Insulated",
+    "Multicore",
+    "FR PVC Flexible",
+    "FRLS PVC Flexible",
+    "IS-694:2010",
+    "3.7.25",
+    "3rd july 2025",
+    "july 2025",
+    "latest"
+  ],
+  "prices": [
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 35.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 50.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 63.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 84.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 96.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 108.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 164.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 189.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 219.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 248.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 290.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 370.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 49.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 65.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 85.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 116.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 130.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 147.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 222.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 256.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 297.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 338.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 396.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.75",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 505.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 59.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 83.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 108.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 138.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 166.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 188.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 279.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 329.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 382.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 434.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 505.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 644.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 81.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 116.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 152.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 194.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 233.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 266.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 389.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 462.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 536.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 610.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 718.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 915.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 132.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 190.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 250.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 314.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 378.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 433.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 631.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 750.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 872.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 993.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1171.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "2.5",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1491.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 213.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 308.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 406.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 512.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 616.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 708.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1028.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1224.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1423.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1622.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1917.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "4",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 2440.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "6",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 312.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "6",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 454.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "6",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 601.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "6",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 751.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "10",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 525.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "10",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 767.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "10",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1016.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "10",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1275.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "16",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 813.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "16",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1190.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "16",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1578.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "25",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 1811.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "25",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 2410.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "35",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 2533.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "35",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 3371.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "50",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 3625.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "50",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 4825.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "70",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 5121.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "70",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 6817.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "95",
+              "flexible_type": "FR"
+            }
+          }
+        }
+      },
+      "price": 9011.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 39.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 54.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 66.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 90.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 102.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 113.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 177.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 199.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 230.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 260.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 301.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 386.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 52.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 71.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 92.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 126.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 141.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 158.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 236.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 278.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 321.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 363.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 424.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.75",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 542.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 64.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 89.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 115.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 147.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 180.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 202.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 299.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 354.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 409.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 464.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 543.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1.00",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 694.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 88.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 124.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 162.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 209.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 251.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 285.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 420.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 497.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 575.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 654.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 767.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 980.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 144.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 203.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 266.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 336.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 404.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 460.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 675.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 801.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 929.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1056.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1241.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "2.5",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1586.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 230.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 327.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 428.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 534.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 643.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 734.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1075.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1274.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1478.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1684.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1986.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "4",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 2536.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "6",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 334.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "6",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 479.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "6",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 631.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "6",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 790.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "10",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 559.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "10",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 805.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "10",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1063.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "10",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1337.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "16",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 860.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "16",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1245.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "16",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1647.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "25",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 1893.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "25",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 2517.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "35",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 2645.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "35",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 3516.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 3780.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "50",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 5027.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "70",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 5282.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "70",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 7096.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "95",
+              "flexible_type": "FRLSH"
+            }
+          }
+        }
+      },
+      "price": 9386.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 45.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 58.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 72.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 96.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 113.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 123.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 188.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 220.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 252.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 283.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 326.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 420.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 59.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 78.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 100.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 130.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 154.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 170.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 256.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 300.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 346.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 390.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 451.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "0.75",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 580.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 71.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 96.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 123.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 158.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 193.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 214.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 322.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 378.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 436.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 493.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 572.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1.00",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 736.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 97.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 133.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 171.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 222.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 267.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 299.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 446.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 525.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 606.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 686.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 800.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "1.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1028.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 157.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 216.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 279.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 352.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 424.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 477.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 709.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 836.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 967.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1098.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1284.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "2.5",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1649.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 246.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 343.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 446.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 556.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "6",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 670.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "7",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 757.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "10",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1121.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "12",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1322.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "14",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1530.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "16",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1739.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "19",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 2045.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "24",
+              "sqmm": "4",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 2625.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "6",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 355.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "6",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 499.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "6",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 655.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "6",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 820.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "10",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 590.10
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "10",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 834.60
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "10",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1097.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "5",
+              "sqmm": "10",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1381.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "2",
+              "sqmm": "16",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 900.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "16",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1283.90
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "16",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1691.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "25",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 1954.30
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "25",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 2593.00
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "35",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 2723.40
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "35",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 3615.70
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 3886.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "50",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 5162.20
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "3",
+              "sqmm": "70",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 5474.80
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "70",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 7275.50
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "Flexible": {
+              "core_size": "4",
+              "sqmm": "95",
+              "flexible_type": "ZHFR"
+            }
+          }
+        }
+      },
+      "price": 9634.90
+    }
+  ]
+}

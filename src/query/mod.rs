@@ -1,203 +1,135 @@
-use serde::Deserialize;
-use crate::prices::item_prices::PriceList;
-use crate::quotation::QuotationRequest;
+use crate::claude::{ClaudeAI, Query};
+use crate::communication::telegram::Response;
+use crate::configuration::{Context};
+use crate::core::Service;
+use crate::prices::PriceService;
+use crate::quotation::{QuotationService};
 use thiserror::Error;
-use crate::claude::{Query,parse_query};
+use crate::pdf::create_quotation_pdf;
+use chrono::{Datelike,Local};
+use rand::prelude::*;
 
 #[derive(Error, Debug)]
 pub enum QueryError {
     #[error("Failed to understand query: {0}")]
-    LLMError(String)
+    LLMError(String),
+
+    #[error("LLM initialization error: {0}")]
+    LLMInitializationError(String),
+
+    #[error("Quotation Service Initialization Error: {0}")]
+    QuotationServiceInitializationError(String),
+
+    #[error("Error getting metal price: {0}")]
+    MetalPricingError(String),
 }
 
-pub async fn get_query(query: &str) -> Result<Query, QueryError> {
-    let sample_response = r#"{
-  "GetQuotation": {
-    "items": [
-      {
-        "product": {
-          "Cable": {
-            "PowerControl": {
-              "LT": {
-                "conductor": "Copper",
-                "core_size": "4",
-                "sqmm": "95",
-                "armoured": true
-              }
+pub struct QueryFulfilment {
+    price_service: PriceService,
+    llm_service: ClaudeAI,
+    quotation_service: QuotationService,
+}
+
+impl QueryFulfilment {
+    pub async fn new(context: Context) -> Result<Self, QueryError> {
+        let price_service = PriceService::new(context.clone()).await;
+        let claude_ai = ClaudeAI::new(&context.config.claude.system_prompt)
+            .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
+        let quotation_service = QuotationService::new(context.config.pricelists.clone())
+            .map_err(|e| QueryError::QuotationServiceInitializationError(e.to_string()))?;
+        Ok(Self {
+            price_service,
+            llm_service: claude_ai,
+            quotation_service,
+        })
+    }
+
+    pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
+        let query = self.get_query_type(query).await?;
+        let response = match query {
+            Query::MetalPricing => {
+                let price_cu = self
+                    .price_service
+                    .fetch_price("copper")
+                    .await
+                    .map_err(|e| QueryError::MetalPricingError(e.to_string()))?;
+                let price_al = self
+                    .price_service
+                    .fetch_price("aluminium")
+                    .await
+                    .map_err(|e| QueryError::MetalPricingError(e.to_string()))?;
+                let response_text_cu = format!("Current Copper price : {:.2}", price_cu);
+                let response_text_al = format!("Current Aluminium price : {:.2}", price_al);
+                let response_text = format!("{}\n{}", response_text_cu, response_text_al);
+                Response {
+                    text: response_text,
+                    file: None,
+                }
             }
-          }
-        },
-        "brand": "KEI",
-        "tag": "latest",
-        "discount": 0,
-        "loading_frls": 0,
-        "loading_pvc": 0,
-        "quantity": 100
-      }
-    ],
-    "delivery_charges": 0
-  }
-}"#;
-    let system_prompt = "You are a query understanding agent for electrical items' related queries. User queries can be of 3 types as per following Rust type
-    #[derive(Debug, Deserialize)]
-    enum Query {
-        MetalPricing, // eg. send metal prices or send copper prices or find aluminum prices, get current mcx prices etc.
-        GetPriceList(PriceList), // eg. send current price list, give armoured cable price list
-        GetQuotation(QuotationRequest),
-        UnsupportedQuery
+            Query::GetQuotation(quotation_request) => {
+                let q_response = self.quotation_service.generate_quotation(quotation_request);
+                if q_response.is_none() {
+                    Response {
+                        text: "Cannot form quotation for this request".to_string(),
+                        file: None,
+                    }
+                } else {
+                    let date = Local::now().date_naive();
+                    let formatted_date = date.format("%Y%m%d").to_string();
+                    let quotation_response = q_response.unwrap();
+                    let mut random_gen = rand::rng();
+                    let random_q_num = random_gen.random_range(1000..=9999);
+                    let quotation_number = format!("Ref: Q-{}-{}", formatted_date, random_q_num);
+                    let now = Local::now();
+
+                    // Get day, month, and year
+                    let day = now.day();
+                    let month = now.format("%B"); // Full month name, e.g., "August"
+                    let year = now.year();
+
+                    // Determine the ordinal suffix for the day
+                    let suffix = match day {
+                        1 | 21 | 31 => "st",
+                        2 | 22 => "nd",
+                        3 | 23 => "rd",
+                        _ => "th",
+                    };
+
+                    // Format the date as a string
+                    let quotation_date = format!("{}{} {}, {}", day, suffix, month, year);
+                    let _ = create_quotation_pdf(
+                        &quotation_number,
+                        &quotation_date,
+                        &quotation_response,
+                        format!("{}.pdf",quotation_number).as_str(),
+                    )
+                    .unwrap();
+                    Response {
+                        text: "Quotation created for given enquiry".to_string(),
+                        file: Some(format!("{}.pdf",quotation_number))
+                    }
+                }
+            }
+            _ => Response {
+                text: "Cannot fulfil this request at the moment".to_string(),
+                file: None,
+            },
+        };
+        Ok(response)
     }
 
-    #[derive(Debug, Deserialize)]
-    pub struct QuoteItem {
-        pub product: Product,
-        pub brand: String, // default kei
-        pub tag: String, // default latest
-        pub discount: f32,     // in percentage eg. 0.70 means 70%, default 0
-        pub loading_frls: f32, // in percentage eg. 0.05 means 5%, default 0
-        pub loading_pvc: f32,  // in percentage eg. 0.05 means 5%, default 0
-        pub quantity: f32,
+    pub async fn get_query_type(&self, query: &str) -> Result<Query, QueryError> {
+        let query: Query = self
+            .llm_service
+            .parse_query(query)
+            .await
+            .map_err(|e| QueryError::LLMError(e.to_string()))?;
+        println!("parsed query successfully");
+        Ok(query)
     }
-
-    #[derive(Debug, Deserialize)]
-    pub struct QuotationRequest {
-        pub items: Vec<QuoteItem>,
-        pub delivery_charges: f32, // default 0
-    }
-
-    #[derive(Debug, Deserialize)]
-    pub struct PriceList {
-        brand: String,
-        tag: String
-    }
-    #[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
-    pub enum Product {
-        Cable(Cable),
-    }
-
-    #[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
-    pub enum Cable {
-        PowerControl(PowerControl),
-
-        Telephone {
-            pair_size: String,
-            conductor_mm: String,
-        },
-        Coaxial(CoaxialType),
-        Submersible {
-            core_size: String,
-            sqmm: String,
-        },
-        Solar {
-            solar_type: SolarType,
-            sqmm: String,
-        },
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    enum SolarType {
-        BS,
-        EN,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    enum CoaxialType {
-        RG6,
-        RG11,
-        RG59,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    pub enum PowerControl {
-        LT(LT),
-        HT(HT),
-        Flexible(Flexible),
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    pub struct LT {
-        pub conductor: Conductor,
-        pub core_size: String,
-        pub sqmm: String,
-        pub armoured: bool,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    pub struct HT {
-        pub conductor: Conductor,
-        pub voltage_grade: String,
-        pub core_size: String,
-        pub sqmm: String,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    struct Flexible {
-        core_size: String,
-        sqmm: String,
-        flexible_type: FlexibleType,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    enum FlexibleType {
-        FR,
-        FRLSH,
-        HRFR,
-    }
-
-    #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
-    pub enum Conductor {
-        Copper,
-        Aluminium,
-    }
-
-Quotation requests for armoured and unarmoured cables can include insulation type which can be either pvc or xlpe
-for armoured and unarmoured cables, default is xlpe and loading would be 0 in this case, if insulation is of type pvc then loading_pvc would be 5% (given as 0.05)
-for armoured and unarmoured cables, if cable is of type frls then loading_frls would be 3% represented as 0.03
-loading_pvc and loading_frls is ONLY applicable for armoured and unarmoured cables of types LT and HT- 
-User can either ask for metal prices, or ask for price lists or ask for quotations for electrical items. 
-You need to understand what the user wants and return your response as a JSON string that can be deserialized into the Query type. Do not return anything else in the response.
-If you cannot understand the request then use Unsupported query type
-Return ONLY the raw JSON object without any markdown formatting, code blocks, or explanations - Do not wrap the response in ```json blocks or any other formatting -
-Your entire response should be valid JSON that starts with { and ends with }
-Your response must be exactly one valid JSON object with no additional text, formatting, or explanations
-eg. ";
-    let prompt_with_sample = format!("{}{}", system_prompt, sample_response);
-    let query: Query = parse_query(&prompt_with_sample, query).await.map_err(|e| QueryError::LLMError(e.to_string()))?;
-    println!("parsed query successfully");
-    Ok(query)
 }
 
-// TODO - update prompt to include proper specific tags for each item type
-// search normalized sizes - handle float in size spec etc.
-// proper error message irrespective of original message
-// pdf formatting - done
-// dynamic quote no. and date - done
-// size of item field - done
-// pagination - done
-// sorting of items in quote - deferred
-// Salutation - thanks etc. - done
-// Rs. symbol - done
-// Delivery charges only if  > 0 - done
-// GST specify - done
-// no decimal in qty
-// exact 2 decimals in quote
-
-// just prices
-// type of response - text, pdf or both
-
-// quotation qty decimal, price decimal
-// item field, pagination, totals formatting, lines
-
-// what happens if program gets user message but faces an error while responding - will program get same message again ?
-
-// extra line in last row - done
-// no salution required on 2nd page - done
-// too much whitespace below table before splitting to next page - can accomodate more items - done
-// table should start earlier from 2nd page onwards - done
-// understand pdf generation code
-
-// decimals - done
-// normalized search
-// insert accepted tags - the tags act like selectors for price lists - for instance, user could specify 
+// insert accepted tags - the tags act like selectors for price lists - for instance, user could specify
 // give price for 3 c x 2.5 cu armd 100 M and 4 core x 2.5 cu armd 200 m - use feb 2025 price list and give disc 70%
 // then feb 2025 becomes the tag because it will help idetify which price list to use to get the base price internally
 // acceptable tags are given as follows

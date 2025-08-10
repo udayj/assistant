@@ -1,0 +1,5256 @@
+{
+  "brand": "KEI",
+  "tags": ["power cable pricelist", "latest", "march 2025", "kei latest"],
+  "prices": [
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 110.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 143.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 197.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 263.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 343.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 427.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 533.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 650.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 830.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1027.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "500",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1677.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "630",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2103.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "800",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2650.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "1000",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3313.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 77.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 97.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 133.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 173.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 227.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 293.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 400.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 540.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 710.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 883.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1103.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1340.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1710.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2113.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2787.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 93.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 117.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 163.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 217.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 317.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 420.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 570.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 787.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1030.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1287.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1620.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1970.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2533.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3133.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4120.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 110.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 140.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 207.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 280.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 380.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 483.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 667.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 917.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1207.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1527.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1847.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2310.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2940.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3643.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4797.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 417.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 550.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 760.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1037.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1717.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2133.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2620.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3353.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4170.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 5490.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 150.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 177.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 227.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 260.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 197.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 243.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 310.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 393.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 480.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 573.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 683.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 827.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1027.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1247.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1610.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "500",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1947.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "630",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2403.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "800",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2993.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "1",
+              "sqmm": "1000",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3650.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 167.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 197.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 253.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 283.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 283.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 470.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 623.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 800.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 980.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1193.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1453.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1830.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2247.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "2",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2937.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 190.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 227.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 303.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 383.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 490.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 650.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 877.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1130.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1393.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1720.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2100.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2667.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3280.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4270.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 450.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 567.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 747.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1010.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1313.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1653.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1970.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2447.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3080.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3807.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "3.5",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4943.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 490.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 633.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 847.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1140.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1463.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1823.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2247.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2757.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3493.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4317.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Aluminium",
+              "core_size": "4",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 5653.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 523.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 837.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1160.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1647.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2293.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2973.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3750.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4687.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 5770.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 7470.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 9327.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 12427.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "500",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 15520.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "630",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 19550.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "800",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 24807.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "1000",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 30993.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 300.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 430.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 690.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1060.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1613.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2233.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3170.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4417.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 5973.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 7530.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 9417.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 11590.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 15017.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 18747.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 24947.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 423.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 613.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 993.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1513.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2393.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3330.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4723.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 6600.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 8920.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 11250.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 14077.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 17333.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 22460.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 28047.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 37347.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "4",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 553.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "6",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 807.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "10",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1310.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "16",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2010.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2900.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3833.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 5510.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 7697.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 10490.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 13437.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 16247.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 20303.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 26200.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 32733.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 43160.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "25",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3187.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "35",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 4427.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "50",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 6297.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "70",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 8790.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "95",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 11897.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "120",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 15000.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "150",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 18747.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "185",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 23113.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "240",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 29940.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "300",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 37413.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "400",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 50093.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 363.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 493.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 753.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 587.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 897.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1220.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1703.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2343.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3120.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3910.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4853.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 5970.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 7693.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 9580.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 12727.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "500",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 15840.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "630",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 19907.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "800",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 25203.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "1",
+              "sqmm": "1000",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 31413.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1103.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1677.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2303.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3253.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4513.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 6080.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 7647.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 9533.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 11733.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 15177.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 18917.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 25150.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 480.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 660.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1040.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1553.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2470.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3410.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4820.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 6713.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 9047.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 11397.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 14227.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 17523.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 22650.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 28270.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 37630.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "4",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 608.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "6",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 855.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "10",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1350.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "16",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2020.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2983.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3930.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 5613.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 7817.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 10630.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 13603.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 16423.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 20507.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 26417.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 32993.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3.5",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 43620.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "25",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3277.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "35",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 4527.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "50",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 6417.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "70",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 8920.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "95",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 12040.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "120",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 15163.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "150",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 18930.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "185",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 23320.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "240",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 30170.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "300",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 37700.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "400",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 50377.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 133.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 197.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 180.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 277.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 233.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "5",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 297.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "5",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 460.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "6",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 343.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "6",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 537.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "7",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 393.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "7",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 617.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "8",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 447.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "8",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 707.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "10",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 550.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "10",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 873.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "12",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 653.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "12",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1040.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "14",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 753.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "14",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1207.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "16",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 857.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "16",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1383.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "19",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1007.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "19",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1630.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "24",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1280.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "24",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2053.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "27",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1427.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "27",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2297.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "30",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1580.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "30",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 2547.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "37",
+              "sqmm": "1.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 1937.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "37",
+              "sqmm": "2.5",
+              "armoured": false
+            }
+          }
+        }
+      },
+      "price": 3127.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 185.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "2",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 248.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 225.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "3",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 320.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 280.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "4",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 400.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "5",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 357.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "5",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 517.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "6",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 413.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "6",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 610.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "7",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 460.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "7",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 687.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "8",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 523.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "8",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 780.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "10",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 633.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "10",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 920.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "12",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 733.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "12",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1080.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "14",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 843.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "14",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1253.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "16",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 910.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "16",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1420.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "19",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1067.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "19",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1660.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "24",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1330.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "24",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2083.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "27",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1473.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "27",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2317.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "30",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1627.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "30",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 2563.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "37",
+              "sqmm": "1.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 1973.0
+    },
+    {
+      "product": {
+        "Cable": {
+          "PowerControl": {
+            "LT": {
+              "conductor": "Copper",
+              "core_size": "37",
+              "sqmm": "2.5",
+              "armoured": true
+            }
+          }
+        }
+      },
+      "price": 3133.0
+    }
+  ]
+}

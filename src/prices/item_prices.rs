@@ -65,7 +65,7 @@ pub enum SolarType {
 }
 
 impl Description for SolarType {
-    fn get_description(&self, extras: Vec<String>) -> String {
+    fn get_description(&self, _extras: Vec<String>) -> String {
         match self {
             Self::BS => "BS".to_string(),
             Self::EN => "EN".to_string(),
@@ -81,7 +81,7 @@ pub enum CoaxialType {
 }
 
 impl Description for CoaxialType {
-    fn get_description(&self, extras: Vec<String>) -> String {
+    fn get_description(&self, _extras: Vec<String>) -> String {
         match self {
             Self::RG6 => "RG6".to_string(),
             Self::RG11 => "RG11".to_string(),
@@ -229,11 +229,11 @@ pub enum FlexibleType {
     FR,
     FRLSH,
     HRFR,
-    ZHFR
+    ZHFR,
 }
 
 impl Description for FlexibleType {
-    fn get_description(&self, extras: Vec<String>) -> String {
+    fn get_description(&self, _extras: Vec<String>) -> String {
         match self {
             Self::FR => "FR".to_string(),
             Self::FRLSH => "FRLSH".to_string(),
@@ -250,7 +250,7 @@ pub enum Conductor {
 }
 
 impl Description for Conductor {
-    fn get_description(&self, extras: Vec<String>) -> String {
+    fn get_description(&self, _extras: Vec<String>) -> String {
         match self {
             Self::Aluminium => "Aluminium".to_string(),
             Self::Copper => "Copper".to_string(),
@@ -260,7 +260,6 @@ impl Description for Conductor {
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct PriceList {
-    brand: String,
     tags: Vec<String>,
     prices: Vec<Prices>,
 }
@@ -273,7 +272,7 @@ pub struct Prices {
 
 pub struct PricingSystem {
     tags: Vec<String>,
-    prices: HashMap<(Product), f32>,
+    prices: HashMap<Product, f32>,
 }
 
 // for a given user query we try to find the price list corresponding to required brand and matching tags

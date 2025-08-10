@@ -19,29 +19,41 @@ impl Error {
 
 #[async_trait]
 pub trait Service {
-    async fn new() -> Self;
+    type Context: Clone + Send;
+    async fn new(context: Self::Context) -> Self;
     async fn run(self) -> Result<(), Error>;
 }
 
-pub struct ServiceManager {
+pub struct ServiceManager<C> {
+    context: C,
     services: JoinSet<()>,
 }
 
-impl ServiceManager {
-    pub fn new() -> Self {
+impl<C> ServiceManager<C>
+where C: 'static + Clone + Send {
+    pub fn new(context: C) -> Self {
         Self {
+            context,
             services: JoinSet::new(),
         }
     }
 
-    pub fn spawn<T: Service>(&mut self) {
+    pub fn spawn<T: Service<Context = C>>(&mut self) {
+        let context = self.context.clone();
         self.services.spawn(async move {
             loop {
-                let service = T::new().await;
-                if let Err(err) = service.run().await {
+                let service = T::new(context.clone()).await;
+                if let Err(_) = service.run().await {
                     continue;
                 }
             }
         });
+    }
+
+    pub async fn wait(&mut self) -> Result<(), Error> {
+        if self.services.join_next().await.is_some() {
+            return Err(Error::new("Internal Service Error"));
+        }
+        Ok(())
     }
 }
