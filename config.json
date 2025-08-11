@@ -11,5 +11,8 @@
     },
     "claude" : {
         "system_prompt": "assets/claude/system_prompt.txt"
+    },
+    "telegram": {
+        "price_alert_subscribers": [2050924196]
     }
 }

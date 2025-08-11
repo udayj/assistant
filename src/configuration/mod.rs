@@ -16,6 +16,7 @@ pub struct Config {
     pub pricelists: Vec<PriceListConfig>,
     pub metal_pricing: MetalPricingConfig,
     pub claude: ClaudeConfig,
+    pub telegram: TelegramConfig
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -33,6 +34,11 @@ pub struct ClaudeConfig {
 pub struct PriceListConfig {
     pub pricelist: String,
     pub brand: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct TelegramConfig {
+    pub price_alert_subscribers: Vec<i64>,
 }
 
 #[derive(Debug, Clone)]

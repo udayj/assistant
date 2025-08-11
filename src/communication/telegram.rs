@@ -32,6 +32,7 @@ impl Service for TelegramService {
     async fn new(context: Context) -> Self {
         let query_fulfilment = QueryFulfilment::new(context.clone()).await.unwrap();
         let bot = Bot::from_env();
+
         Self {
             bot,
             query_fulfilment,
@@ -69,8 +70,8 @@ impl TelegramService {
                 },
                 "/help" => Response {
                     text:
-                        "Hello! I'm your Price Assistant. Send me your price / quotation queries."
-                            .to_string(),
+                        format!("Hello! I'm your Price Assistant {}. Send me your price / quotation queries.",chat_id)
+                            ,
                     file: None,
                 },
                 text => {

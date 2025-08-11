@@ -1,15 +1,21 @@
+use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
 use assistant::configuration::Context;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
 use assistant::AppError;
+use std::sync::Arc;
+use tokio::sync::{mpsc, Mutex};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
     let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
     let mut service_manager = ServiceManager::new(context);
-    service_manager.spawn::<PriceService>();
+    let (sender, receiver) = mpsc::channel::<String>(100);
+    let shared_receiver = Arc::new(Mutex::new(receiver));
     service_manager.spawn::<TelegramService>();
+    service_manager.spawn_with_price_receiver::<PriceAlertService>(shared_receiver);
+    service_manager.spawn_with_price_sender::<PriceService>(sender.clone());
 
     service_manager
         .wait()
@@ -19,7 +25,7 @@ async fn main() -> Result<(), AppError> {
 
 #[cfg(test)]
 mod tests {
-    
+
     use assistant::pdf::create_quotation_pdf;
     use assistant::prices::item_prices::{
         Cable, Conductor, Flexible, FlexibleType, PowerControl, Product, LT,

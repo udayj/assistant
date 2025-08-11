@@ -1,6 +1,6 @@
 use crate::configuration::Context;
 use crate::core::service_manager::Error as ServiceManagerError;
-use crate::core::Service;
+use crate::core::{service_manager::ServiceWithSender, Service};
 use async_trait::async_trait;
 use chrono::{Timelike, Utc};
 use chrono_tz::Asia::Kolkata;
@@ -9,6 +9,7 @@ use scraper::{Html, Selector};
 use std::thread;
 use std::time::Duration;
 use thiserror::Error;
+use tokio::sync::mpsc;
 
 pub mod item_prices;
 
@@ -37,6 +38,7 @@ pub enum PriceError {
 pub struct PriceService {
     pub url_al: String,
     pub url_cu: String,
+    pub price_channel: Option<mpsc::Sender<String>>,
 }
 
 #[async_trait]
@@ -46,27 +48,64 @@ impl Service for PriceService {
         Self {
             url_al: context.config.metal_pricing.al_url.to_string(),
             url_cu: context.config.metal_pricing.cu_url.to_string(),
+            price_channel: None,
         }
     }
 
     async fn run(self) -> Result<(), ServiceManagerError> {
+        println!("Task running on thread: {:?}", std::thread::current().id());
         loop {
             let now_ist = Utc::now().with_timezone(&Kolkata);
             let hour = now_ist.hour();
             let minute = now_ist.minute();
             println!("running service");
-            if (hour == 9 && minute == 30) || (hour == 15 && minute == 30) {
-                self.fetch_price("aluminium")
+            if (hour == 11 && minute == 50) || (hour == 15 && minute == 0) {
+                let price_al = self
+                    .fetch_price("aluminium")
                     .await
                     .map_err(|e| ServiceManagerError::from(e))?;
-                thread::sleep(Duration::from_secs(2));
-                self.fetch_price("copper")
-                    .await
-                    .map_err(|e| ServiceManagerError::from(e))?;
-            }
 
-            thread::sleep(Duration::from_secs(600));
+                thread::sleep(Duration::from_secs(2));
+
+                let price_cu = self
+                    .fetch_price("copper")
+                    .await
+                    .map_err(|e| ServiceManagerError::from(e))?;
+
+                if let Some(sender) = &self.price_channel {
+                    println!("found sender for broadcasting message");
+                    let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
+                    let message = format!("🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
+                        timestamp, price_cu, price_al);
+                    println!("message:{}", message);
+                    let e = sender.send(message).await;
+                    if e.is_err() {
+                        println!("Error:{}", e.err().unwrap());
+                    } else {
+                        println!("no error:");
+                    }
+                }
+            }
+            // always use tokio::time::sleep and not thread::sleep when there are other threads in the same tokio runtime
+            tokio::time::sleep(Duration::from_secs(600)).await;
         }
+    }
+}
+
+#[async_trait]
+impl ServiceWithSender for PriceService {
+    type Context = Context;
+
+    async fn new(context: Context, price_channel: Option<mpsc::Sender<String>>) -> Self {
+        Self {
+            url_al: context.config.metal_pricing.al_url.to_string(),
+            url_cu: context.config.metal_pricing.cu_url.to_string(),
+            price_channel,
+        }
+    }
+
+    async fn run(self) -> Result<(), ServiceManagerError> {
+        <Self as Service>::run(self).await
     }
 }
 
