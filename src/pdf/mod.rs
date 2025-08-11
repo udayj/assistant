@@ -193,7 +193,8 @@ fn add_header_to_page(
     img.add_to_layer(layer.clone(), transform);
 
     // Add quotation details
-    layer.use_text(quotation_number, 10.0, Mm(MARGIN_MM), Mm(220.0), font);
+    let quotation_reference = format!("Ref: {}", quotation_number);
+    layer.use_text(quotation_reference, 10.0, Mm(MARGIN_MM), Mm(220.0), font);
     layer.use_text(date, 10.0, Mm(157.0), Mm(220.0), font);
 
     layer.use_text(

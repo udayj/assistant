@@ -1,4 +1,5 @@
 use crate::configuration::Context;
+use crate::core::cache::ExpirableCache;
 use crate::core::service_manager::Error as ServiceManagerError;
 use crate::core::{service_manager::ServiceWithSender, Service};
 use async_trait::async_trait;
@@ -39,6 +40,7 @@ pub struct PriceService {
     pub url_al: String,
     pub url_cu: String,
     pub price_channel: Option<mpsc::Sender<String>>,
+    pub price_cache: ExpirableCache<String, f64>,
 }
 
 #[async_trait]
@@ -49,6 +51,7 @@ impl Service for PriceService {
             url_al: context.config.metal_pricing.al_url.to_string(),
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel: None,
+            price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
         }
     }
 
@@ -96,6 +99,7 @@ impl ServiceWithSender for PriceService {
             url_al: context.config.metal_pricing.al_url.to_string(),
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel,
+            price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
         }
     }
 
@@ -106,6 +110,11 @@ impl ServiceWithSender for PriceService {
 
 impl PriceService {
     pub async fn fetch_price(&self, metal: &str) -> Result<f64, PriceError> {
+        let price = self.price_cache.get(&metal.to_string());
+        if price.is_some() {
+            return Ok(price.unwrap());
+        }
+
         let client = reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         .build()
@@ -154,6 +163,7 @@ impl PriceService {
             .map_err(|_| PriceError::PriceParseError)?;
 
         println!("{} price is:{}", metal, price);
+        self.price_cache.insert(metal.to_string(), price);
         Ok(price)
     }
 

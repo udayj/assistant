@@ -72,7 +72,7 @@ impl QueryFulfilment {
                     let quotation_response = q_response.unwrap();
                     let mut random_gen = rand::rng();
                     let random_q_num = random_gen.random_range(1000..=9999);
-                    let quotation_number = format!("Ref: Q-{}-{}", formatted_date, random_q_num);
+                    let quotation_number = format!("Q-{}-{}", formatted_date, random_q_num);
                     let now = Local::now();
 
                     // Get day, month, and year

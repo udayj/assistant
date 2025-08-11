@@ -1,6 +1,7 @@
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::{configuration::Context, query::QueryFulfilment};
 use async_trait::async_trait;
+use std::fs;
 use std::sync::Arc;
 use teloxide::prelude::*;
 use teloxide::types::InputFile;
@@ -37,7 +38,7 @@ impl ServiceWithErrorSender for TelegramService {
         Self {
             bot,
             query_fulfilment,
-            error_sender
+            error_sender,
         }
     }
 
@@ -48,7 +49,12 @@ impl ServiceWithErrorSender for TelegramService {
             let query_fulfilment = Arc::clone(&query_fulfilment);
             let error_sender = Arc::clone(&error_sender);
             async move {
-                tokio::spawn(Self::handle_message(bot, msg, query_fulfilment, error_sender));
+                tokio::spawn(Self::handle_message(
+                    bot,
+                    msg,
+                    query_fulfilment,
+                    error_sender,
+                ));
                 respond(())
             }
         })
@@ -62,7 +68,7 @@ impl TelegramService {
         bot: Bot,
         msg: Message,
         query_fulfilment: Arc<QueryFulfilment>,
-        error_sender: Arc<mpsc::Sender<String>>
+        error_sender: Arc<mpsc::Sender<String>>,
     ) -> ResponseResult<()> {
         let chat_id = msg.chat.id;
         if let Some(text) = msg.text() {
@@ -74,30 +80,34 @@ impl TelegramService {
                     file: None,
                 },
                 "/help" => Response {
-                    text:
-                        format!("Hello! I'm your Price Assistant. Send me your price / quotation queries.")
-                            ,
+                    text: format!(
+                        "Hello! I'm your Price Assistant. Send me your price / quotation queries."
+                    ),
                     file: None,
                 },
-                text => {
-                    match query_fulfilment.fulfil_query(text).await {
-                        Ok(response) => response,
-                        Err(e) => {
-                            let error_msg = format!("❌ Query Failed\n\nQuery: {}\nError: {}", text, e);
-                            let _ = error_sender.send(error_msg).await;
-                            Response {
-                                text: "Faced error during request processing - please contact admin".to_string(),
-                                file: None,
-                            }
+                text => match query_fulfilment.fulfil_query(text).await {
+                    Ok(response) => response,
+                    Err(e) => {
+                        let error_msg = format!("❌ Query Failed\n\nQuery: {}\nError: {}", text, e);
+                        let _ = error_sender.send(error_msg).await;
+                        Response {
+                            text: "Faced error during request processing - please contact admin"
+                                .to_string(),
+                            file: None,
                         }
                     }
-                }
+                },
             };
 
             bot.send_message(chat_id, response.text).await?;
-            if response.file.is_some() {
-                bot.send_document(chat_id, InputFile::file(response.file.unwrap()))
+            if let Some(file_path) = response.file {
+                bot.send_document(chat_id, InputFile::file(&file_path))
                     .await?;
+
+                // Clean up the PDF file after successful send
+                if let Err(e) = fs::remove_file(&file_path) {
+                    println!("Warning: Failed to delete PDF file {}: {}", file_path, e);
+                }
             }
         } else if msg.photo().is_some() {
             bot.send_message(chat_id, "I am not able to process image requests right now")
