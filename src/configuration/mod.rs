@@ -39,6 +39,7 @@ pub struct PriceListConfig {
 #[derive(Debug, Deserialize, Clone)]
 pub struct TelegramConfig {
     pub price_alert_subscribers: Vec<i64>,
+    pub error_channel_id: i64,
 }
 
 #[derive(Debug, Clone)]

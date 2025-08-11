@@ -287,13 +287,13 @@ impl PricingSystem {
         }
 
         PricingSystem {
-            tags: price_list.tags,
+            tags: price_list.tags.iter().map(|tag| tag.trim().to_lowercase()).collect(),
             prices,
         }
     }
 
     pub fn get_price(&self, product: &Product, tag: &str) -> Option<f32> {
-        if self.tags.contains(&tag.to_string()) {
+        if self.tags.contains(&tag.to_string().trim().to_lowercase()) {
             self.prices.get(&product.clone()).copied()
         } else {
             None

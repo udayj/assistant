@@ -33,6 +33,13 @@ pub trait ServiceWithSender {
 }
 
 #[async_trait]
+pub trait ServiceWithErrorSender {
+    type Context: Clone + Send;
+    async fn new(context: Self::Context, sender: mpsc::Sender<String>) -> Self;
+    async fn run(self) -> Result<(), Error>;
+}
+
+#[async_trait]
 pub trait ServiceWithReceiver {
     type Context: Clone + Send;
     async fn new(
@@ -107,4 +114,36 @@ where
         }
         Ok(())
     }
+
+    pub fn spawn_with_error_sender<T: ServiceWithErrorSender<Context = C>>(
+        &mut self,
+        error_sender: mpsc::Sender<String>,
+    ) {
+        let context = self.context.clone();
+        self.services.spawn(async move {
+            loop {
+                let service = T::new(context.clone(), error_sender.clone()).await;
+                if let Err(_) = service.run().await {
+                    continue;
+                }
+            }
+        });
+    }
+
+    pub fn spawn_with_error_receiver<T: ServiceWithReceiver<Context = C>>(
+        &mut self,
+        receiver: Arc<Mutex<mpsc::Receiver<String>>>,
+    ) {
+        let context = self.context.clone();
+        self.services.spawn(async move {
+            loop {
+                let service = T::new(context.clone(), Some(receiver.clone())).await;
+                if let Err(e) = service.run().await {
+                    println!("Error:{}", e);
+                    break;
+                }
+            }
+        });
+    }
 }
+

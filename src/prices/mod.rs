@@ -53,12 +53,11 @@ impl Service for PriceService {
     }
 
     async fn run(self) -> Result<(), ServiceManagerError> {
-        println!("Task running on thread: {:?}", std::thread::current().id());
         loop {
             let now_ist = Utc::now().with_timezone(&Kolkata);
             let hour = now_ist.hour();
             let minute = now_ist.minute();
-            println!("running service");
+            println!("running price update service");
             if (hour == 11 && minute == 50) || (hour == 15 && minute == 0) {
                 let price_al = self
                     .fetch_price("aluminium")
@@ -73,16 +72,12 @@ impl Service for PriceService {
                     .map_err(|e| ServiceManagerError::from(e))?;
 
                 if let Some(sender) = &self.price_channel {
-                    println!("found sender for broadcasting message");
                     let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
                     let message = format!("🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
                         timestamp, price_cu, price_al);
-                    println!("message:{}", message);
                     let e = sender.send(message).await;
                     if e.is_err() {
                         println!("Error:{}", e.err().unwrap());
-                    } else {
-                        println!("no error:");
                     }
                 }
             }
@@ -160,5 +155,19 @@ impl PriceService {
 
         println!("{} price is:{}", metal, price);
         Ok(price)
+    }
+
+    pub async fn fetch_formatted_prices(&self) -> Result<String, PriceError> {
+        let price_cu = self.fetch_price("copper").await?;
+
+        let price_al = self.fetch_price("aluminium").await?;
+
+        let now_ist = Utc::now().with_timezone(&Kolkata);
+        let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
+        let message = format!(
+            "🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}",
+            timestamp, price_cu, price_al
+        );
+        Ok(message)
     }
 }

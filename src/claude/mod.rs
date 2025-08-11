@@ -50,7 +50,6 @@ impl ClaudeAI {
         let client = Client::new();
         // Cost per quotation = Rs.0.5 input + Rs.0.8 output for text queries with 10 items
         // Effective total cost per quotation = Rs.1.30 for file quotation
-        //println!("API KEY:{}", self.api_key);
         let response = client
             .post("https://api.anthropic.com/v1/messages")
             .header("x-api-key", self.api_key.clone())

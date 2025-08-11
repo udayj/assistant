@@ -1,5 +1,6 @@
 use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
+use assistant::communication::error_alert::ErrorAlertService;
 use assistant::configuration::Context;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
@@ -12,8 +13,12 @@ async fn main() -> Result<(), AppError> {
     let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
     let mut service_manager = ServiceManager::new(context);
     let (sender, receiver) = mpsc::channel::<String>(100);
+    let (error_sender, error_receiver) = mpsc::channel::<String>(100);
     let shared_receiver = Arc::new(Mutex::new(receiver));
-    service_manager.spawn::<TelegramService>();
+    let shared_error_receiver = Arc::new(Mutex::new(error_receiver));
+
+    service_manager.spawn_with_error_receiver::<ErrorAlertService>(shared_error_receiver);
+    service_manager.spawn_with_error_sender::<TelegramService>(error_sender);
     service_manager.spawn_with_price_receiver::<PriceAlertService>(shared_receiver);
     service_manager.spawn_with_price_sender::<PriceService>(sender.clone());
 

@@ -4,24 +4,29 @@ use async_trait::async_trait;
 use std::sync::Arc;
 use teloxide::prelude::*;
 use tokio::sync::{mpsc, Mutex};
+use dotenvy::dotenv;
+use std::env;
 
-pub struct PriceAlertService {
+pub struct ErrorAlertService {
     bot: Bot,
     receiver: Option<Arc<Mutex<mpsc::Receiver<String>>>>,
-    subscribers: Vec<i64>,
+    channel_id: i64,
 }
 
 #[async_trait]
-impl ServiceWithReceiver for PriceAlertService {
+impl ServiceWithReceiver for ErrorAlertService {
     type Context = Context;
 
     async fn new(context: Context, receiver: Option<Arc<Mutex<mpsc::Receiver<String>>>>) -> Self {
-        let bot = Bot::from_env();
-        let subscribers = context.config.telegram.price_alert_subscribers.clone();
+        dotenv().ok();
+        let error_bot_token = env::var("ERROR_BOT_TOKEN").expect("ERROR_BOT_TOKEN not found");
+        let bot = Bot::new(error_bot_token);
+        let channel_id = context.config.telegram.error_channel_id;
+        
         Self {
             bot,
             receiver,
-            subscribers,
+            channel_id,
         }
     }
 
@@ -29,13 +34,10 @@ impl ServiceWithReceiver for PriceAlertService {
         if let Some(receiver) = &self.receiver {
             loop {
                 let mut rx = receiver.lock().await;
-                if let Some(price_message) = rx.recv().await {
-                    drop(rx); // Release lock before sending messages
-                    for &chat_id in &self.subscribers {
-                        if let Err(e) = self.bot.send_message(ChatId(chat_id), &price_message).await
-                        {
-                            println!("Failed to send price alert to {}: {}", chat_id, e);
-                        }
+                if let Some(error_message) = rx.recv().await {
+                    drop(rx);
+                    if let Err(e) = self.bot.send_message(ChatId(self.channel_id), &error_message).await {
+                        println!("Failed to send error alert: {}", e);
                     }
                 }
             }

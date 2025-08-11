@@ -3,7 +3,16 @@
         {
             "pricelist":"assets/processed_pricelists/kei_armoured_lt.json",
             "brand":"kei"
+        },
+        {
+            "pricelist":"assets/processed_pricelists/kei_multicore.json",
+            "brand":"kei"
+        },
+        {
+            "pricelist":"assets/processed_pricelists/kei_single_core.json",
+            "brand":"kei"
         }
+
     ],
     "metal_pricing" : {
         "al_url":"https://www.5paisa.com/commodity-trading/mcx-aluminium-price",
@@ -13,6 +22,7 @@
         "system_prompt": "assets/claude/system_prompt.txt"
     },
     "telegram": {
-        "price_alert_subscribers": [2050924196]
+        "price_alert_subscribers": [2050924196],
+        "error_channel_id": 2050924196
     }
 }

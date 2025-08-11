@@ -1,13 +1,13 @@
 use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
-use crate::configuration::{Context};
+use crate::configuration::Context;
 use crate::core::Service;
-use crate::prices::PriceService;
-use crate::quotation::{QuotationService};
-use thiserror::Error;
 use crate::pdf::create_quotation_pdf;
-use chrono::{Datelike,Local};
+use crate::prices::PriceService;
+use crate::quotation::QuotationService;
+use chrono::{Datelike, Local};
 use rand::prelude::*;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum QueryError {
@@ -22,6 +22,9 @@ pub enum QueryError {
 
     #[error("Error getting metal price: {0}")]
     MetalPricingError(String),
+
+    #[error("Quotation Formation Error")]
+    QuotationServiceError
 }
 
 pub struct QueryFulfilment {
@@ -48,31 +51,21 @@ impl QueryFulfilment {
         let query = self.get_query_type(query).await?;
         let response = match query {
             Query::MetalPricing => {
-                let price_cu = self
+                let response_text = self
                     .price_service
-                    .fetch_price("copper")
+                    .fetch_formatted_prices()
                     .await
                     .map_err(|e| QueryError::MetalPricingError(e.to_string()))?;
-                let price_al = self
-                    .price_service
-                    .fetch_price("aluminium")
-                    .await
-                    .map_err(|e| QueryError::MetalPricingError(e.to_string()))?;
-                let response_text_cu = format!("Current Copper price : {:.2}", price_cu);
-                let response_text_al = format!("Current Aluminium price : {:.2}", price_al);
-                let response_text = format!("{}\n{}", response_text_cu, response_text_al);
                 Response {
                     text: response_text,
                     file: None,
                 }
             }
+
             Query::GetQuotation(quotation_request) => {
                 let q_response = self.quotation_service.generate_quotation(quotation_request);
                 if q_response.is_none() {
-                    Response {
-                        text: "Cannot form quotation for this request".to_string(),
-                        file: None,
-                    }
+                    return Err(QueryError::QuotationServiceError);
                 } else {
                     let date = Local::now().date_naive();
                     let formatted_date = date.format("%Y%m%d").to_string();
@@ -101,12 +94,12 @@ impl QueryFulfilment {
                         &quotation_number,
                         &quotation_date,
                         &quotation_response,
-                        format!("{}.pdf",quotation_number).as_str(),
+                        format!("{}.pdf", quotation_number).as_str(),
                     )
                     .unwrap();
                     Response {
                         text: "Quotation created for given enquiry".to_string(),
-                        file: Some(format!("{}.pdf",quotation_number))
+                        file: Some(format!("{}.pdf", quotation_number)),
                     }
                 }
             }
