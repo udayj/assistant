@@ -1,7 +1,8 @@
+use assistant::communication::error_alert::ErrorAlertService;
 use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
-use assistant::communication::error_alert::ErrorAlertService;
 use assistant::configuration::Context;
+use assistant::core::health_check::start_health_server;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
 use assistant::AppError;
@@ -10,6 +11,9 @@ use tokio::sync::{mpsc, Mutex};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
+    // Health check for running on DO
+    tokio::spawn(start_health_server());
+
     let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
     let mut service_manager = ServiceManager::new(context);
     let (sender, receiver) = mpsc::channel::<String>(100);
