@@ -3,11 +3,10 @@ use crate::core::cache::ExpirableCache;
 use crate::core::service_manager::Error as ServiceManagerError;
 use crate::core::{service_manager::ServiceWithSender, Service};
 use async_trait::async_trait;
-use chrono::{Timelike, Utc};
+use chrono::{Timelike, Utc, DateTime};
 use chrono_tz::Asia::Kolkata;
 use reqwest;
 use scraper::{Html, Selector};
-use std::thread;
 use std::time::Duration;
 use thiserror::Error;
 use tokio::sync::mpsc;
@@ -34,13 +33,13 @@ pub enum PriceError {
     #[error("Failed to parse Price")]
     PriceParseError,
 }
-// read url, time to check for executing price fetching from config
-// caching of previous prices in memory with timestamp - cache for 10 minutes
+
 pub struct PriceService {
     pub url_al: String,
     pub url_cu: String,
     pub price_channel: Option<mpsc::Sender<String>>,
     pub price_cache: ExpirableCache<String, f64>,
+    pub last_alert_hour: Option<u32>
 }
 
 #[async_trait]
@@ -52,40 +51,41 @@ impl Service for PriceService {
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel: None,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
+            last_alert_hour: None
         }
     }
 
-    async fn run(self) -> Result<(), ServiceManagerError> {
+    async fn run(mut self) -> Result<(), ServiceManagerError> {
         loop {
             let now_ist = Utc::now().with_timezone(&Kolkata);
             let hour = now_ist.hour();
             let minute = now_ist.minute();
-            println!("running price update service");
-            if (hour == 11 && minute == 50) || (hour == 15 && minute == 0) {
-                let price_al = self
-                    .fetch_price("aluminium")
-                    .await
-                    .map_err(|e| ServiceManagerError::from(e))?;
+            
+            // Check if we're in a valid time window and haven't sent alert this hour
+            let should_send_alert = match hour {
+                11 if minute >= 50 && minute <= 52 => {
+                    self.last_alert_hour != Some(11)
+                }
+                15 if minute <= 10 => {
+                    self.last_alert_hour != Some(15)
+                }
+                _ => false,
+            };
 
-                thread::sleep(Duration::from_secs(2));
-
-                let price_cu = self
-                    .fetch_price("copper")
-                    .await
-                    .map_err(|e| ServiceManagerError::from(e))?;
-
-                if let Some(sender) = &self.price_channel {
-                    let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
-                    let message = format!("🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
-                        timestamp, price_cu, price_al);
-                    let e = sender.send(message).await;
-                    if e.is_err() {
-                        println!("Error:{}", e.err().unwrap());
+            if should_send_alert {
+                match self.send_price_alert(now_ist).await {
+                    Ok(_) => {
+                        self.last_alert_hour = Some(hour);
+                        println!("Price alert sent successfully at {}:{:02}", hour, minute);
+                    }
+                    Err(e) => {
+                        println!("Failed to send price alert: {}", e);
+                        // Continue running even if alert fails
                     }
                 }
             }
-            // always use tokio::time::sleep and not thread::sleep when there are other threads in the same tokio runtime
-            tokio::time::sleep(Duration::from_secs(600)).await;
+
+            tokio::time::sleep(Duration::from_secs(60)).await;
         }
     }
 }
@@ -100,6 +100,7 @@ impl ServiceWithSender for PriceService {
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
+            last_alert_hour: None
         }
     }
 
@@ -109,6 +110,32 @@ impl ServiceWithSender for PriceService {
 }
 
 impl PriceService {
+
+    async fn send_price_alert(&self, now_ist: DateTime<chrono_tz::Tz>) -> Result<(), ServiceManagerError> {
+        let price_al = self
+            .fetch_price("aluminium")
+            .await
+            .map_err(|e| ServiceManagerError::from(e))?;
+
+        tokio::time::sleep(Duration::from_secs(2)).await;
+
+        let price_cu = self
+            .fetch_price("copper")
+            .await
+            .map_err(|e| ServiceManagerError::from(e))?;
+
+        if let Some(sender) = &self.price_channel {
+            let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
+            let message = format!(
+                "🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
+                timestamp, price_cu, price_al
+            );
+            sender.send(message).await
+                .map_err(|e| ServiceManagerError::new(&format!("Failed to send price alert: {}", e)))?;
+        }
+        Ok(())
+    }
+
     pub async fn fetch_price(&self, metal: &str) -> Result<f64, PriceError> {
         let price = self.price_cache.get(&metal.to_string());
         if price.is_some() {
@@ -169,7 +196,7 @@ impl PriceService {
 
     pub async fn fetch_formatted_prices(&self) -> Result<String, PriceError> {
         let price_cu = self.fetch_price("copper").await?;
-
+        tokio::time::sleep(Duration::from_secs(2)).await;
         let price_al = self.fetch_price("aluminium").await?;
 
         let now_ist = Utc::now().with_timezone(&Kolkata);
