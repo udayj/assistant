@@ -287,7 +287,11 @@ impl PricingSystem {
         }
 
         PricingSystem {
-            tags: price_list.tags.iter().map(|tag| tag.trim().to_lowercase()).collect(),
+            tags: price_list
+                .tags
+                .iter()
+                .map(|tag| tag.trim().to_lowercase())
+                .collect(),
             prices,
         }
     }
@@ -299,4 +303,30 @@ impl PricingSystem {
             None
         }
     }
+}
+
+#[cfg(test)]
+mod pricelist_tests {
+    use crate::prices::item_prices::PriceList;
+    use std::fs;
+    use std::path::Path;
+
+    #[test]
+    fn test_pricelist_deserialization() {
+        let test_cases = vec!["assets/processed_pricelists/polycab_flexible_cables.json"];
+        for pricelist_path in test_cases {
+            let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(pricelist_path);
+            let json_content = fs::read_to_string(path)
+                .unwrap_or_else(|_| panic!("Failed to read file: {}", pricelist_path));
+
+            let pricelist: PriceList = serde_json::from_str(&json_content)
+                .unwrap_or_else(|e| panic!("Failed to deserialize {}: {}", pricelist_path, e));
+
+            println!("✅ Successfully deserialized: {}", pricelist_path);
+
+            // Basic validation
+            assert!(!pricelist.tags.is_empty(), "Tags should not be empty");
+            assert!(!pricelist.prices.is_empty(), "Prices should not be empty");
+        }
+    }   
 }

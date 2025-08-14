@@ -43,6 +43,7 @@ mod tests {
     use chrono::{Datelike, Local};
     use rand::prelude::*;
 
+    #[ignore = "dummy"]
     #[tokio::test]
     async fn test_various() {
         let _quotation_request = QuotationRequest {

@@ -84,7 +84,7 @@ impl QuotationService {
         for item in request.items {
             println!("processing:{:#?}", item);
             let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
-            println!("found price:{} for item:{:#?}", listed_price, item);
+            println!("found price:{}", listed_price);
             let mut price = listed_price
                 * (1.0 - item.discount)
                 * (1.0 + item.loading_frls)

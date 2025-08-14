@@ -56,6 +56,7 @@ impl ClaudeAI {
             .header("anthropic-version", "2023-06-01")
             .json(&json!({
                 "model": "claude-sonnet-4-20250514",
+                "temperature": 0.0,
                 "system": self.system_prompt.as_str(),
                 "max_tokens": 10240,
                 "messages": [{

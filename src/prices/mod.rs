@@ -66,7 +66,7 @@ impl Service for PriceService {
                 11 if minute >= 50 && minute <= 52 => {
                     self.last_alert_hour != Some(11)
                 }
-                15 if minute <= 10 => {
+                15 if minute>=7 && minute <= 10 => {
                     self.last_alert_hour != Some(15)
                 }
                 _ => false,
@@ -125,9 +125,9 @@ impl PriceService {
             .map_err(|e| ServiceManagerError::from(e))?;
 
         if let Some(sender) = &self.price_channel {
-            let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
+            let timestamp = now_ist.format("%d/%m/%Y %I:%M %p");
             let message = format!(
-                "🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
+                "🔔 Metal Price Update\n  {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
                 timestamp, price_cu, price_al
             );
             sender.send(message).await

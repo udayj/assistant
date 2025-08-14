@@ -121,12 +121,3 @@ impl QueryFulfilment {
         Ok(query)
     }
 }
-
-// insert accepted tags - the tags act like selectors for price lists - for instance, user could specify
-// give price for 3 c x 2.5 cu armd 100 M and 4 core x 2.5 cu armd 200 m - use feb 2025 price list and give disc 70%
-// then feb 2025 becomes the tag because it will help idetify which price list to use to get the base price internally
-// acceptable tags are given as follows
-// the sizes of cables should not have trailing 0s in the value for instance, 3.5 Core should not be written as 3.50
-// similarly 4 core should not be written as 4.0
-// however, 0.75 sq. mm can be written with 1 leading decimal
-// use claude itself to make the prompt clear

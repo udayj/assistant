@@ -11,6 +11,10 @@
         {
             "pricelist":"assets/processed_pricelists/kei_single_core.json",
             "brand":"kei"
+        },
+        {
+            "pricelist":"assets/processed_pricelists/polycab_flexible_cables.json",
+            "brand":"polycab"
         }
 
     ],
