@@ -3,6 +3,7 @@ use crate::communication::telegram::Response;
 use crate::configuration::Context;
 use crate::core::Service;
 use crate::pdf::create_quotation_pdf;
+use crate::prices::price_list::PriceListService;
 use crate::prices::PriceService;
 use crate::quotation::QuotationService;
 use chrono::{Datelike, Local};
@@ -24,13 +25,17 @@ pub enum QueryError {
     MetalPricingError(String),
 
     #[error("Quotation Formation Error")]
-    QuotationServiceError
+    QuotationServiceError,
+
+    #[error("PriceList Service Initialization Error: {0}")]
+    PriceListServiceInitializationError(String),
 }
 
 pub struct QueryFulfilment {
     price_service: PriceService,
     llm_service: ClaudeAI,
     quotation_service: QuotationService,
+    pricelist_service: PriceListService,
 }
 
 impl QueryFulfilment {
@@ -40,16 +45,32 @@ impl QueryFulfilment {
             .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
         let quotation_service = QuotationService::new(context.config.pricelists.clone())
             .map_err(|e| QueryError::QuotationServiceInitializationError(e.to_string()))?;
+        let pricelist_service = PriceListService::new(context.config.pdf_pricelists)
+            .map_err(|e| QueryError::PriceListServiceInitializationError(e.to_string()))?;
         Ok(Self {
             price_service,
             llm_service: claude_ai,
             quotation_service,
+            pricelist_service,
         })
     }
 
     pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
         let query = self.get_query_type(query).await?;
         let response = match query {
+            Query::GetPriceList { brand, tags } => {
+                match self.pricelist_service.find_pricelist(&brand, &tags) {
+                    Some(pdf_path) => Response {
+                        text: "Pricelist".to_string(),
+                        file: Some(pdf_path),
+                    },
+                    None => Response {
+                        text: "No matching pricelist found".to_string(),
+                        file: None,
+                    },
+                }
+            }
+
             Query::MetalPricing => {
                 let response_text = self
                     .price_service
@@ -99,7 +120,7 @@ impl QueryFulfilment {
                     .unwrap();
                     Response {
                         text: "Quotation created for given enquiry".to_string(),
-                        file: Some(format!("{}.pdf", quotation_number)),
+                        file: Some(format!("artifacts/{}.pdf", quotation_number)),
                     }
                 }
             }

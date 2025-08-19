@@ -1,32 +1,135 @@
 {
-    "pricelists" :[
+    "pricelists": [
         {
-            "pricelist":"assets/processed_pricelists/kei_armoured_lt.json",
-            "brand":"kei"
+            "pricelist": "assets/processed_pricelists/kei_armoured_lt.json",
+            "brand": "kei"
         },
         {
-            "pricelist":"assets/processed_pricelists/kei_multicore.json",
-            "brand":"kei"
+            "pricelist": "assets/processed_pricelists/kei_multicore.json",
+            "brand": "kei"
         },
         {
-            "pricelist":"assets/processed_pricelists/kei_single_core.json",
-            "brand":"kei"
+            "pricelist": "assets/processed_pricelists/kei_single_core.json",
+            "brand": "kei"
         },
         {
-            "pricelist":"assets/processed_pricelists/polycab_flexible_cables.json",
-            "brand":"polycab"
+            "pricelist": "assets/processed_pricelists/polycab_flexible_cables.json",
+            "brand": "polycab"
         }
-
     ],
-    "metal_pricing" : {
-        "al_url":"https://www.5paisa.com/commodity-trading/mcx-aluminium-price",
-        "cu_url":"https://www.5paisa.com/commodity-trading/mcx-copper-price"
+    "pdf_pricelists": [
+        {
+            "pdf_path": "assets/pricelists/KEI Cable LP - Mar 25.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest armoured",
+                "current cable",
+                "march 2025 armoured",
+                "latest cable",
+                "latest armoured cable",
+                "current cable",
+                "march2025 cable",
+                "latest ht",
+                "march armoured cable"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/KEI LDC - SC Flx List Price - 3rd Jul 2025.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest single core",
+                "latest wires",
+                "current wires",
+                "latest fr wires",
+                "july 2025 wires"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/KEI LDC - MC Flx List Price - 3rd Jul 2025.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest multi core",
+                "latest flexibles",
+                "latest flexible",
+                "current flexible",
+                "latest fr flexible",
+                "current flexible cable",
+                "july 2025 flexible"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/KEI LDC - 3C Flat List Price - 3rd Jul 2025.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest submersible",
+                "current submersible",
+                "current flat",
+                "latest flat",
+                "july 2025 submersible"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/KEI Communication Cable LP - 3rd Jul 2025.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest communication",
+                "latest cat6",
+                "latest telephone",
+                "latest coaxial",
+                "current cat6",
+                "latest telephone cable",
+                "july 2025 cat6"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/PV Solar Cable LP - 3rd Jul 2025.pdf",
+            "brand": "kei",
+            "tags": [
+                "latest solar",
+                "current solar",
+                "july 2025 solar",
+                "july 2025 solar cables"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/LDC LP No 03 Dtd 24th June 2025_250624_163556.pdf",
+            "brand": "polycab",
+            "tags": [
+                "latest single core",
+                "latest multicore",
+                "latest flexible cable",
+                "june 2025 flexible cable",
+                "current flexible"
+            ]
+        },
+        {
+            "pdf_path": "assets/pricelists/PCC LP No. 06 Dtd 24th February 2025.pdf",
+            "brand": "polycab",
+            "tags": [
+                "latest armoured cable",
+                "latest armoured",
+                "latest lt",
+                "feb 2025 cable",
+                "feb 2025 armoured cable",
+                "feb armoured",
+                "current ht",
+                "latest ht",
+                "current armoured",
+                "current cable"
+            ]
+        }
+    ],
+    "metal_pricing": {
+        "al_url": "https://www.5paisa.com/commodity-trading/mcx-aluminium-price",
+        "cu_url": "https://www.5paisa.com/commodity-trading/mcx-copper-price"
     },
-    "claude" : {
+    "claude": {
         "system_prompt": "assets/claude/system_prompt.txt"
     },
     "telegram": {
-        "price_alert_subscribers": [2050924196],
+        "price_alert_subscribers": [
+            2050924196
+        ],
         "error_channel_id": 2050924196
     },
     "whatsapp": {

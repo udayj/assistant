@@ -13,6 +13,7 @@ use tokio::sync::mpsc;
 
 pub mod item_prices;
 pub mod utils;
+pub mod price_list;
 
 #[derive(Error, Debug)]
 pub enum PriceError {

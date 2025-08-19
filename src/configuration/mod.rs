@@ -14,6 +14,7 @@ pub enum ConfigError {
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub pricelists: Vec<PriceListConfig>,
+    pub pdf_pricelists: Vec<PdfPriceListConfig>,
     pub metal_pricing: MetalPricingConfig,
     pub claude: ClaudeConfig,
     pub telegram: TelegramConfig,
@@ -36,6 +37,14 @@ pub struct PriceListConfig {
     pub pricelist: String,
     pub brand: String,
 }
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct PdfPriceListConfig {
+    pub pdf_path: String,
+    pub brand: String,
+    pub tags: Vec<String>,
+}
+
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct TelegramConfig {

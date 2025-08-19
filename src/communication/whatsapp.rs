@@ -118,7 +118,7 @@ async fn serve_file(
     State(state): State<AppState>,
     Path(filename): Path<String>,
 ) -> Result<Response<Body>, StatusCode> {
-    let file_path = format!("artifacts/{}", filename);
+    let file_path = format!("{}", filename);
     match tokio::fs::read(&file_path).await {
         Ok(contents) => Ok(Response::builder()
             .status(StatusCode::OK)

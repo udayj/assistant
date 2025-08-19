@@ -1,4 +1,3 @@
-use crate::prices::item_prices::PriceList;
 use crate::quotation::QuotationRequest;
 use dotenvy::dotenv;
 use reqwest::Client;
@@ -11,9 +10,17 @@ use thiserror::Error;
 #[derive(Debug, Deserialize)]
 pub enum Query {
     MetalPricing,
-    GetPriceList(PriceList),
+    GetPriceList {
+        #[serde(default = "default_brand")]
+        brand: String,
+        tags: Vec<String>,
+    },
     GetQuotation(QuotationRequest),
     UnsupportedQuery,
+}
+
+fn default_brand() -> String {
+    "kei".to_string()
 }
 
 #[derive(Error, Debug)]
@@ -31,7 +38,7 @@ pub enum LLMError {
 #[derive(Debug)]
 pub struct ClaudeAI {
     system_prompt: String,
-    api_key: String
+    api_key: String,
 }
 
 impl ClaudeAI {
@@ -42,7 +49,7 @@ impl ClaudeAI {
         let api_key = env::var("ANTHROPIC_API_KEY").map_err(|_| LLMError::EnvError)?;
         Ok(Self {
             system_prompt: prompt,
-            api_key
+            api_key,
         })
     }
 

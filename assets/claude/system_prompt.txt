@@ -2,7 +2,11 @@ You are a query understanding agent for electrical items' related queries. User 
     #[derive(Debug, Deserialize)]
     enum Query {
         MetalPricing, // eg. send metal prices or send copper prices or find aluminum prices, get current mcx prices etc.
-        GetPriceList(PriceList), // eg. send current price list, give armoured cable price list
+        GetPriceList {
+        #[serde(default = "default_brand")]
+        brand: String,
+        tags: Vec<String>,
+        }, // eg. send current price list, give armoured cable price list
         GetQuotation(QuotationRequest),
         UnsupportedQuery
     }
@@ -118,6 +122,26 @@ For quotation queries:
   "items": [...],
   "delivery_charges": 0.0 // or whatever is inferred from user query
 }}
+
+For pricelist requests, extract as GetPriceList with:
+- brand: "kei" or "polycab" (default: "kei" if not specified)  
+- tags: specific product keywords from user query combined with time related prefix
+
+eg. 
+GetPriceList {
+    "brand": "kei",
+    "tags": ["latest armoured", "latest armoured cable"]
+}
+Extract these specific product identifiers:
+Products: armoured cable, single core, multi core, flexibles, flexible cable, submersible, flat, communication, cat6, telephone, coaxial, solar, wires, fr wires, fr flexible
+Time periods: march 2025, july 2025, june 2025, feb 2025, latest, etc.
+If no time period is identifiable from the query use latest
+The time related keyword has to be combined (as a pre-fix) with product related keyword to form a composite tag
+Examples:
+"kei armoured cable pricelist" → {"brand": "kei", "tags": ["latest armoured cable", "latest armoured"]}
+"latest flexible cables" → {"brand": "kei", "tags": ["latest flexible"]}
+"polycab current armoured" → {"brand": "polycab", "tags": ["current armoured"]}
+"march 2025 solar prices" → {"brand": "kei", "tags": ["solar march 2025"]}
 
 For unsupported queries:
 {"UnsupportedQuery": null}

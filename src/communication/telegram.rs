@@ -101,12 +101,11 @@ impl TelegramService {
 
             bot.send_message(chat_id, response.text).await?;
             if let Some(file_path) = response.file {
-                let full_filepath = format!("artifacts/{}", file_path);
-                bot.send_document(chat_id, InputFile::file(&full_filepath))
+                bot.send_document(chat_id, InputFile::file(&file_path))
                     .await?;
 
                 // Clean up the PDF file after successful send
-                if let Err(e) = fs::remove_file(&full_filepath) {
+                if let Err(e) = fs::remove_file(&file_path) {
                     println!("Warning: Failed to delete PDF file {}: {}", file_path, e);
                 }
             }
