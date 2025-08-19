@@ -12,6 +12,7 @@ use thiserror::Error;
 use tokio::sync::mpsc;
 
 pub mod item_prices;
+pub mod utils;
 
 #[derive(Error, Debug)]
 pub enum PriceError {
