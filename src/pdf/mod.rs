@@ -137,7 +137,8 @@ pub fn create_quotation_pdf(
     );
 
     // Save PDF
-    doc.save(&mut BufWriter::new(File::create(filename)?))?;
+    let full_filename = format!("artifacts/{}", filename);
+    doc.save(&mut BufWriter::new(File::create(full_filename)?))?;
     Ok(())
 }
 

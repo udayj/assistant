@@ -1307,7 +1307,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "2",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1321,7 +1321,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "3",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1335,7 +1335,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "4",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1349,7 +1349,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "5",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1363,7 +1363,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "6",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1377,7 +1377,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "7",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1391,7 +1391,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "10",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1405,7 +1405,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "12",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1419,7 +1419,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "14",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1433,7 +1433,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "16",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1447,7 +1447,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "19",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1461,7 +1461,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "24",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "FRLSH"
             }
           }
@@ -1643,7 +1643,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "2",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1657,7 +1657,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "3",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1671,7 +1671,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "4",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1685,7 +1685,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "5",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1699,7 +1699,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "6",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1713,7 +1713,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "7",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1727,7 +1727,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "10",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1741,7 +1741,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "12",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1755,7 +1755,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "14",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1769,7 +1769,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "16",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1783,7 +1783,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "19",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -1797,7 +1797,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "24",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "FRLSH"
             }
           }
@@ -2595,7 +2595,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "2",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2609,7 +2609,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "3",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2623,7 +2623,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "4",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2637,7 +2637,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "5",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2651,7 +2651,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "6",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2665,7 +2665,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "7",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2679,7 +2679,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "10",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2693,7 +2693,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "12",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2707,7 +2707,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "14",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2721,7 +2721,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "16",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2735,7 +2735,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "19",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2749,7 +2749,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "24",
-              "sqmm": "0.50",
+              "sqmm": "0.5",
               "flexible_type": "ZHFR"
             }
           }
@@ -2931,7 +2931,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "2",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -2945,7 +2945,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "3",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -2959,7 +2959,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "4",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -2973,7 +2973,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "5",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -2987,7 +2987,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "6",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3001,7 +3001,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "7",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3015,7 +3015,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "10",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3029,7 +3029,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "12",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3043,7 +3043,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "14",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3057,7 +3057,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "16",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3071,7 +3071,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "19",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
@@ -3085,7 +3085,7 @@
           "PowerControl": {
             "Flexible": {
               "core_size": "24",
-              "sqmm": "1.00",
+              "sqmm": "1",
               "flexible_type": "ZHFR"
             }
           }
