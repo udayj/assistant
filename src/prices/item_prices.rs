@@ -1,3 +1,4 @@
+use crate::prices::utils::normalize_decimal;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -258,6 +259,80 @@ impl Description for Conductor {
     }
 }
 
+impl Product {
+    fn normalize(&self) -> Self {
+        match self {
+            Product::Cable(cable) => Product::Cable(cable.normalize()),
+        }
+    }
+}
+
+impl Cable {
+    fn normalize(&self) -> Self {
+        match self {
+            Cable::PowerControl(pc) => Cable::PowerControl(pc.normalize()),
+            Cable::Telephone {
+                pair_size,
+                conductor_mm,
+            } => Cable::Telephone {
+                pair_size: normalize_decimal(pair_size),
+                conductor_mm: normalize_decimal(conductor_mm),
+            },
+            Cable::Submersible { core_size, sqmm } => Cable::Submersible {
+                core_size: normalize_decimal(core_size),
+                sqmm: normalize_decimal(sqmm),
+            },
+            Cable::Solar { solar_type, sqmm } => Cable::Solar {
+                solar_type: solar_type.clone(),
+                sqmm: normalize_decimal(sqmm),
+            },
+            Cable::Coaxial(coaxial_type) => Cable::Coaxial(coaxial_type.clone()),
+        }
+    }
+}
+
+impl PowerControl {
+    fn normalize(&self) -> Self {
+        match self {
+            PowerControl::LT(lt) => PowerControl::LT(lt.normalize()),
+            PowerControl::HT(ht) => PowerControl::HT(ht.normalize()),
+            PowerControl::Flexible(flex) => PowerControl::Flexible(flex.normalize()),
+        }
+    }
+}
+
+impl LT {
+    fn normalize(&self) -> Self {
+        LT {
+            conductor: self.conductor.clone(),
+            core_size: normalize_decimal(&self.core_size),
+            sqmm: normalize_decimal(&self.sqmm),
+            armoured: self.armoured,
+        }
+    }
+}
+
+impl HT {
+    fn normalize(&self) -> Self {
+        HT {
+            conductor: self.conductor.clone(),
+            voltage_grade: self.voltage_grade.clone(),
+            core_size: normalize_decimal(&self.core_size),
+            sqmm: normalize_decimal(&self.sqmm),
+        }
+    }
+}
+
+impl Flexible {
+    fn normalize(&self) -> Self {
+        Flexible {
+            core_size: normalize_decimal(&self.core_size),
+            sqmm: normalize_decimal(&self.sqmm),
+            flexible_type: self.flexible_type.clone(),
+        }
+    }
+}
+
 #[derive(Deserialize, Clone, Debug)]
 pub struct PriceList {
     tags: Vec<String>,
@@ -283,7 +358,7 @@ impl PricingSystem {
         let mut prices = HashMap::new();
 
         for price_entry in price_list.prices {
-            prices.insert(price_entry.product.clone(), price_entry.price);
+            prices.insert(price_entry.product.normalize(), price_entry.price);
         }
 
         PricingSystem {
@@ -298,7 +373,7 @@ impl PricingSystem {
 
     pub fn get_price(&self, product: &Product, tag: &str) -> Option<f32> {
         if self.tags.contains(&tag.to_string().trim().to_lowercase()) {
-            self.prices.get(&product.clone()).copied()
+            self.prices.get(&product.normalize()).copied()
         } else {
             None
         }
@@ -328,5 +403,5 @@ mod pricelist_tests {
             assert!(!pricelist.tags.is_empty(), "Tags should not be empty");
             assert!(!pricelist.prices.is_empty(), "Prices should not be empty");
         }
-    }   
+    }
 }
