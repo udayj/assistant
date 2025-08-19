@@ -134,6 +134,6 @@
     },
     "whatsapp": {
         "webhook_port": 8080,
-        "file_base_url": "https://75b8ae9de371.ngrok-free.app"
+        "file_base_url": "https://whatsapp.avantgardelabs.in"
     }
 }
