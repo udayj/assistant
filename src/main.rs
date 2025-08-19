@@ -1,8 +1,8 @@
 use assistant::communication::error_alert::ErrorAlertService;
 use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
+use assistant::communication::whatsapp::WhatsAppService;
 use assistant::configuration::Context;
-use assistant::core::http_server::HttpServer;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
 use assistant::AppError;
@@ -11,11 +11,7 @@ use tokio::sync::{mpsc, Mutex};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
-    tokio::spawn(async {
-        if let Err(e) = HttpServer::start(8080).await {
-            println!("HTTP server error: {}", e);
-        }
-    });
+   
 
     let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
     let mut service_manager = ServiceManager::new(context);
@@ -25,6 +21,7 @@ async fn main() -> Result<(), AppError> {
     let shared_error_receiver = Arc::new(Mutex::new(error_receiver));
 
     service_manager.spawn_with_error_receiver::<ErrorAlertService>(shared_error_receiver);
+    service_manager.spawn_with_error_sender::<WhatsAppService>(error_sender.clone());
     service_manager.spawn_with_error_sender::<TelegramService>(error_sender);
     service_manager.spawn_with_price_receiver::<PriceAlertService>(shared_receiver);
     service_manager.spawn_with_price_sender::<PriceService>(sender.clone());

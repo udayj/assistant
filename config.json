@@ -28,5 +28,9 @@
     "telegram": {
         "price_alert_subscribers": [2050924196],
         "error_channel_id": 2050924196
+    },
+    "whatsapp": {
+        "webhook_port": 8080,
+        "file_base_url": "https://75b8ae9de371.ngrok-free.app"
     }
 }

@@ -16,7 +16,8 @@ pub struct Config {
     pub pricelists: Vec<PriceListConfig>,
     pub metal_pricing: MetalPricingConfig,
     pub claude: ClaudeConfig,
-    pub telegram: TelegramConfig
+    pub telegram: TelegramConfig,
+    pub whatsapp: WhatsappConfig
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -40,6 +41,12 @@ pub struct PriceListConfig {
 pub struct TelegramConfig {
     pub price_alert_subscribers: Vec<i64>,
     pub error_channel_id: i64,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct WhatsappConfig {
+    pub webhook_port: u16,
+    pub file_base_url: String
 }
 
 #[derive(Debug, Clone)]
