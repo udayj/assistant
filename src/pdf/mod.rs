@@ -3,6 +3,7 @@ use crate::quotation::{QuotationResponse, QuotedItem};
 use ::image::codecs::jpeg::JpegDecoder;
 use ::image::io::Reader as ImageReader;
 use printpdf::*;
+use std::fs;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
@@ -21,6 +22,7 @@ pub fn create_quotation_pdf(
     quotation: &QuotationResponse,
     filename: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    fs::create_dir_all("artifacts")?;
     let (doc, page1, layer1) = PdfDocument::new(
         "Quotation",
         Mm(PAGE_WIDTH_MM),
