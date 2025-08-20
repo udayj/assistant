@@ -55,7 +55,7 @@ impl ServiceWithErrorSender for WhatsAppService {
         let app = Router::new()
             .route("/health", get(health_check))
             .route("/webhook", post(webhook_handler))
-            .route("/{filename}", get(serve_file))
+            .route("/{*filename}", get(serve_file))
             .layer(CorsLayer::permissive())
             .with_state(state);
 
