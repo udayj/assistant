@@ -36,9 +36,12 @@ impl ServiceWithErrorSender for WhatsAppService {
 
     async fn new(context: Context, error_sender: mpsc::Sender<String>) -> Self {
         let query_fulfilment = QueryFulfilment::new(context.clone()).await.unwrap();
-
+        let port = std::env::var("PORT")
+            .unwrap_or_else(|_| context.config.whatsapp.webhook_port.to_string())
+            .parse::<u16>()
+            .unwrap_or(context.config.whatsapp.webhook_port);
         Self {
-            port: context.config.whatsapp.webhook_port,
+            port,
             query_fulfilment,
             error_sender,
             file_base_url: context.config.whatsapp.file_base_url,
@@ -46,6 +49,14 @@ impl ServiceWithErrorSender for WhatsAppService {
     }
 
     async fn run(self) -> Result<(), ServiceManagerError> {
+        println!("Config port: {}", self.port);
+        println!("PORT env var: {:?}", std::env::var("PORT"));
+        println!("All env vars:");
+        for (key, value) in std::env::vars() {
+            if key.contains("PORT") || key.contains("port") {
+                println!("  {}: {}", key, value);
+            }
+        }
         let state = AppState {
             query_fulfilment: Arc::new(self.query_fulfilment),
             error_sender: self.error_sender,
@@ -67,9 +78,7 @@ impl ServiceWithErrorSender for WhatsAppService {
 
         axum::serve(listener, app)
             .await
-            .map_err(|e| ServiceManagerError::new(&format!("HTTP server error: {}", e)))?;
-
-        Ok(())
+            .map_err(|e| ServiceManagerError::new(&format!("HTTP server error: {}", e)))
     }
 }
 
