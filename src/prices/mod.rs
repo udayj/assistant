@@ -1,9 +1,10 @@
+use crate::communication::price_alert::PriceAlert;
 use crate::configuration::Context;
 use crate::core::cache::ExpirableCache;
 use crate::core::service_manager::Error as ServiceManagerError;
 use crate::core::{service_manager::ServiceWithSender, Service};
 use async_trait::async_trait;
-use chrono::{Timelike, Utc, DateTime};
+use chrono::{DateTime, Timelike, Utc};
 use chrono_tz::Asia::Kolkata;
 use reqwest;
 use scraper::{Html, Selector};
@@ -12,8 +13,8 @@ use thiserror::Error;
 use tokio::sync::mpsc;
 
 pub mod item_prices;
-pub mod utils;
 pub mod price_list;
+pub mod utils;
 
 #[derive(Error, Debug)]
 pub enum PriceError {
@@ -41,7 +42,7 @@ pub struct PriceService {
     pub url_cu: String,
     pub price_channel: Option<mpsc::Sender<String>>,
     pub price_cache: ExpirableCache<String, f64>,
-    pub last_alert_hour: Option<u32>
+    pub last_alert_hour: Option<u32>,
 }
 
 #[async_trait]
@@ -53,7 +54,7 @@ impl Service for PriceService {
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel: None,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
-            last_alert_hour: None
+            last_alert_hour: None,
         }
     }
 
@@ -62,15 +63,11 @@ impl Service for PriceService {
             let now_ist = Utc::now().with_timezone(&Kolkata);
             let hour = now_ist.hour();
             let minute = now_ist.minute();
-            
+
             // Check if we're in a valid time window and haven't sent alert this hour
             let should_send_alert = match hour {
-                11 if minute >= 50 && minute <= 52 => {
-                    self.last_alert_hour != Some(11)
-                }
-                15 if minute>=7 && minute <= 10 => {
-                    self.last_alert_hour != Some(15)
-                }
+                11 if minute >= 50 && minute <= 52 => self.last_alert_hour != Some(11),
+                15 if minute >= 7 && minute <= 10 => self.last_alert_hour != Some(15),
                 _ => false,
             };
 
@@ -102,7 +99,7 @@ impl ServiceWithSender for PriceService {
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
-            last_alert_hour: None
+            last_alert_hour: None,
         }
     }
 
@@ -112,8 +109,10 @@ impl ServiceWithSender for PriceService {
 }
 
 impl PriceService {
-
-    async fn send_price_alert(&self, now_ist: DateTime<chrono_tz::Tz>) -> Result<(), ServiceManagerError> {
+    async fn send_price_alert(
+        &self,
+        now_ist: DateTime<chrono_tz::Tz>,
+    ) -> Result<(), ServiceManagerError> {
         let price_al = self
             .fetch_price("aluminium")
             .await
@@ -127,13 +126,18 @@ impl PriceService {
             .map_err(|e| ServiceManagerError::from(e))?;
 
         if let Some(sender) = &self.price_channel {
-            let timestamp = now_ist.format("%d/%m/%Y %I:%M %p");
-            let message = format!(
-                "🔔 Metal Price Update\n  {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}", 
-                timestamp, price_cu, price_al
-            );
-            sender.send(message).await
-                .map_err(|e| ServiceManagerError::new(&format!("Failed to send price alert: {}", e)))?;
+            let alert = PriceAlert {
+                timestamp: now_ist.format("%d/%m/%Y %I:%M %p").to_string(),
+                copper_price: price_cu,
+                aluminum_price: price_al,
+            };
+
+            let alert_json = serde_json::to_string(&alert)
+                .map_err(|e| ServiceManagerError::new(&format!("Serialization error: {}", e)))?;
+
+            sender.send(alert_json).await.map_err(|e| {
+                ServiceManagerError::new(&format!("Failed to send price alert: {}", e))
+            })?;
         }
         Ok(())
     }
@@ -204,7 +208,7 @@ impl PriceService {
         let now_ist = Utc::now().with_timezone(&Kolkata);
         let timestamp = now_ist.format("%d/%m/%Y %I:%M %p IST");
         let message = format!(
-            "🔔 Metal Price Update\n📅 {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}",
+            "🔔 Metal Price Update\n {}\n\n🟤 Copper: Rs. {:.2}\n⚪ Aluminium: Rs. {:.2}",
             timestamp, price_cu, price_al
         );
         Ok(message)
