@@ -15,6 +15,10 @@
         {
             "pricelist": "assets/processed_pricelists/polycab_flexible_cables.json",
             "brand": "polycab"
+        },
+        {
+            "pricelist": "assets/processed_pricelists/polycab_armoured_lt.json",
+            "brand": "polycab"
         }
     ],
     "pdf_pricelists": [
@@ -28,6 +32,7 @@
                 "latest cable",
                 "latest armoured cable",
                 "current cable",
+                "current armoured cable",
                 "march2025 cable",
                 "latest ht",
                 "march armoured cable"

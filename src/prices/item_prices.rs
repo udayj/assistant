@@ -388,7 +388,7 @@ mod pricelist_tests {
 
     #[test]
     fn test_pricelist_deserialization() {
-        let test_cases = vec!["assets/processed_pricelists/polycab_flexible_cables.json"];
+        let test_cases = vec!["assets/processed_pricelists/polycab_armoured_lt.json"];
         for pricelist_path in test_cases {
             let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(pricelist_path);
             let json_content = fs::read_to_string(path)
