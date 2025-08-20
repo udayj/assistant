@@ -139,6 +139,11 @@
     },
     "whatsapp": {
         "webhook_port": 8080,
-        "file_base_url": "https://whatsapp.avantgardelabs.in"
+        "file_base_url": "https://whatsapp.avantgardelabs.in",
+        "price_alert_subscribers": [
+            "whatsapp:+919830906922"
+        ],
+        "twilio_from_number": "whatsapp:+17246175462",
+        "template_sid": "HXfd736bdc218a0032686e7d171b251c48"
     }
 }
