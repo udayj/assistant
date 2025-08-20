@@ -67,6 +67,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             .route("/health", get(health_check))
             .route("/webhook", post(webhook_handler))
             .route("/{filename}", get(serve_file))
+            .route("/*path", get(debug_all_requests))
             .layer(CorsLayer::permissive())
             .with_state(state);
 
@@ -84,6 +85,11 @@ impl ServiceWithErrorSender for WhatsAppService {
 
 async fn health_check() -> (StatusCode, &'static str) {
     (StatusCode::OK, "OK")
+}
+
+async fn debug_all_requests(axum::extract::Path(path): axum::extract::Path<String>) -> String {
+    println!("=== UNKNOWN REQUEST: /{} ===", path);
+    format!("Debug: Received request for /{}", path)
 }
 
 async fn webhook_handler(
