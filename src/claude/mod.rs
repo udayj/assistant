@@ -1,4 +1,4 @@
-use crate::quotation::QuotationRequest;
+use crate::quotation::{QuotationRequest, PriceOnlyRequest};
 use dotenvy::dotenv;
 use reqwest::Client;
 use serde::Deserialize;
@@ -18,6 +18,7 @@ pub enum Query {
         keywords: Vec<String>,
     },
     GetQuotation(QuotationRequest),
+    GetPricesOnly(PriceOnlyRequest),
     UnsupportedQuery,
 }
 

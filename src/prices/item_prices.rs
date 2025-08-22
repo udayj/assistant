@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 pub trait Description {
     fn get_description(&self, extras: Vec<String>) -> String;
+    fn get_brief_description(&self, extras: Vec<String>) -> String;
 }
 
 #[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
@@ -15,6 +16,12 @@ impl Description for Product {
     fn get_description(&self, extras: Vec<String>) -> String {
         match self {
             Self::Cable(cable) => cable.get_description(extras),
+        }
+    }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+        match self {
+            Self::Cable(cable) => cable.get_brief_description(extras),
         }
     }
 }
@@ -57,6 +64,16 @@ impl Description for Cable {
             Self::PowerControl(cable) => cable.get_description(extras),
         }
     }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        match self {
+            Self::Coaxial(coaxial_type) => format!("{}", coaxial_type.get_brief_description(extras)),
+            Self::Solar { solar_type, sqmm } => format!("{}mm² Solar {}", sqmm, solar_type.get_brief_description(extras)),
+            Self::Submersible { core_size, sqmm } => format!("{}C x {}mm² Flat Flex", core_size, sqmm),
+            Self::Telephone { pair_size, conductor_mm } => format!("{}P x {}mm Tel", pair_size, conductor_mm),
+            Self::PowerControl(cable) => cable.get_brief_description(extras),
+        }
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -71,6 +88,10 @@ impl Description for SolarType {
             Self::BS => "BS".to_string(),
             Self::EN => "EN".to_string(),
         }
+    }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        self.get_description(extras) // Same as full description
     }
 }
 
@@ -89,6 +110,10 @@ impl Description for CoaxialType {
             Self::RG59 => "RG59".to_string(),
         }
     }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        self.get_description(extras) // Same as full description
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -104,6 +129,14 @@ impl Description for PowerControl {
             Self::LT(lt_cable) => lt_cable.get_description(extras),
             Self::HT(ht_cable) => ht_cable.get_description(extras),
             Self::Flexible(flexible_cable) => flexible_cable.get_description(extras),
+        }
+    }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+        match self {
+            Self::LT(lt_cable) => lt_cable.get_brief_description(extras),
+            Self::HT(ht_cable) => ht_cable.get_brief_description(extras),
+            Self::Flexible(flexible_cable) => flexible_cable.get_brief_description(extras),
         }
     }
 }
@@ -187,6 +220,17 @@ impl Description for LT {
             }
         }
     }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+        let insulation = if extras.contains(&"pvc".to_string()) { "PVC" } else { "XLPE" };
+        let sheath = if extras.contains(&"frls".to_string()) { "FRLS" } else { "" };
+        let armor = if self.armoured { "Armd" } else { "UnArm" };
+        
+        format!("{}C x {}mm² {} {} {} {}", 
+            self.core_size, self.sqmm, 
+            self.conductor.get_brief_description(vec![]),
+            insulation, sheath, armor)
+    }
 }
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
 pub struct HT {
@@ -206,6 +250,13 @@ impl Description for HT {
             self.conductor.get_description(extras)
         )
     }
+
+    fn get_brief_description(&self, _extras: Vec<String>) -> String {  // NEW
+        format!("{}C x {}mm² {} {}kV Arm", 
+            self.core_size, self.sqmm,
+            self.conductor.get_brief_description(vec![]),
+            self.voltage_grade)
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -223,6 +274,12 @@ impl Description for Flexible {
             self.sqmm,
             self.flexible_type.get_description(extras)
         )
+    }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+        format!("{}C x {}mm² Cu Flex {}", 
+            self.core_size, self.sqmm,
+            self.flexible_type.get_brief_description(extras))
     }
 }
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -242,6 +299,10 @@ impl Description for FlexibleType {
             Self::ZHFR => "ZHFR".to_string(),
         }
     }
+
+    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+        self.get_description(extras) // Same as full description
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -255,6 +316,13 @@ impl Description for Conductor {
         match self {
             Self::Aluminium => "Aluminium".to_string(),
             Self::Copper => "Copper".to_string(),
+        }
+    }
+
+    fn get_brief_description(&self, _extras: Vec<String>) -> String {  // NEW
+        match self {
+            Self::Aluminium => "Al".to_string(),
+            Self::Copper => "Cu".to_string(),
         }
     }
 }

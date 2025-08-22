@@ -124,6 +124,24 @@ impl QueryFulfilment {
                     }
                 }
             }
+
+            Query::GetPricesOnly(price_only_request) => {
+                // NEW
+                let price_response = self.quotation_service.get_prices_only(price_only_request);
+                match price_response {
+                    Some(response) if !response.items.is_empty() => {
+                        Response {
+                            text: self.format_price_only_response(response),
+                            file: None,
+                        }
+                    }
+                    _ => Response {
+                        text: "No prices found for the requested items. Please check item/specifications".to_string(),
+                        file: None,
+                    }
+                }
+            }
+
             _ => Response {
                 text: "Cannot fulfil this request at the moment".to_string(),
                 file: None,
@@ -140,5 +158,17 @@ impl QueryFulfilment {
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
         println!("parsed query successfully");
         Ok(query)
+    }
+
+    fn format_price_only_response(&self, response: crate::quotation::PriceOnlyResponse) -> String {
+        let mut lines = Vec::new();
+
+        for item in response.items {
+            let line = format!("{}: Rs.{:.2}/mtr", item.description, item.price);
+
+            lines.push(line);
+        }
+
+        lines.join("\n")
     }
 }

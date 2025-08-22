@@ -1,6 +1,6 @@
 use crate::{
     configuration::PriceListConfig,
-    prices::item_prices::{PriceList, PricingSystem, Product},
+    prices::item_prices::{PriceList, PricingSystem, Product, Description},
 };
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -36,6 +36,35 @@ pub struct QuotationRequest {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct PriceOnlyRequest {
+    pub items: Vec<PriceOnlyItem>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PriceOnlyItem {
+    pub product: Product,
+    #[serde(default = "default_brand")]
+    pub brand: String,
+    #[serde(default = "default_tag")]
+    pub tag: String,
+    #[serde(default)]
+    pub discount: f32,
+    pub quantity: Option<f32>,
+    #[serde(default)]
+    pub loading_frls: f32,
+    #[serde(default)]
+    pub loading_pvc: f32,
+}
+
+fn default_brand() -> String {
+    "kei".to_string()
+}
+
+fn default_tag() -> String {
+    "latest".to_string()
+}
+
+#[derive(Debug, Deserialize)]
 pub struct QuotedItem {
     pub product: Product,
     pub brand: String,
@@ -57,6 +86,19 @@ pub struct QuotationResponse {
     pub to: Option<Vec<String>>,
     pub terms_and_conditions: Option<Vec<String>>,
 }
+
+#[derive(Debug)]
+pub struct PriceOnlyResponse {
+    pub items: Vec<PriceOnlyResponseItem>,
+}
+
+#[derive(Debug)]
+pub struct PriceOnlyResponseItem {
+    pub description: String,
+    pub price: f32,
+    pub quantity: Option<f32>,
+}
+
 pub struct QuotationService {
     pub pricelists: HashMap<String, Vec<PricingSystem>>,
 }
@@ -123,6 +165,48 @@ impl QuotationService {
             grand_total,
             to: request.to,
             terms_and_conditions: self.process_terms_and_conditions(request.terms_and_conditions)
+        })
+    }
+
+    pub fn get_prices_only(&self, request: PriceOnlyRequest) -> Option<PriceOnlyResponse> {
+        let mut response_items = Vec::new();
+
+        for item in request.items {
+            let listed_price = self.get_price(&item.product, &item.brand, &item.tag);
+            if listed_price.is_none() {
+                continue;
+            }
+            let listed_price = listed_price.unwrap();
+            
+            let mut price = listed_price
+                * (1.0 - item.discount)
+                * (1.0 + item.loading_frls)
+                * (1.0 + item.loading_pvc);
+            price = (price * 100.0).round() / 100.0;
+
+            // Use existing Description trait but make it brief
+            let mut extras = Vec::new();
+            if item.loading_frls > 0.0 {
+                extras.push("frls".to_string());
+            }
+            if item.loading_pvc > 0.0 {
+                extras.push("pvc".to_string());
+            }
+            
+            let description = format!(
+                "{}",
+                item.product.get_brief_description(extras)
+            );
+
+            response_items.push(PriceOnlyResponseItem {
+                description,
+                price,
+                quantity: item.quantity,
+            });
+        }
+
+        Some(PriceOnlyResponse {
+            items: response_items,
         })
     }
 
