@@ -25,13 +25,13 @@
         {
             "pdf_path": "assets/pricelists/KEI Cable LP - Mar 25.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
                 "latest armoured",
                 "current cable",
                 "march 2025 armoured",
                 "latest cable",
                 "latest armoured cable",
-                "current cable",
+                "current armoured",
                 "current armoured cable",
                 "march2025 cable",
                 "latest ht",
@@ -41,7 +41,7 @@
         {
             "pdf_path": "assets/pricelists/KEI LDC - SC Flx List Price - 3rd Jul 2025.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
                 "latest single core",
                 "latest wires",
                 "current wires",
@@ -52,20 +52,22 @@
         {
             "pdf_path": "assets/pricelists/KEI LDC - MC Flx List Price - 3rd Jul 2025.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
                 "latest multi core",
                 "latest flexibles",
                 "latest flexible",
                 "current flexible",
                 "latest fr flexible",
                 "current flexible cable",
-                "july 2025 flexible"
+                "july 2025 flexible",
+                "current flexibles",
+                "latest flexible cables"
             ]
         },
         {
             "pdf_path": "assets/pricelists/KEI LDC - 3C Flat List Price - 3rd Jul 2025.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
                 "latest submersible",
                 "current submersible",
                 "current flat",
@@ -76,7 +78,7 @@
         {
             "pdf_path": "assets/pricelists/KEI Communication Cable LP - 3rd Jul 2025.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
                 "latest communication",
                 "latest cat6",
                 "latest telephone",
@@ -89,7 +91,8 @@
         {
             "pdf_path": "assets/pricelists/PV Solar Cable LP - 3rd Jul 2025.pdf",
             "brand": "kei",
-            "tags": [
+            "keywords": [
+                "solar",
                 "latest solar",
                 "current solar",
                 "july 2025 solar",
@@ -99,18 +102,20 @@
         {
             "pdf_path": "assets/pricelists/LDC LP No 03 Dtd 24th June 2025_250624_163556.pdf",
             "brand": "polycab",
-            "tags": [
+            "keywords": [
                 "latest single core",
                 "latest multicore",
                 "latest flexible cable",
                 "june 2025 flexible cable",
-                "current flexible"
+                "current flexible",
+                "current flexible cable",
+                "current multicore"
             ]
         },
         {
             "pdf_path": "assets/pricelists/PCC LP No. 06 Dtd 24th February 2025.pdf",
             "brand": "polycab",
-            "tags": [
+            "keywords": [
                 "latest armoured cable",
                 "latest armoured",
                 "latest lt",
@@ -120,7 +125,8 @@
                 "current ht",
                 "latest ht",
                 "current armoured",
-                "current cable"
+                "current cable",
+                "current armoured cable"
             ]
         }
     ],

@@ -58,8 +58,8 @@ impl QueryFulfilment {
     pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
         let query = self.get_query_type(query).await?;
         let response = match query {
-            Query::GetPriceList { brand, tags } => {
-                match self.pricelist_service.find_pricelist(&brand, &tags) {
+            Query::GetPriceList { brand, keywords } => {
+                match self.pricelist_service.find_pricelist(&brand, &keywords) {
                     Some(pdf_path) => Response {
                         text: "Pricelist".to_string(),
                         file: Some(pdf_path),

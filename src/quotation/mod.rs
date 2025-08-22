@@ -31,11 +31,14 @@ pub struct QuoteItem {
 pub struct QuotationRequest {
     pub items: Vec<QuoteItem>,
     pub delivery_charges: f32,
+    pub to: Option<Vec<String>>,
+    pub terms_and_conditions: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct QuotedItem {
     pub product: Product,
+    pub brand: String,
     pub quantity_mtrs: f32,
     pub price: f32, // price = listed_price*(1-discount)*(1+loading_frls)*(1+loading_pvc)
     pub amount: f32, // amount = price*qty
@@ -51,6 +54,8 @@ pub struct QuotationResponse {
     pub total_with_delivery: f32,
     pub taxes: f32,       //taxes = total_with_delivery*0.18
     pub grand_total: f32, // grand_total = total_with_delivery + taxes
+    pub to: Option<Vec<String>>,
+    pub terms_and_conditions: Option<Vec<String>>,
 }
 pub struct QuotationService {
     pub pricelists: HashMap<String, Vec<PricingSystem>>,
@@ -96,6 +101,7 @@ impl QuotationService {
 
             quoted_items.push(QuotedItem {
                 product: item.product,
+                brand: item.brand,
                 quantity_mtrs: item.quantity,
                 price,
                 amount,
@@ -115,6 +121,8 @@ impl QuotationService {
             total_with_delivery,
             taxes,
             grand_total,
+            to: request.to,
+            terms_and_conditions: self.process_terms_and_conditions(request.terms_and_conditions)
         })
     }
 
@@ -123,5 +131,27 @@ impl QuotationService {
             .get(&brand.to_lowercase())?
             .iter()
             .find_map(|pricing_system| pricing_system.get_price(product, tag))
+    }
+
+    fn process_terms_and_conditions(&self, terms: Option<Vec<String>>) -> Option<Vec<String>> {
+        match terms {
+            Some(terms_vec) if terms_vec.len() == 1 => {
+                match terms_vec[0].to_lowercase().as_str() {
+                    "standard" => Some(self.get_standard_terms()),
+                    _ => Some(terms_vec),
+                }
+            }
+            other => other,
+        }
+    }
+
+    fn get_standard_terms(&self) -> Vec<String> {
+        vec![
+            "Qty. Tolerance: +/-5%",
+            "Payment: Full payment against proforma invoice",
+            "Delivery: Ready stock subject to prior sale",
+            "GST: 18% extra as applicable",
+            "Validity: 3 days from quotation date",
+        ].iter().map(|x| x.to_string()).collect()
     }
 }

@@ -42,7 +42,7 @@ pub struct PriceListConfig {
 pub struct PdfPriceListConfig {
     pub pdf_path: String,
     pub brand: String,
-    pub tags: Vec<String>,
+    pub keywords: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

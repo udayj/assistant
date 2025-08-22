@@ -12,7 +12,7 @@ pub enum PriceListError {
 #[derive(Debug, Clone)]
 pub struct PdfPriceListEntry {
     pub pdf_path: String,
-    pub tags: Vec<String>,
+    pub keywords: Vec<String>,
 }
 
 pub struct PriceListService {
@@ -26,7 +26,7 @@ impl PriceListService {
         for config in pdf_configs {
             let entry = PdfPriceListEntry {
                 pdf_path: config.pdf_path,
-                tags: config.tags,
+                keywords: config.keywords,
             };
 
             pricelists_by_brand
@@ -40,16 +40,16 @@ impl PriceListService {
         })
     }
 
-    pub fn find_pricelist(&self, brand: &str, tags: &[String]) -> Option<String> {
+    pub fn find_pricelist(&self, brand: &str, keywords: &[String]) -> Option<String> {
         self.pricelists_by_brand
             .get(&brand.to_lowercase())?
             .iter()
             .find(|entry| {
-                tags.iter().any(|tag| {
+                keywords.iter().any(|keyword| {
                     entry
-                        .tags
+                        .keywords
                         .iter()
-                        .any(|entry_tag| entry_tag.eq_ignore_ascii_case(tag))
+                        .any(|entry_keyword| entry_keyword.eq_ignore_ascii_case(keyword))
                 })
             })
             .map(|entry| entry.pdf_path.clone())

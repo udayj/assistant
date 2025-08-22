@@ -11,10 +11,14 @@ use std::path::Path;
 const PAGE_WIDTH_MM: f64 = 210.0;
 const PAGE_HEIGHT_MM: f64 = 297.0;
 const MARGIN_MM: f64 = 10.0;
-const TABLE_START_Y: f64 = 200.0;
+const BASE_TABLE_START_Y: f64 = 200.0;
 const ROW_HEIGHT_MM: f64 = 10.0;
 const MIN_ROW_HEIGHT_MM: f64 = 10.0;
-const MAX_CHARS_PER_LINE: usize = 45; // Adjust based on your font size and column width
+const MAX_CHARS_PER_LINE: usize = 60;
+const TO_SECTION_LINE_SPACING: f64 = 5.0;
+const SECOND_PAGE_START_Y: f64 = 230.0;
+const TC_SECTION_LINE_SPACING: f64 = 5.0;
+const MAX_TOTALS_SECTION_HEIGHT: f64 = 28.0;
 
 pub fn create_quotation_pdf(
     quotation_number: &str,
@@ -33,12 +37,19 @@ pub fn create_quotation_pdf(
     let font = doc.add_builtin_font(BuiltinFont::Helvetica)?;
     let font_bold = doc.add_builtin_font(BuiltinFont::HelveticaBold)?;
 
+    let to_section_height = quotation
+        .to
+        .as_ref()
+        .map(|lines| (lines.len() + 1) as f64 * TO_SECTION_LINE_SPACING + 5.0) // line height + spacing
+        .unwrap_or(0.0);
+
+    let table_start_y = BASE_TABLE_START_Y - to_section_height;
     let mut current_page = page1;
     let mut current_layer = doc.get_page(current_page).get_layer(layer1);
-    let mut current_y = TABLE_START_Y;
+    let mut current_y = table_start_y;
 
     // Add header to first page
-    add_header_to_page(&current_layer, quotation_number, date, &font)?;
+    add_header_to_page(&current_layer, quotation_number, date, &quotation.to, &font)?;
 
     // Table column positions
     let col_item = MARGIN_MM;
@@ -70,12 +81,16 @@ pub fn create_quotation_pdf(
             extras.push("pvc".to_string());
         }
 
-        let description = item.product.get_description(extras);
+        let description = format!(
+            "{} - {}",
+            item.product.get_description(extras),
+            item.brand.to_uppercase()
+        );
         let lines = wrap_text(&description, MAX_CHARS_PER_LINE);
         let row_height = (lines.len() as f64 * 8.0).max(MIN_ROW_HEIGHT_MM);
 
         // Check if we need a new page
-        if current_y - row_height < 50.0 {
+        if current_y - row_height < MAX_TOTALS_SECTION_HEIGHT + 10.0 {
             // Leave space for totals
             // Add current page table border
             //draw_table_border(&current_layer, col_item, TABLE_START_Y, table_width, TABLE_START_Y - current_y - ROW_HEIGHT_MM);
@@ -85,7 +100,7 @@ pub fn create_quotation_pdf(
                 doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer");
             current_page = new_page;
             current_layer = doc.get_page(current_page).get_layer(new_layer);
-            current_y = 230.0;
+            current_y = SECOND_PAGE_START_Y;
 
             // Add header to new page
             add_image_only_to_page(&current_layer)?;
@@ -114,7 +129,6 @@ pub fn create_quotation_pdf(
             &lines,
             item,
             current_y,
-            row_height,
             col_item,
             col_qty,
             col_rate,
@@ -124,19 +138,48 @@ pub fn create_quotation_pdf(
         current_y -= row_height;
     }
 
-    // Close the table with bottom border
-    //draw_table_border(&current_layer, col_item, TABLE_START_Y, table_width, TABLE_START_Y - current_y);
-
     // Add totals section
-    current_y -= 20.0;
+    current_y -= 15.0;
+    let totals_start_y = current_y;
     add_totals_section(
         &current_layer,
         &font,
         &font_bold,
         quotation,
         current_y,
-        col_amount + 30.0,
+        col_amount + 40.0,
     );
+
+    let totals_height = if quotation.delivery_charges > 0.0 {
+        MAX_TOTALS_SECTION_HEIGHT
+    } else {
+        MAX_TOTALS_SECTION_HEIGHT - 7.0
+    };
+    current_y = totals_start_y - totals_height;
+
+    let terms_section_height = quotation
+        .terms_and_conditions
+        .as_ref()
+        .map(|terms| ((terms.len() + 1) as f64 * TC_SECTION_LINE_SPACING) + 15.0) // terms lines + header + spacing
+        .unwrap_or(0.0);
+
+    // Add terms and conditions with space check
+    if let Some(terms) = &quotation.terms_and_conditions {
+        // Check if terms fit on current page
+        if current_y - terms_section_height < 10.0 {
+            // 20mm bottom margin
+            // Create new page for terms
+            let (new_page, new_layer) =
+                doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer");
+            current_layer = doc.get_page(new_page).get_layer(new_layer);
+            add_image_only_to_page(&current_layer)?;
+            current_y = SECOND_PAGE_START_Y; // Start high on new page
+        } else {
+            current_y -= 5.0; // Space after totals on same page
+        }
+
+        add_terms_and_conditions(&current_layer, &font, &font_bold, terms, current_y);
+    }
 
     // Save PDF
     let full_filename = format!("artifacts/{}", filename);
@@ -172,6 +215,7 @@ fn add_header_to_page(
     layer: &PdfLayerReference,
     quotation_number: &str,
     date: &str,
+    to: &Option<Vec<String>>,
     font: &IndirectFontRef,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Load and add header image
@@ -200,11 +244,26 @@ fn add_header_to_page(
     layer.use_text(quotation_reference, 10.0, Mm(MARGIN_MM), Mm(220.0), font);
     layer.use_text(date, 10.0, Mm(157.0), Mm(220.0), font);
 
+    let mut current_y = 220.0;
+    if let Some(to_lines) = to {
+        current_y -= 7.0; // Space after date
+        layer.use_text("To:", 10.0, Mm(MARGIN_MM), Mm(current_y), font);
+        current_y -= TO_SECTION_LINE_SPACING;
+
+        for line in to_lines {
+            layer.use_text(line, 10.0, Mm(MARGIN_MM), Mm(current_y), font);
+            current_y -= TO_SECTION_LINE_SPACING;
+        }
+        current_y -= TO_SECTION_LINE_SPACING; // Extra space after "to" section
+    } else {
+        current_y -= 10.0; // Standard spacing when no "to" section
+    }
+
     layer.use_text(
         "Thank you for enquiry. Please find the quotation below for your consideration",
         10.0,
         Mm(MARGIN_MM),
-        Mm(210.0),
+        Mm(current_y),
         font,
     );
 
@@ -266,26 +325,21 @@ fn add_item_row(
     description_lines: &[String],
     item: &QuotedItem,
     y_pos: f64,
-    row_height: f64,
     col_item: f64,
     col_qty: f64,
     col_rate: f64,
     col_amount: f64,
 ) {
     // Add description (multi-line) - start from top of row with proper padding
+    let mut row_y_pos = y_pos;
     for (i, line) in description_lines.iter().enumerate() {
-        layer.use_text(
-            line,
-            9.0,
-            Mm(col_item + 2.0),
-            Mm(y_pos - 4.0 - (i as f64 * 8.0)), // Changed from -2.0 to -4.0
-            font,
-        );
+        row_y_pos = y_pos - 4.0 - (i as f64 * 8.0);
+        layer.use_text(line, 9.0, Mm(col_item + 2.0), Mm(row_y_pos), font);
     }
 
     // Center other values vertically in the row with proper padding
-    let text_y = y_pos - (row_height / 2.0) - 2.0; // Changed from -1.0 to -2.0
-
+    // let text_y = y_pos - (row_height / 2.0) - 2.0; // Changed from -1.0 to -2.0
+    let text_y = row_y_pos;
     layer.use_text(
         &format!("{:.0}", item.quantity_mtrs),
         9.0,
@@ -321,7 +375,7 @@ fn add_totals_section(
 ) {
     let label_x = right_align_x - 60.0;
     let value_x = right_align_x - 5.0;
-
+    let row_separation = 7.0;
     // Sub Total
     layer.use_text("Sub Total:", 10.0, Mm(label_x), Mm(y_pos), font_bold);
     layer.use_text(
@@ -334,7 +388,7 @@ fn add_totals_section(
 
     // Delivery Charges (if applicable)
     if quotation.delivery_charges > 0.0 {
-        y_pos -= ROW_HEIGHT_MM;
+        y_pos -= row_separation;
         layer.use_text("Delivery Charges:", 10.0, Mm(label_x), Mm(y_pos), font);
         layer.use_text(
             &format!("Rs.{:.2}", quotation.delivery_charges),
@@ -346,7 +400,7 @@ fn add_totals_section(
     }
 
     // GST
-    y_pos -= ROW_HEIGHT_MM;
+    y_pos -= row_separation;
     layer.use_text("GST @ 18%:", 10.0, Mm(label_x), Mm(y_pos), font);
     layer.use_text(
         &format!("Rs.{:.2}", quotation.taxes),
@@ -357,7 +411,7 @@ fn add_totals_section(
     );
 
     // Total
-    y_pos -= ROW_HEIGHT_MM;
+    y_pos -= row_separation;
     layer.use_text("Total:", 10.0, Mm(label_x), Mm(y_pos), font_bold);
     layer.use_text(
         &format!("Rs.{:.2}", quotation.grand_total),
@@ -366,6 +420,28 @@ fn add_totals_section(
         Mm(y_pos),
         font_bold,
     );
+}
+
+fn add_terms_and_conditions(
+    layer: &PdfLayerReference,
+    font: &IndirectFontRef,
+    font_bold: &IndirectFontRef,
+    terms: &[String],
+    mut y_pos: f64,
+) {
+    layer.use_text(
+        "Terms & Conditions:",
+        10.0,
+        Mm(MARGIN_MM),
+        Mm(y_pos),
+        font_bold,
+    );
+    y_pos -= TC_SECTION_LINE_SPACING;
+
+    for term in terms {
+        layer.use_text(term, 9.0, Mm(MARGIN_MM), Mm(y_pos), font);
+        y_pos -= TC_SECTION_LINE_SPACING;
+    }
 }
 
 fn wrap_text(text: &str, max_chars_per_line: usize) -> Vec<String> {
@@ -455,4 +531,142 @@ fn get_text_width(text: &str) -> f64 {
     // Approximate text width calculation (you might want to use a more accurate method)
     // This is a rough estimation based on character count
     text.len() as f64 * 2.5 // Adjust multiplier based on your font size
+}
+
+#[cfg(test)]
+mod pdf_tests {
+    use super::*;
+    use crate::prices::item_prices::*;
+    use crate::quotation::*;
+
+    #[test]
+    fn test_pdf_generation() {
+        let test_quotation = QuotationResponse {
+            items: vec![
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
+                        Flexible {
+                            core_size: "4".to_string(),
+                            sqmm: "2.5".to_string(),
+                            flexible_type: FlexibleType::FR,
+                        },
+                    ))),
+                    brand: "polycab".to_string(),
+                    quantity_mtrs: 100.0,
+                    price: 250.60,
+                    amount: 25060.00,
+                    loading_frls: 0.05,
+                    loading_pvc: 0.03,
+                },
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
+                        Flexible {
+                            core_size: "4".to_string(),
+                            sqmm: "2.5".to_string(),
+                            flexible_type: FlexibleType::FR,
+                        },
+                    ))),
+                    brand: "polycab".to_string(),
+                    quantity_mtrs: 100.0,
+                    price: 250.60,
+                    amount: 25060.00,
+                    loading_frls: 0.05,
+                    loading_pvc: 0.03,
+                },
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
+                        Flexible {
+                            core_size: "4".to_string(),
+                            sqmm: "2.5".to_string(),
+                            flexible_type: FlexibleType::FR,
+                        },
+                    ))),
+                    brand: "polycab".to_string(),
+                    quantity_mtrs: 100.0,
+                    price: 250.60,
+                    amount: 25060.00,
+                    loading_frls: 0.05,
+                    loading_pvc: 0.03,
+                },
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
+                        Flexible {
+                            core_size: "4".to_string(),
+                            sqmm: "2.5".to_string(),
+                            flexible_type: FlexibleType::FR,
+                        },
+                    ))),
+                    brand: "polycab".to_string(),
+                    quantity_mtrs: 100.0,
+                    price: 250.60,
+                    amount: 25060.00,
+                    loading_frls: 0.05,
+                    loading_pvc: 0.03,
+                },
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
+                        Flexible {
+                            core_size: "4".to_string(),
+                            sqmm: "2.5".to_string(),
+                            flexible_type: FlexibleType::FR,
+                        },
+                    ))),
+                    brand: "polycab".to_string(),
+                    quantity_mtrs: 100.0,
+                    price: 250.60,
+                    amount: 25060.00,
+                    loading_frls: 0.05,
+                    loading_pvc: 0.03,
+                },
+                QuotedItem {
+                    product: Product::Cable(Cable::PowerControl(PowerControl::LT(LT {
+                        conductor: Conductor::Copper,
+                        core_size: "3".to_string(),
+                        sqmm: "1.5".to_string(),
+                        armoured: true,
+                    }))),
+                    brand: "kei".to_string(),
+                    quantity_mtrs: 50.0,
+                    price: 180.50,
+                    amount: 9025.00,
+                    loading_frls: 0.0,
+                    loading_pvc: 0.0,
+                },
+            ],
+            basic_total: 34085.00,
+            delivery_charges: 500.00,
+            total_with_delivery: 34585.00,
+            taxes: 6225.30,
+            grand_total: 40810000.30,
+            to: Some(vec![
+                "Skipper Ltd.",
+                "Kolkata",
+            ]
+            .iter()
+            .map(|x| x.to_string())
+            .collect()),
+            terms_and_conditions: Some(
+                vec![
+                    "Qty. Tolerance: +/-5%",
+                    "Payment: Full payment against proforma invoice",
+                    "Delivery: Ready stock subject to prior sale",
+                    "GST: 18% extra as applicable",
+                    "Validity: 3 days from quotation date",
+                ]
+                .iter()
+                .map(|x| x.to_string())
+                .collect(),
+            )
+        };
+
+        let result = create_quotation_pdf(
+            "Q-20250821-TEST",
+            "21st August, 2025",
+            &test_quotation,
+            "test_quotation.pdf",
+        );
+
+        assert!(result.is_ok(), "PDF generation failed: {:?}", result.err());
+        assert!(std::path::Path::new("artifacts/test_quotation.pdf").exists());
+    }
 }
