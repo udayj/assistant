@@ -13,7 +13,7 @@ pub enum Query {
     GetPriceList {
         #[serde(default = "default_brand")]
         brand: String,
-        tags: Vec<String>,
+        keywords: Vec<String>,
     },
     GetQuotation(QuotationRequest),
     UnsupportedQuery,

@@ -79,6 +79,8 @@ mod tests {
                 },
             ],
             delivery_charges: 500.0,
+            to: None,
+            terms_and_conditions: None
         };
 
         let file_content = std::fs::read_to_string("sample_response.json").unwrap();
