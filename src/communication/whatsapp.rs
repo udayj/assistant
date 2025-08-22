@@ -1,6 +1,6 @@
 use crate::configuration::Context;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
-use crate::query::QueryFulfilment;
+use crate::query::{QueryError, QueryFulfilment};
 use async_trait::async_trait;
 use axum::{
     body::Body,
@@ -37,7 +37,7 @@ impl ServiceWithErrorSender for WhatsAppService {
     async fn new(context: Context, error_sender: mpsc::Sender<String>) -> Self {
         let query_fulfilment = QueryFulfilment::new(context.clone()).await.unwrap();
         Self {
-            port:context.config.whatsapp.webhook_port,
+            port: context.config.whatsapp.webhook_port,
             query_fulfilment,
             error_sender,
             file_base_url: context.config.whatsapp.file_base_url,
@@ -45,7 +45,6 @@ impl ServiceWithErrorSender for WhatsAppService {
     }
 
     async fn run(self) -> Result<(), ServiceManagerError> {
-        
         let state = AppState {
             query_fulfilment: Arc::new(self.query_fulfilment),
             error_sender: self.error_sender,
@@ -107,7 +106,18 @@ async fn webhook_handler(
         Err(e) => {
             let error_msg = format!("❌ WhatsApp Query Failed\n\nQuery: {}\nError: {}", body, e);
             let _ = state.error_sender.try_send(error_msg);
-            send_text_response("Error during processing - please contact admin@avantgardelabs.in")
+            match e {
+                QueryError::MetalPricingError(_) => {
+                    send_text_response("Could not fetch metal prices - please try again later")
+                }
+                QueryError::QuotationServiceError => send_text_response(
+                    "Error generating quotation - please check whether items are valid",
+                ),
+                QueryError::LLMError(_) => {
+                    send_text_response("Could not understand query - please rephrase")
+                }
+                _ => send_text_response("Could not service request - please try again later"),
+            }
         }
     }
 }

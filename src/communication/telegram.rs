@@ -1,4 +1,5 @@
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
+use crate::query::QueryError;
 use crate::{configuration::Context, query::QueryFulfilment};
 use async_trait::async_trait;
 use std::fs;
@@ -85,18 +86,34 @@ impl TelegramService {
                     ),
                     file: None,
                 },
-                text => match query_fulfilment.fulfil_query(text).await {
-                    Ok(response) => response,
-                    Err(e) => {
-                        let error_msg = format!("❌ Query Failed\n\nQuery: {}\nError: {}", text, e);
-                        let _ = error_sender.send(error_msg).await;
-                        Response {
-                            text: "Faced error during request processing - please contact admin"
-                                .to_string(),
-                            file: None,
+                text => {
+                    match query_fulfilment.fulfil_query(text).await {
+                        Ok(response) => response,
+                        Err(e) => {
+                            let error_msg =
+                                format!("❌ Query Failed\n\nQuery: {}\nError: {}", text, e);
+                            let _ = error_sender.send(error_msg).await;
+                            match e {
+                            QueryError::MetalPricingError(_) => Response {
+                                text: "Could not fetch metal prices - please try again later".to_string(),
+                                file: None
+                            },
+                            QueryError::QuotationServiceError =>Response {
+                                text: "Error generating quotation - please check whether items are valid".to_string(),
+                                file: None
+                            },
+                                
+                            QueryError::LLMError(_) => Response {
+                                text:"Could not understand query - please rephrase".to_string(),
+                                file: None
+                            },
+                            _ => Response { text:"Could not service request - please try again later".to_string(), file: None }
+                                
+                            ,
+                            }
                         }
                     }
-                },
+                }
             };
 
             bot.send_message(chat_id, response.text).await?;
@@ -104,13 +121,15 @@ impl TelegramService {
                 bot.send_document(chat_id, InputFile::file(&file_path))
                     .await?;
 
-                // Clean up the PDF file after successful send
-                if let Err(e) = fs::remove_file(&file_path) {
-                    println!("Warning: Failed to delete PDF file {}: {}", file_path, e);
+                // Clean up the PDF file - only quotations - after successful send
+                if !&file_path.contains("assets") {
+                    if let Err(e) = fs::remove_file(&file_path) {
+                        println!("Warning: Failed to delete PDF file {}: {}", file_path, e);
+                    }
                 }
             }
         } else if msg.photo().is_some() {
-            bot.send_message(chat_id, "I am not able to process image requests right now")
+            bot.send_message(chat_id, "not able to process image requests right now")
                 .await?;
         } else if msg.document().is_some() {
             bot.send_message(chat_id, "I received a document! 📄")
