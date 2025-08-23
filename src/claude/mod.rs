@@ -1,4 +1,4 @@
-use crate::quotation::{QuotationRequest, PriceOnlyRequest};
+use crate::quotation::{PriceOnlyRequest, QuotationRequest};
 use dotenvy::dotenv;
 use reqwest::Client;
 use serde::Deserialize;
@@ -124,23 +124,26 @@ impl ClaudeAI {
             .client
             .post("https://api.anthropic.com/v1/messages")
             .header("x-api-key", &self.api_key)
-            .header("anthropic-version", "2023-06-01") 
+            .header("anthropic-version", "2023-06-01")
             .json(&json!({
-                "model": "claude-sonnet-4-20250514",
-                "temperature": 0.0,
-                "system": [
-                    {
-                        "type" : "text",
-                        "text" : self.system_prompt.as_str(),
-                        "cache_control" : { "type" : "ephemeral"}
-                    } 
-                ],
-                "max_tokens": 10240,
-                "messages": [{
-                    "role": "user",
-                    "content": query
-                }]
-            }))
+                            "model": "claude-sonnet-4-20250514",
+                            "temperature": 0.0,
+                            "system": [
+                                {
+                                    "type" : "text",
+                                    "text" : self.system_prompt.as_str(),
+                                    "cache_control": {
+                                        "type": "ephemeral",
+                                        "ttl": "1h"
+                                    }
+                                }
+                            ],
+                            "max_tokens": 10240,
+                            "messages": [{
+                                "role": "user",
+                                "content": query
+                            }]
+                        }))
             .send()
             .await
             .map_err(|e| LLMError::ClientError(e.to_string()))?;
