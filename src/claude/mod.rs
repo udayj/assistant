@@ -18,6 +18,7 @@ pub enum Query {
         keywords: Vec<String>,
     },
     GetQuotation(QuotationRequest),
+    GetProformaInvoice(QuotationRequest),
     GetPricesOnly(PriceOnlyRequest),
     UnsupportedQuery,
 }

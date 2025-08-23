@@ -20,11 +20,34 @@ const SECOND_PAGE_START_Y: f64 = 230.0;
 const TC_SECTION_LINE_SPACING: f64 = 5.0;
 const MAX_TOTALS_SECTION_HEIGHT: f64 = 28.0;
 
+#[derive(Debug, Clone, Copy)]
+pub enum DocumentType {
+    Quotation,
+    ProformaInvoice,
+}
+
+impl DocumentType {
+    pub fn get_header_text(&self) -> &'static str {
+        match self {
+            Self::Quotation => "QUOTATION",
+            Self::ProformaInvoice => "PROFORMA INVOICE",
+        }
+    }
+
+    pub fn get_ref_prefix(&self) -> &'static str {
+        match self {
+            Self::Quotation => "Q",
+            Self::ProformaInvoice => "PI",
+        }
+    }
+}
+
 pub fn create_quotation_pdf(
     quotation_number: &str,
     date: &str,
     quotation: &QuotationResponse,
     filename: &str,
+    document_type: DocumentType,
 ) -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all("artifacts")?;
     let (doc, page1, layer1) = PdfDocument::new(
@@ -49,7 +72,14 @@ pub fn create_quotation_pdf(
     let mut current_y = table_start_y;
 
     // Add header to first page
-    add_header_to_page(&current_layer, quotation_number, date, &quotation.to, &font)?;
+    add_header_to_page(
+        &current_layer,
+        quotation_number,
+        date,
+        &quotation.to,
+        &font,
+        document_type,
+    )?;
 
     // Table column positions
     let col_item = MARGIN_MM;
@@ -217,6 +247,7 @@ fn add_header_to_page(
     date: &str,
     to: &Option<Vec<String>>,
     font: &IndirectFontRef,
+    document_type: DocumentType,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Load and add header image
     let img_info = ImageReader::open("assets/header.jpg")?.decode()?.to_rgb8();
@@ -239,6 +270,14 @@ fn add_header_to_page(
 
     img.add_to_layer(layer.clone(), transform);
 
+    let header_text = document_type.get_header_text();
+    let page_center_x = PAGE_WIDTH_MM / 2.0;
+
+    let header_x = page_center_x - (header_text.len() as f64 * 2.0);
+    layer.use_text(header_text, 12.0, Mm(header_x), Mm(240.0), font);
+    let text_width = header_text.len() as f64 * 2.8;
+    draw_horizontal_line(layer, header_x, 238.0, text_width);
+
     // Add quotation details
     let quotation_reference = format!("Ref: {}", quotation_number);
     layer.use_text(quotation_reference, 10.0, Mm(MARGIN_MM), Mm(220.0), font);
@@ -259,13 +298,13 @@ fn add_header_to_page(
         current_y -= 10.0; // Standard spacing when no "to" section
     }
 
-    layer.use_text(
-        "Thank you for enquiry. Please find the quotation below for your consideration",
-        10.0,
-        Mm(MARGIN_MM),
-        Mm(current_y),
-        font,
-    );
+    let mut introduction_text =
+        "Thank you for enquiry. Please find the quotation below for your consideration:-";
+    match document_type {
+        DocumentType::ProformaInvoice => introduction_text = "Please find the details below:-",
+        _ => {}
+    }
+    layer.use_text(introduction_text, 10.0, Mm(MARGIN_MM), Mm(current_y), font);
 
     Ok(())
 }
@@ -638,13 +677,12 @@ mod pdf_tests {
             total_with_delivery: 34585.00,
             taxes: 6225.30,
             grand_total: 40810000.30,
-            to: Some(vec![
-                "Skipper Ltd.",
-                "Kolkata",
-            ]
-            .iter()
-            .map(|x| x.to_string())
-            .collect()),
+            to: Some(
+                vec!["Skipper Ltd.", "Kolkata"]
+                    .iter()
+                    .map(|x| x.to_string())
+                    .collect(),
+            ),
             terms_and_conditions: Some(
                 vec![
                     "Qty. Tolerance: +/-5%",
@@ -656,7 +694,7 @@ mod pdf_tests {
                 .iter()
                 .map(|x| x.to_string())
                 .collect(),
-            )
+            ),
         };
 
         let result = create_quotation_pdf(
@@ -664,6 +702,7 @@ mod pdf_tests {
             "21st August, 2025",
             &test_quotation,
             "test_quotation.pdf",
+            DocumentType::Quotation,
         );
 
         assert!(result.is_ok(), "PDF generation failed: {:?}", result.err());

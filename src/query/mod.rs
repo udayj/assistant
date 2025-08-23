@@ -2,7 +2,7 @@ use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
 use crate::configuration::Context;
 use crate::core::Service;
-use crate::pdf::create_quotation_pdf;
+use crate::pdf::{create_quotation_pdf, DocumentType};
 use crate::prices::price_list::PriceListService;
 use crate::prices::PriceService;
 use crate::quotation::QuotationService;
@@ -88,39 +88,45 @@ impl QueryFulfilment {
                 if q_response.is_none() {
                     return Err(QueryError::QuotationServiceError);
                 } else {
-                    let date = Local::now().date_naive();
-                    let formatted_date = date.format("%Y%m%d").to_string();
-                    let quotation_response = q_response.unwrap();
-                    let mut random_gen = rand::rng();
-                    let random_q_num = random_gen.random_range(1000..=9999);
-                    let quotation_number = format!("Q-{}-{}", formatted_date, random_q_num);
-                    let now = Local::now();
+                    let (quotation_number, quotation_date, filename) =
+                        self.generate_document_details(DocumentType::Quotation);
 
-                    // Get day, month, and year
-                    let day = now.day();
-                    let month = now.format("%B"); // Full month name, e.g., "August"
-                    let year = now.year();
-
-                    // Determine the ordinal suffix for the day
-                    let suffix = match day {
-                        1 | 21 | 31 => "st",
-                        2 | 22 => "nd",
-                        3 | 23 => "rd",
-                        _ => "th",
-                    };
-
-                    // Format the date as a string
-                    let quotation_date = format!("{}{} {}, {}", day, suffix, month, year);
                     let _ = create_quotation_pdf(
                         &quotation_number,
                         &quotation_date,
-                        &quotation_response,
-                        format!("{}.pdf", quotation_number).as_str(),
+                        &q_response.unwrap(),
+                        &filename,
+                        DocumentType::Quotation,
                     )
                     .unwrap();
+
                     Response {
                         text: "Quotation created for given enquiry".to_string(),
-                        file: Some(format!("artifacts/{}.pdf", quotation_number)),
+                        file: Some(format!("artifacts/{}", filename)),
+                    }
+                }
+            }
+
+            Query::GetProformaInvoice(quotation_request) => {
+                let q_response = self.quotation_service.generate_quotation(quotation_request);
+                if q_response.is_none() {
+                    return Err(QueryError::QuotationServiceError);
+                } else {
+                    let (quotation_number, quotation_date, filename) =
+                        self.generate_document_details(DocumentType::ProformaInvoice);
+
+                    let _ = create_quotation_pdf(
+                        &quotation_number,
+                        &quotation_date,
+                        &q_response.unwrap(),
+                        &filename,
+                        DocumentType::ProformaInvoice,
+                    )
+                    .unwrap();
+
+                    Response {
+                        text: "Proforma Invoice created for given enquiry".to_string(),
+                        file: Some(format!("artifacts/{}", filename)),
                     }
                 }
             }
@@ -170,5 +176,31 @@ impl QueryFulfilment {
         }
 
         lines.join("\n")
+    }
+
+    fn generate_document_details(&self, document_type: DocumentType) -> (String, String, String) {
+        let date = Local::now().date_naive();
+        let formatted_date = date.format("%Y%m%d").to_string();
+        let mut random_gen = rand::rng();
+        let random_num = random_gen.random_range(1000..=9999);
+        let prefix = document_type.get_ref_prefix();
+        let quotation_number = format!("{}-{}-{}", prefix, formatted_date, random_num);
+
+        let now = Local::now();
+        let day = now.day();
+        let month = now.format("%B");
+        let year = now.year();
+
+        let suffix = match day {
+            1 | 21 | 31 => "st",
+            2 | 22 => "nd",
+            3 | 23 => "rd",
+            _ => "th",
+        };
+
+        let quotation_date = format!("{}{} {}, {}", day, suffix, month, year);
+        let filename = format!("{}.pdf", quotation_number);
+
+        (quotation_number, quotation_date, filename)
     }
 }

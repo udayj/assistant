@@ -42,6 +42,7 @@ mod tests {
     use assistant::quotation::{QuotationRequest, QuoteItem};
     use chrono::{Datelike, Local};
     use rand::prelude::*;
+    use assistant::pdf::DocumentType;
 
     #[ignore = "dummy"]
     #[tokio::test]
@@ -112,6 +113,7 @@ mod tests {
             &quotation_date,
             &quotation_response,
             "quotation.pdf",
+            DocumentType::ProformaInvoice
         )
         .unwrap();
         return;
