@@ -89,6 +89,9 @@ async fn webhook_handler(
         );
     }
 
+    if body.trim() == "/help" {
+        return send_text_response(&QueryFulfilment::get_help_text());
+    }
     match state.query_fulfilment.fulfil_query(&body).await {
         Ok(response) => {
             if let Some(file_path) = response.file {
@@ -114,7 +117,7 @@ async fn webhook_handler(
                     "Error generating quotation - please check whether items are valid",
                 ),
                 QueryError::LLMError(_) => {
-                    send_text_response("Could not understand query - please rephrase")
+                    send_text_response(&QueryFulfilment::get_help_text())
                 }
                 _ => send_text_response("Could not service request - please try again later"),
             }

@@ -81,9 +81,7 @@ impl TelegramService {
                     file: None,
                 },
                 "/help" => Response {
-                    text: format!(
-                        "Hello! I'm your Price Assistant. Send me your price / quotation queries."
-                    ),
+                    text: QueryFulfilment::get_help_text(),
                     file: None,
                 },
                 text => {
@@ -104,7 +102,7 @@ impl TelegramService {
                             },
                                 
                             QueryError::LLMError(_) => Response {
-                                text:"Could not understand query - please rephrase".to_string(),
+                                text:QueryFulfilment::get_help_text().to_string(),
                                 file: None
                             },
                             _ => Response { text:"Could not service request - please try again later".to_string(), file: None }

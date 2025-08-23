@@ -1,0 +1,28 @@
+This automated assistant can help you with the following
+
+📈 **Metal Prices**
+- "send metal prices"
+- "current mcx rates"
+
+📋 **Price Lists** 
+- "KEI latest armoured cable price list"
+- "give Polycab flexible cable price list"
+- "require KEI multicore price list"
+
+📈 **Item Prices**
+- "price of 4C x 2.5 cu flex, 3 C x 2.5 cu armd" 
+(if nothing specified uses latest KEI, and gives LP if no discount specified)
+- "give Polycab 3C x 1.5 cu armd cable rate - discount 75% "
+
+📄 **Quotations**
+- "quote for 4C x 2.5 cu flex 100 M discount 58%"
+- "quote for 4 C x 2.5 cu armd 100 M discount 69%, 
+   to: BTL EPC Ltd.
+   terms: 
+   FOR Kolkata 
+   Delivery: Ready stock 
+   Validity: 2 days from today"
+
+📋 **Proforma Invoice**
+- "give proforma for 4C x 2.5 cu flex 100 M discount 58%
+   to: BTL EPC Ltd., Kolkata"

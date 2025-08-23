@@ -124,11 +124,17 @@ impl ClaudeAI {
             .client
             .post("https://api.anthropic.com/v1/messages")
             .header("x-api-key", &self.api_key)
-            .header("anthropic-version", "2023-06-01")
+            .header("anthropic-version", "2023-06-01") 
             .json(&json!({
                 "model": "claude-sonnet-4-20250514",
                 "temperature": 0.0,
-                "system": self.system_prompt.as_str(),
+                "system": [
+                    {
+                        "type" : "text",
+                        "text" : self.system_prompt.as_str(),
+                        "cache_control" : { "type" : "ephemeral"}
+                    } 
+                ],
                 "max_tokens": 10240,
                 "messages": [{
                     "role": "user",

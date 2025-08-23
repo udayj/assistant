@@ -55,6 +55,11 @@ impl QueryFulfilment {
         })
     }
 
+    pub fn get_help_text() -> String {
+        std::fs::read_to_string("assets/help.txt")
+            .unwrap_or_else(|_| "Could not understand query. Please rephrase".to_string())
+    }
+
     pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
         let query = self.get_query_type(query).await?;
         let response = match query {
