@@ -147,7 +147,6 @@
         "webhook_port": 8080,
         "file_base_url": "https://whatsapp.avantgardelabs.in",
         "price_alert_subscribers": [
-            "whatsapp:+919830906922",
             "whatsapp:+919831074751",
             "whatsapp:+919830053838"
         ],

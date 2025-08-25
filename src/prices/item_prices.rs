@@ -19,7 +19,8 @@ impl Description for Product {
         }
     }
 
-    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        // NEW
         match self {
             Self::Cable(cable) => cable.get_brief_description(extras),
         }
@@ -67,10 +68,21 @@ impl Description for Cable {
 
     fn get_brief_description(&self, extras: Vec<String>) -> String {
         match self {
-            Self::Coaxial(coaxial_type) => format!("{}", coaxial_type.get_brief_description(extras)),
-            Self::Solar { solar_type, sqmm } => format!("{}mm² Solar {}", sqmm, solar_type.get_brief_description(extras)),
-            Self::Submersible { core_size, sqmm } => format!("{}C x {}mm² Flat Flex", core_size, sqmm),
-            Self::Telephone { pair_size, conductor_mm } => format!("{}P x {}mm Tel", pair_size, conductor_mm),
+            Self::Coaxial(coaxial_type) => {
+                format!("{}", coaxial_type.get_brief_description(extras))
+            }
+            Self::Solar { solar_type, sqmm } => format!(
+                "{}mm² Solar {}",
+                sqmm,
+                solar_type.get_brief_description(extras)
+            ),
+            Self::Submersible { core_size, sqmm } => {
+                format!("{}C x {}mm² Flat Flex", core_size, sqmm)
+            }
+            Self::Telephone {
+                pair_size,
+                conductor_mm,
+            } => format!("{}P x {}mm Tel", pair_size, conductor_mm),
             Self::PowerControl(cable) => cable.get_brief_description(extras),
         }
     }
@@ -132,7 +144,8 @@ impl Description for PowerControl {
         }
     }
 
-    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        // NEW
         match self {
             Self::LT(lt_cable) => lt_cable.get_brief_description(extras),
             Self::HT(ht_cable) => ht_cable.get_brief_description(extras),
@@ -188,7 +201,7 @@ impl Description for LT {
         } else {
             if extras.contains(&pvc) && !extras.contains(&frls) {
                 return format!(
-                    "{} C x {} sq. mm PVC Insulated, PVC Sheathed Armoured {} Cable",
+                    "{} C x {} sq. mm PVC Insulated, PVC Sheathed Unarmoured {} Cable",
                     self.core_size,
                     self.sqmm,
                     self.conductor.get_description(extras)
@@ -196,7 +209,7 @@ impl Description for LT {
             }
             if extras.contains(&pvc) && extras.contains(&frls) {
                 return format!(
-                    "{} C x {} sq. mm PVC Insulated, FRLS PVC Sheathed Armoured {} Cable",
+                    "{} C x {} sq. mm PVC Insulated, FRLS PVC Sheathed Unarmoured {} Cable",
                     self.core_size,
                     self.sqmm,
                     self.conductor.get_description(extras)
@@ -205,14 +218,14 @@ impl Description for LT {
 
             if !extras.contains(&pvc) && extras.contains(&frls) {
                 return format!(
-                    "{} C x {} sq. mm XLPE Insulated, FRLS PVC Sheathed Armoured {} Cable",
+                    "{} C x {} sq. mm XLPE Insulated, FRLS PVC Sheathed Unarmoured {} Cable",
                     self.core_size,
                     self.sqmm,
                     self.conductor.get_description(extras)
                 );
             } else {
                 return format!(
-                    "{} C x {} sq. mm XLPE Insulated, PVC Sheathed Armoured {} Cable",
+                    "{} C x {} sq. mm XLPE Insulated, PVC Sheathed Unarmoured {} Cable",
                     self.core_size,
                     self.sqmm,
                     self.conductor.get_description(extras)
@@ -221,15 +234,29 @@ impl Description for LT {
         }
     }
 
-    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
-        let insulation = if extras.contains(&"pvc".to_string()) { "PVC" } else { "XLPE" };
-        let sheath = if extras.contains(&"frls".to_string()) { "FRLS" } else { "" };
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        // NEW
+        let insulation = if extras.contains(&"pvc".to_string()) {
+            "PVC"
+        } else {
+            "XLPE"
+        };
+        let sheath = if extras.contains(&"frls".to_string()) {
+            "FRLS"
+        } else {
+            ""
+        };
         let armor = if self.armoured { "Armd" } else { "UnArm" };
-        
-        format!("{}C x {}mm² {} {} {} {}", 
-            self.core_size, self.sqmm, 
+
+        format!(
+            "{}C x {}mm² {} {} {} {}",
+            self.core_size,
+            self.sqmm,
             self.conductor.get_brief_description(vec![]),
-            insulation, sheath, armor)
+            insulation,
+            sheath,
+            armor
+        )
     }
 }
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -251,11 +278,15 @@ impl Description for HT {
         )
     }
 
-    fn get_brief_description(&self, _extras: Vec<String>) -> String {  // NEW
-        format!("{}C x {}mm² {} {}kV Arm", 
-            self.core_size, self.sqmm,
+    fn get_brief_description(&self, _extras: Vec<String>) -> String {
+        // NEW
+        format!(
+            "{}C x {}mm² {} {}kV Arm",
+            self.core_size,
+            self.sqmm,
             self.conductor.get_brief_description(vec![]),
-            self.voltage_grade)
+            self.voltage_grade
+        )
     }
 }
 
@@ -276,10 +307,14 @@ impl Description for Flexible {
         )
     }
 
-    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
-        format!("{}C x {}mm² Cu Flex {}", 
-            self.core_size, self.sqmm,
-            self.flexible_type.get_brief_description(extras))
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        // NEW
+        format!(
+            "{}C x {}mm² Cu Flex {}",
+            self.core_size,
+            self.sqmm,
+            self.flexible_type.get_brief_description(extras)
+        )
     }
 }
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
@@ -300,7 +335,8 @@ impl Description for FlexibleType {
         }
     }
 
-    fn get_brief_description(&self, extras: Vec<String>) -> String {  // NEW
+    fn get_brief_description(&self, extras: Vec<String>) -> String {
+        // NEW
         self.get_description(extras) // Same as full description
     }
 }
@@ -319,7 +355,8 @@ impl Description for Conductor {
         }
     }
 
-    fn get_brief_description(&self, _extras: Vec<String>) -> String {  // NEW
+    fn get_brief_description(&self, _extras: Vec<String>) -> String {
+        // NEW
         match self {
             Self::Aluminium => "Al".to_string(),
             Self::Copper => "Cu".to_string(),
