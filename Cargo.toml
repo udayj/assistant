@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1.88"
-axum = "0.8.4"
+axum = { version="0.8.4", features = ["macros"] }
 base64 = "0.22.1"
 chrono = "0.4.41"
 chrono-tz = "0.10.4"

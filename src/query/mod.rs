@@ -79,7 +79,7 @@ impl QueryFulfilment {
             } else {
                 format!("{}\n{}", image_text.trim(), user_text.trim())
             };
-
+        println!("formed combined query:{}", combined_query);
         // Use existing fulfillment logic
         self.fulfil_query(&combined_query).await
     }

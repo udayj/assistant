@@ -185,9 +185,11 @@ impl ClaudeAI {
     }
 
     async fn make_api_request(&self, query: &str) -> Result<serde_json::Value, LLMError> {
+        println!("About to make HTTP request to Claude API");
         let response = self
             .client
             .post("https://api.anthropic.com/v1/messages")
+            .timeout(Duration::from_secs(45))
             .header("x-api-key", &self.api_key)
             .header("anthropic-version", "2023-06-01")
             .json(&json!({
@@ -213,6 +215,7 @@ impl ClaudeAI {
             .await
             .map_err(|e| LLMError::ClientError(e.to_string()))?;
 
+        println!("Received HTTP response, parsing JSON...");
         let json_response: serde_json::Value = response
             .json()
             .await
