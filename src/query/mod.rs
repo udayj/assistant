@@ -60,6 +60,30 @@ impl QueryFulfilment {
             .unwrap_or_else(|_| "Could not understand query. Please rephrase".to_string())
     }
 
+    pub async fn fulfil_image_query(
+        &self,
+        image_data: &[u8],
+        user_text: &str,
+    ) -> Result<Response, QueryError> {
+        // Extract text from image
+        let image_text = self
+            .llm_service
+            .extract_text_from_image(image_data.to_vec())
+            .await
+            .map_err(|e| QueryError::LLMError(e.to_string()))?;
+
+        let combined_query =
+            if image_text.trim().is_empty() || image_text.contains("No readable text found") {
+                // Fallback to user text only
+                user_text.to_string()
+            } else {
+                format!("{}\n{}", image_text.trim(), user_text.trim())
+            };
+
+        // Use existing fulfillment logic
+        self.fulfil_query(&combined_query).await
+    }
+
     pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
         let query = self.get_query_type(query).await?;
         let response = match query {

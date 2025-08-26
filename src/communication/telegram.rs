@@ -8,6 +8,8 @@ use teloxide::prelude::*;
 use teloxide::types::InputFile;
 use thiserror::Error;
 use tokio::sync::mpsc;
+use teloxide::net::Download;
+use teloxide::types::PhotoSize;
 
 #[derive(Debug, Error)]
 pub enum TelegramError {
@@ -15,6 +17,8 @@ pub enum TelegramError {
     EnvError,
     #[error("Error initializing query fulfilment service: {0}")]
     QueryFulfilmentInitError(String),
+    #[error("Image processing error: {0}")]
+    ImageProcessingError(String),
 }
 
 pub struct TelegramService {
@@ -72,6 +76,31 @@ impl TelegramService {
         error_sender: Arc<mpsc::Sender<String>>,
     ) -> ResponseResult<()> {
         let chat_id = msg.chat.id;
+        if let Some(photo) = msg.photo() {
+            let caption = msg.caption().unwrap_or("").trim();
+
+            bot.send_message(chat_id, "Processing request... please wait ⏳").await?;
+
+            match Self::process_image_query(&bot, photo, caption, &query_fulfilment).await {
+                Ok(response) => {
+                    bot.send_message(chat_id, response.text).await?;
+                    if let Some(file_path) = response.file {
+                        bot.send_document(chat_id, InputFile::file(&file_path)).await?;
+                        // Clean up generated files
+                        if !file_path.contains("assets") {
+                            let _ = fs::remove_file(&file_path);
+                        }
+                    }
+                }
+                Err(e) => {
+                    let error_msg = format!("❌ Image Query Failed\n\nCaption: {}\nError: {}", caption, e);
+                    let _ = error_sender.send(error_msg).await;
+                    bot.send_message(chat_id, "Could not process image - please try again with clearer image and text").await?;
+                }
+            }
+            return Ok(());
+        }
+
         if let Some(text) = msg.text() {
             let response = match text {
                 "/start" => Response {
@@ -126,9 +155,6 @@ impl TelegramService {
                     }
                 }
             }
-        } else if msg.photo().is_some() {
-            bot.send_message(chat_id, "not able to process image requests right now")
-                .await?;
         } else if msg.document().is_some() {
             bot.send_message(chat_id, "I received a document! 📄")
                 .await?;
@@ -140,5 +166,30 @@ impl TelegramService {
             .await?;
         }
         Ok(())
+    }
+
+    async fn process_image_query(
+        bot: &Bot,
+        photos: &[PhotoSize],
+        caption: &str,
+        query_fulfilment: &QueryFulfilment,
+    ) -> Result<Response, TelegramError> {
+        // Get the largest photo size
+        let photo = photos
+            .iter()
+            .max_by_key(|p| p.width * p.height)
+            .ok_or(TelegramError::ImageProcessingError("No photo found".to_string()))?;
+
+        // Download image
+        let file_info = bot.get_file(&photo.file.id).await
+            .map_err(|e| TelegramError::ImageProcessingError(format!("Failed to get image file info: {}", e)))?;
+        
+        let mut image_data = Vec::new();
+        bot.download_file(&file_info.path, &mut image_data).await
+            .map_err(|e| TelegramError::ImageProcessingError(format!("Failed to download image: {}", e)))?;
+
+        // Process through existing query fulfilment with image support
+        query_fulfilment.fulfil_image_query(&image_data, caption).await
+            .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
     }
 }
