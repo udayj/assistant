@@ -11,6 +11,7 @@ use scraper::{Html, Selector};
 use std::time::Duration;
 use thiserror::Error;
 use tokio::sync::mpsc;
+use tracing::{error, info};
 
 pub mod item_prices;
 pub mod price_list;
@@ -75,10 +76,10 @@ impl Service for PriceService {
                 match self.send_price_alert(now_ist).await {
                     Ok(_) => {
                         self.last_alert_hour = Some(hour);
-                        println!("Price alert sent successfully at {}:{:02}", hour, minute);
+                        info!(hour = %hour, minute = %minute, "Price alert sent successfully");
                     }
                     Err(e) => {
-                        println!("Failed to send price alert: {}", e);
+                        error!(error = %e, "Failed to send price alert");
                         // Continue running even if alert fails
                     }
                 }
@@ -195,7 +196,7 @@ impl PriceService {
             .parse::<f64>()
             .map_err(|_| PriceError::PriceParseError)?;
 
-        println!("{} price is:{}", metal, price);
+        info!(metal = %metal, price = %price, "Fetched metal price");
         self.price_cache.insert(metal.to_string(), price);
         Ok(price)
     }

@@ -1,4 +1,5 @@
 {
+    "log_level" : "info",
     "pricelists": [
         {
             "pricelist": "assets/processed_pricelists/kei_armoured_lt.json",

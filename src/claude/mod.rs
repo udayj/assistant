@@ -1,6 +1,4 @@
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
-use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use dotenvy::dotenv;
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
@@ -9,6 +7,7 @@ use std::fs;
 use std::time::Duration;
 use thiserror::Error;
 use tokio::time::sleep;
+use tracing::{error, info};
 
 #[derive(Debug, Deserialize)]
 pub enum Query {
@@ -55,7 +54,7 @@ impl ClaudeAI {
     pub fn new(system_prompt_file: &str) -> Result<Self, LLMError> {
         let prompt = fs::read_to_string(system_prompt_file)
             .map_err(|e| LLMError::SystemPromptError(e.to_string()))?;
-        dotenv().ok();
+
         let api_key = env::var("ANTHROPIC_API_KEY").map_err(|_| LLMError::EnvError)?;
         let client = Client::builder()
             .timeout(Duration::from_secs(30))
@@ -84,9 +83,9 @@ impl ClaudeAI {
                 Ok(response) => match self.parse_response(&response) {
                     Ok(parsed_query) => return Ok(parsed_query),
                     Err(LLMError::ParseError) if !parse_retry_attempted => {
-                        println!(
-                            "Parse error on attempt {}, will retry with enhanced prompt",
-                            attempt + 1
+                        error!(
+                            attempt = attempt + 1,
+                            "Parse error, will retry with enhanced prompt"
                         );
                         parse_retry_attempted = true;
                         last_error = Some(LLMError::ParseError);
@@ -99,7 +98,7 @@ impl ClaudeAI {
 
                     if attempt < MAX_RETRIES - 1 {
                         let delay = Duration::from_millis(1000 * (2_u64.pow(attempt)));
-                        println!(
+                        error!(
                             "Claude API attempt {} failed, retrying in {:?}",
                             attempt + 1,
                             delay
@@ -113,7 +112,7 @@ impl ClaudeAI {
         // All retries exhausted
         match last_error {
             Some(LLMError::ParseError) => {
-                println!("Parse error persisted after retry for: {}", query);
+                error!("Parse error persisted after retry for: {}", query);
                 Err(LLMError::ParseError)
             }
             Some(LLMError::OverloadedError) => Err(LLMError::OverloadedError),
@@ -122,70 +121,8 @@ impl ClaudeAI {
         }
     }
 
-    pub async fn extract_text_from_image(&self, image_data: Vec<u8>) -> Result<String, LLMError> {
-        let base64_image = BASE64.encode(&image_data);
-
-        let response = self
-            .client
-            .post("https://api.anthropic.com/v1/messages")
-            .header("x-api-key", &self.api_key)
-            .header("anthropic-version", "2023-06-01")
-            .json(&json!({
-                "model": "claude-sonnet-4-20250514",
-                "temperature": 0.0,
-                "max_tokens": 4096,
-                "messages": [{
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "image/jpeg",
-                                "data": base64_image
-                            }
-                        },
-                        {
-                            "type": "text",
-                            /*"text": "Extract all text content from this image exactly as written. Be careful and extract the numbers & decimals exactly as they appear in the image.
-                            Read this image character by character, letter by letter, number by number. Do not make assumptions about what the text should say - extract only what you actually see written. Pay special attention to small details like spaces, decimal points, and individual digits. 
-                            If it appears to be in a tablular format, preserve the structure and include all visible text, numbers, and labels. If there's no readable text, respond with 'No readable text found'."*/
-                            "text": "Extract only the raw text visible in this image. No formatting, no explanations, no assumptions. Just the text as it appears."
-                        }
-                    ]
-                }]
-            }))
-            .send()
-            .await
-            .map_err(|e| LLMError::ImageProcessingError(e.to_string()))?;
-
-        let json_response: serde_json::Value = response
-            .json()
-            .await
-            .map_err(|e| LLMError::ImageProcessingError(e.to_string()))?;
-
-        println!("raw response:{:#?}", json_response);
-        // Check for API errors
-        if let Some(error) = json_response.get("error") {
-            let error_message = error
-                .get("message")
-                .and_then(|m| m.as_str())
-                .unwrap_or("unknown");
-            return Err(LLMError::ImageProcessingError(error_message.to_string()));
-        }
-
-        let extracted_text =
-            json_response["content"][0]["text"]
-                .as_str()
-                .ok_or(LLMError::ImageProcessingError(
-                    "Failed to parse response".to_string(),
-                ))?;
-
-        Ok(extracted_text.to_string())
-    }
-
     async fn make_api_request(&self, query: &str) -> Result<serde_json::Value, LLMError> {
-        println!("About to make HTTP request to Claude API");
+        info!("About to make HTTP request to Claude API");
         let response = self
             .client
             .post("https://api.anthropic.com/v1/messages")
@@ -215,7 +152,7 @@ impl ClaudeAI {
             .await
             .map_err(|e| LLMError::ClientError(e.to_string()))?;
 
-        println!("Received HTTP response, parsing JSON...");
+        info!("Received HTTP response, parsing JSON...");
         let json_response: serde_json::Value = response
             .json()
             .await
@@ -246,16 +183,16 @@ impl ClaudeAI {
     }
 
     fn parse_response(&self, response: &serde_json::Value) -> Result<Query, LLMError> {
-        println!("raw response:{:#?}", response);
+        info!(response = ?response, "raw response ");
 
         let content_text = response["content"][0]["text"]
             .as_str()
             .ok_or(LLMError::ParseError)?;
 
-        println!("{}", content_text);
+        info!(content = %content_text, "content");
 
         let actual_query: Query = serde_json::from_str(content_text).map_err(|e| {
-            println!("Parse error: {:#?}", e);
+            info!(error = ?e, "Error parsing ");
             LLMError::ParseError
         })?;
 

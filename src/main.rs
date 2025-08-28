@@ -6,14 +6,25 @@ use assistant::configuration::Context;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
 use assistant::AppError;
+use dotenvy::dotenv;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
+use tracing::Level;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
-   
-
     let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
+    dotenv().ok();
+
+    let log_level = Level::from_str(&context.config.log_level).unwrap_or(Level::INFO);
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::EnvFilter::new(log_level.to_string()))
+        .init();
+    tracing::info!("Starting Assistant Application");
+
     let mut service_manager = ServiceManager::new(context);
     let (sender, receiver) = mpsc::channel::<String>(100);
     let (error_sender, error_receiver) = mpsc::channel::<String>(100);
@@ -36,13 +47,13 @@ async fn main() -> Result<(), AppError> {
 mod tests {
 
     use assistant::pdf::create_quotation_pdf;
+    use assistant::pdf::DocumentType;
     use assistant::prices::item_prices::{
         Cable, Conductor, Flexible, FlexibleType, PowerControl, Product, LT,
     };
     use assistant::quotation::{QuotationRequest, QuoteItem};
     use chrono::{Datelike, Local};
     use rand::prelude::*;
-    use assistant::pdf::DocumentType;
 
     #[ignore = "dummy"]
     #[tokio::test]
@@ -81,7 +92,7 @@ mod tests {
             ],
             delivery_charges: 500.0,
             to: None,
-            terms_and_conditions: None
+            terms_and_conditions: None,
         };
 
         let file_content = std::fs::read_to_string("sample_response.json").unwrap();
@@ -113,7 +124,7 @@ mod tests {
             &quotation_date,
             &quotation_response,
             "quotation.pdf",
-            DocumentType::ProformaInvoice
+            DocumentType::ProformaInvoice,
         )
         .unwrap();
         return;

@@ -8,6 +8,7 @@ use std::env;
 use std::sync::Arc;
 use teloxide::prelude::*;
 use tokio::sync::{mpsc, Mutex};
+use tracing::error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceAlert {
@@ -84,7 +85,7 @@ impl PriceAlertService {
 
         for &chat_id in &self.telegram_subscribers {
             if let Err(e) = self.bot.send_message(ChatId(chat_id), &message).await {
-                println!("Failed to send Telegram alert to {}: {}", chat_id, e);
+                error!(chat_id = %chat_id, error = %e, "Failed to send Telegram alert");
             }
         }
     }
@@ -92,7 +93,7 @@ impl PriceAlertService {
     async fn send_whatsapp_alerts(&self, alert: &PriceAlert) {
         for subscriber in &self.whatsapp_subscribers {
             if let Err(e) = self.send_whatsapp_template(alert, subscriber).await {
-                println!("Failed to send WhatsApp alert to {}: {}", subscriber, e);
+                error!(subscriber = %subscriber, error = %e, "Failed to send WhatsApp alert");
             }
         }
     }

@@ -1,11 +1,12 @@
 use crate::configuration::Context;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithReceiver};
 use async_trait::async_trait;
+use dotenvy::dotenv;
+use std::env;
 use std::sync::Arc;
 use teloxide::prelude::*;
 use tokio::sync::{mpsc, Mutex};
-use dotenvy::dotenv;
-use std::env;
+use tracing::error;
 
 pub struct ErrorAlertService {
     bot: Bot,
@@ -22,7 +23,7 @@ impl ServiceWithReceiver for ErrorAlertService {
         let error_bot_token = env::var("ERROR_BOT_TOKEN").expect("ERROR_BOT_TOKEN not found");
         let bot = Bot::new(error_bot_token);
         let channel_id = context.config.telegram.error_channel_id;
-        
+
         Self {
             bot,
             receiver,
@@ -36,8 +37,12 @@ impl ServiceWithReceiver for ErrorAlertService {
                 let mut rx = receiver.lock().await;
                 if let Some(error_message) = rx.recv().await {
                     drop(rx);
-                    if let Err(e) = self.bot.send_message(ChatId(self.channel_id), &error_message).await {
-                        println!("Failed to send error alert: {}", e);
+                    if let Err(e) = self
+                        .bot
+                        .send_message(ChatId(self.channel_id), &error_message)
+                        .await
+                    {
+                        error!(error = %e, "Failed to send error alert");
                     }
                 }
             }

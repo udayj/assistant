@@ -17,6 +17,7 @@ use thiserror::Error;
 use tokio::net::TcpListener;
 use tokio::sync::mpsc;
 use tower_http::cors::CorsLayer;
+use tracing::info;
 
 #[derive(Debug, Error)]
 pub enum WhatsAppError {
@@ -86,7 +87,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             .await
             .map_err(|e| ServiceManagerError::new(&format!("Failed to bind port: {}", e)))?;
 
-        println!("WhatsApp HTTP server running on port {}", self.port);
+        info!("WhatsApp HTTP server running on port {}", self.port);
 
         axum::serve(listener, app)
             .await
@@ -102,7 +103,7 @@ async fn webhook_handler(
     State(state): State<AppState>,
     Form(payload): Form<HashMap<String, String>>,
 ) -> Response<String> {
-    println!("Webhook payload: {:?}", payload);
+    info!("Webhook payload: {:?}", payload);
 
     let from = payload.get("From").unwrap_or(&"".to_string()).clone();
     let body = payload.get("Body").unwrap_or(&"".to_string()).clone();

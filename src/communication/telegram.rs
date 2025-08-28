@@ -10,6 +10,7 @@ use thiserror::Error;
 use tokio::sync::mpsc;
 use teloxide::net::Download;
 use teloxide::types::PhotoSize;
+use tracing::error;
 
 #[derive(Debug, Error)]
 pub enum TelegramError {
@@ -151,7 +152,7 @@ impl TelegramService {
                 // Clean up the PDF file - only quotations - after successful send
                 if !&file_path.contains("assets") {
                     if let Err(e) = fs::remove_file(&file_path) {
-                        println!("Warning: Failed to delete PDF file {}: {}", file_path, e);
+                        error!("Warning: Failed to delete PDF file {}: {}", file_path, e);
                     }
                 }
             }
