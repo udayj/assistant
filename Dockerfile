@@ -1,8 +1,11 @@
 # Use official Rust image as builder
-FROM rust:1.89 as builder
+FROM rust:1.89-alpine AS builder
 
 # Set working directory
 WORKDIR /app
+
+RUN apk add --no-cache musl-dev
+RUN apk add --no-cache musl-dev pkgconfig openssl-dev openssl-libs-static
 
 # Copy dependency files first (for better caching)
 COPY Cargo.toml Cargo.lock ./
@@ -27,13 +30,10 @@ COPY config.json ./
 RUN cargo build --release
 
 # Runtime stage - smaller base image
-FROM debian:bookworm-slim
+FROM alpine:latest
 
 # Install required system dependencies
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    libssl3 \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ca-certificates
 
 # Create app directory
 WORKDIR /app
@@ -46,10 +46,10 @@ COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/config.json .
 
 # Create a non-root user for security
-RUN useradd -r -s /bin/false appuser && chown -R appuser:appuser /app
+RUN adduser -D -s /bin/false appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Expose port (DO requires this even though we don't use HTTP)
+# Expose port
 EXPOSE 8080
 
 # Run the application
