@@ -1,11 +1,12 @@
 use crate::{
     configuration::PriceListConfig,
-    prices::item_prices::{PriceList, PricingSystem, Product, Description},
+    prices::item_prices::{Description, PriceList, PricingSystem, Product},
 };
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use thiserror::Error;
+use tracing::info;
 
 #[derive(Debug, Error)]
 pub enum QuotationError {
@@ -129,9 +130,9 @@ impl QuotationService {
         let mut basic_total = 0.0;
 
         for item in request.items {
-            println!("processing:{:#?}", item);
+            info!(item = ?item, "Processing quotation item");
             let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
-            println!("found price:{}", listed_price);
+            info!(price = %listed_price, "Found item price");
             let mut price = listed_price
                 * (1.0 - item.discount)
                 * (1.0 + item.loading_frls)
@@ -164,7 +165,7 @@ impl QuotationService {
             taxes,
             grand_total,
             to: request.to,
-            terms_and_conditions: self.process_terms_and_conditions(request.terms_and_conditions)
+            terms_and_conditions: self.process_terms_and_conditions(request.terms_and_conditions),
         })
     }
 
@@ -177,7 +178,7 @@ impl QuotationService {
                 continue;
             }
             let listed_price = listed_price.unwrap();
-            
+
             let mut price = listed_price
                 * (1.0 - item.discount)
                 * (1.0 + item.loading_frls)
@@ -192,11 +193,8 @@ impl QuotationService {
             if item.loading_pvc > 0.0 {
                 extras.push("pvc".to_string());
             }
-            
-            let description = format!(
-                "{}",
-                item.product.get_brief_description(extras)
-            );
+
+            let description = format!("{}", item.product.get_brief_description(extras));
 
             response_items.push(PriceOnlyResponseItem {
                 description,
@@ -219,12 +217,10 @@ impl QuotationService {
 
     fn process_terms_and_conditions(&self, terms: Option<Vec<String>>) -> Option<Vec<String>> {
         match terms {
-            Some(terms_vec) if terms_vec.len() == 1 => {
-                match terms_vec[0].to_lowercase().as_str() {
-                    "standard" => Some(self.get_standard_terms()),
-                    _ => Some(terms_vec),
-                }
-            }
+            Some(terms_vec) if terms_vec.len() == 1 => match terms_vec[0].to_lowercase().as_str() {
+                "standard" => Some(self.get_standard_terms()),
+                _ => Some(terms_vec),
+            },
             other => other,
         }
     }
@@ -236,6 +232,9 @@ impl QuotationService {
             "Delivery: Ready stock subject to prior sale",
             "GST: 18% extra as applicable",
             "Validity: 3 days from quotation date",
-        ].iter().map(|x| x.to_string()).collect()
+        ]
+        .iter()
+        .map(|x| x.to_string())
+        .collect()
     }
 }

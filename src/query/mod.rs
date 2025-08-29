@@ -2,6 +2,7 @@ use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
 use crate::configuration::Context;
 use crate::core::Service;
+use crate::ocr::OcrService;
 use crate::pdf::{create_quotation_pdf, DocumentType};
 use crate::prices::price_list::PriceListService;
 use crate::prices::PriceService;
@@ -9,6 +10,7 @@ use crate::quotation::QuotationService;
 use chrono::{Datelike, Local};
 use rand::prelude::*;
 use thiserror::Error;
+use tracing::info;
 
 #[derive(Error, Debug)]
 pub enum QueryError {
@@ -17,6 +19,12 @@ pub enum QueryError {
 
     #[error("LLM initialization error: {0}")]
     LLMInitializationError(String),
+
+    #[error("OCR Service initialization error")]
+    OcrInitializationError,
+
+    #[error("OCR Service error: {0}")]
+    OcrError(String),
 
     #[error("Quotation Service Initialization Error: {0}")]
     QuotationServiceInitializationError(String),
@@ -36,6 +44,7 @@ pub struct QueryFulfilment {
     llm_service: ClaudeAI,
     quotation_service: QuotationService,
     pricelist_service: PriceListService,
+    ocr_service: OcrService,
 }
 
 impl QueryFulfilment {
@@ -47,11 +56,16 @@ impl QueryFulfilment {
             .map_err(|e| QueryError::QuotationServiceInitializationError(e.to_string()))?;
         let pricelist_service = PriceListService::new(context.config.pdf_pricelists)
             .map_err(|e| QueryError::PriceListServiceInitializationError(e.to_string()))?;
+        let ocr_service = OcrService::new()
+            .await
+            .map_err(|_| QueryError::OcrInitializationError)?;
+
         Ok(Self {
             price_service,
             llm_service: claude_ai,
             quotation_service,
             pricelist_service,
+            ocr_service,
         })
     }
 
@@ -67,10 +81,10 @@ impl QueryFulfilment {
     ) -> Result<Response, QueryError> {
         // Extract text from image
         let image_text = self
-            .llm_service
+            .ocr_service
             .extract_text_from_image(image_data.to_vec())
             .await
-            .map_err(|e| QueryError::LLMError(e.to_string()))?;
+            .map_err(|e| QueryError::OcrError(e.to_string()))?;
 
         let combined_query =
             if image_text.trim().is_empty() || image_text.contains("No readable text found") {
@@ -79,7 +93,7 @@ impl QueryFulfilment {
             } else {
                 format!("{}\n{}", image_text.trim(), user_text.trim())
             };
-        println!("formed combined query:{}", combined_query);
+        info!("formed combined query:{}", combined_query);
         // Use existing fulfillment logic
         self.fulfil_query(&combined_query).await
     }
@@ -191,7 +205,7 @@ impl QueryFulfilment {
             .parse_query(query)
             .await
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
-        println!("parsed query successfully");
+        info!("parsed query successfully");
         Ok(query)
     }
 

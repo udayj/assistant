@@ -3,6 +3,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::{mpsc, Mutex};
 use tokio::task::JoinSet;
+use tracing::error;
 
 #[derive(Error, Debug)]
 #[error("{0}")]
@@ -101,7 +102,7 @@ where
             loop {
                 let service = T::new(context.clone(), Some(receiver.clone())).await;
                 if let Err(e) = service.run().await {
-                    println!("Error:{}", e);
+                    error!(service = std::any::type_name::<T>(), error = %e, "Service error");
                     break;
                 }
             }
@@ -139,11 +140,10 @@ where
             loop {
                 let service = T::new(context.clone(), Some(receiver.clone())).await;
                 if let Err(e) = service.run().await {
-                    println!("Error:{}", e);
+                    error!(service = std::any::type_name::<T>(), error = %e, "Service error");
                     break;
                 }
             }
         });
     }
 }
-

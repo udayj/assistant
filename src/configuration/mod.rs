@@ -13,6 +13,7 @@ pub enum ConfigError {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
+    pub log_level: String,
     pub pricelists: Vec<PriceListConfig>,
     pub pdf_pricelists: Vec<PdfPriceListConfig>,
     pub metal_pricing: MetalPricingConfig,
