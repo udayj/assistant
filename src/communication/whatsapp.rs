@@ -1,6 +1,6 @@
 use crate::configuration::Context;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
-use crate::query::{QueryError, QueryFulfilment};
+use crate::query::QueryFulfilment;
 use async_trait::async_trait;
 use axum::{
     body::Body,
@@ -17,7 +17,7 @@ use thiserror::Error;
 use tokio::net::TcpListener;
 use tokio::sync::mpsc;
 use tower_http::cors::CorsLayer;
-use tracing::info;
+use tracing::{error, info};
 
 #[derive(Debug, Error)]
 pub enum WhatsAppError {
@@ -114,9 +114,10 @@ async fn webhook_handler(
         );
     }
 
-    if body.trim() == "/help" {
+    if body.trim() == "/help" || body.trim() == "help" {
         return send_text_response(&QueryFulfilment::get_help_text());
     }
+
     if let Some(media_url) = payload.get("MediaUrl0") {
         let no_media_type = "".to_string();
         let media_type = payload.get("MediaContentType0").unwrap_or(&no_media_type);
@@ -125,66 +126,79 @@ async fn webhook_handler(
             return send_text_response("Please send only images with your request");
         }
 
-        if body.trim().is_empty() {
-            return send_text_response(
-                "Please send the image with a text message describing what you need",
-            );
-        }
+        // Process all image queries asynchronously
+        let state_clone = state.clone();
+        let from_clone = from.clone();
+        let media_url_clone = media_url.clone();
+        let body_clone = body.clone();
 
-        match download_and_process_image(&state, media_url, &body).await {
-            Ok(response) => {
-                if let Some(file_path) = response.file {
-                    send_pdf_response(&file_path, &response.text, &state.file_base_url)
-                        .await
-                        .unwrap_or_else(|_| send_text_response("Error processing request"))
-                } else {
-                    send_text_response(&response.text)
+        tokio::spawn(async move {
+            match download_and_process_image(&state_clone, &media_url_clone, &body_clone).await {
+                Ok(response) => {
+                    if let Some(file_path) = response.file {
+                        let file_url = format!("{}/{}", state_clone.file_base_url, file_path);
+                        let _ =
+                            send_whatsapp_message_with_media(&state_clone, &from_clone, &file_url)
+                                .await;
+                    } else {
+                        let _ =
+                            send_whatsapp_message(&state_clone, &from_clone, &response.text).await;
+                    }
+                }
+                Err(e) => {
+                    let error_msg = format!(
+                        "❌ WhatsApp Image Query Failed\nText: {}\nError: {}",
+                        body_clone, e
+                    );
+                    let _ = state_clone.error_sender.try_send(error_msg);
+                    let _ = send_whatsapp_message(
+                        &state_clone,
+                        &from_clone,
+                        "Could not process image - please try again with clearer image and text",
+                    )
+                    .await;
                 }
             }
-            Err(e) => {
-                let error_msg = format!(
-                    "❌ WhatsApp Image Query Failed\n\nText: {}\nError: {}",
-                    body, e
-                );
-                let _ = state.error_sender.try_send(error_msg);
-                send_text_response(
-                    "Could not process image - please try again with clearer image and text",
-                )
-            }
-        }
+        });
+
+        send_text_response("Processing your request...please wait ⏳")
     } else {
-        match state.query_fulfilment.fulfil_query(&body).await {
-            Ok(response) => {
-                if let Some(file_path) = response.file {
-                    send_pdf_response(&file_path, &response.text, &state.file_base_url)
-                        .await
-                        .unwrap_or_else(|_| {
-                            send_text_response(
-                                "Error during processing - please contact admin@avantgardelabs.in",
-                            )
-                        })
-                } else {
-                    send_text_response(&response.text)
+        // Process all text queries asynchronously
+        let state_clone = state.clone();
+        let from_clone = from.clone();
+        let body_clone = body.clone();
+
+        tokio::spawn(async move {
+            match state_clone.query_fulfilment.fulfil_query(&body_clone).await {
+                Ok(response) => {
+                    if let Some(file_path) = response.file {
+                        let file_url = format!("{}/{}", state_clone.file_base_url, file_path);
+                        info!(file_url, %file_url, "File url");
+                        let _ =
+                            send_whatsapp_message_with_media(&state_clone, &from_clone, &file_url)
+                                .await;
+                    } else {
+                        let _ =
+                            send_whatsapp_message(&state_clone, &from_clone, &response.text).await;
+                    }
+                }
+                Err(e) => {
+                    let error_msg = format!(
+                        "❌ Background Processing Failed\nQuery: {}\nError: {}",
+                        body_clone, e
+                    );
+                    let _ = state_clone.error_sender.try_send(error_msg);
+                    let _ = send_whatsapp_message(
+                        &state_clone,
+                        &from_clone,
+                        "Sorry, couldn't process your request. Please try again later.",
+                    )
+                    .await;
                 }
             }
-            Err(e) => {
-                let error_msg =
-                    format!("❌ WhatsApp Query Failed\n\nQuery: {}\nError: {}", body, e);
-                let _ = state.error_sender.try_send(error_msg);
-                match e {
-                    QueryError::MetalPricingError(_) => {
-                        send_text_response("Could not fetch metal prices - please try again later")
-                    }
-                    QueryError::QuotationServiceError => send_text_response(
-                        "Error generating quotation - please check whether items are valid",
-                    ),
-                    QueryError::LLMError(_) => {
-                        send_text_response(&QueryFulfilment::get_help_text())
-                    }
-                    _ => send_text_response("Could not service request - please try again later"),
-                }
-            }
-        }
+        });
+
+        send_text_response("Processing your request...please wait ⏳")
     }
 }
 
@@ -192,11 +206,13 @@ async fn serve_file(
     State(state): State<AppState>,
     Path(filename): Path<String>,
 ) -> Result<Response<Body>, StatusCode> {
-    let file_path = format!("{}", filename);
+    let file_path = format!("artifacts/{}", filename);
+    info!(file_path, %file_path, "File path");
     match tokio::fs::read(&file_path).await {
         Ok(contents) => Ok(Response::builder()
             .status(StatusCode::OK)
             .header("content-type", "application/pdf")
+            //.header("content-type", "image/jpeg")
             .body(Body::from(contents))
             .unwrap()),
         Err(e) => {
@@ -207,7 +223,7 @@ async fn serve_file(
     }
 }
 
-async fn send_pdf_response(
+async fn _send_pdf_response(
     pdf_path: &str,
     message: &str,
     base_url: &str,
@@ -281,4 +297,70 @@ async fn download_and_process_image(
         .fulfil_image_query(&image_data, user_text)
         .await
         .map_err(|e| WhatsAppError::QueryFulfilmentInitError(e.to_string()))
+}
+
+async fn send_whatsapp_message_with_media(
+    state: &AppState,
+    to: &str,
+    media_url: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let url = format!(
+        "https://api.twilio.com/2010-04-01/Accounts/{}/Messages.json",
+        state.twilio_account_sid
+    );
+
+    let params = [
+        ("From", "whatsapp:+17246175462"), // Your Twilio WhatsApp number
+        ("To", to),
+        ("MediaUrl", media_url),
+    ];
+
+    let response = state
+        .http_client
+        .post(&url)
+        .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
+        .form(&params)
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        error!(
+            "Failed to send WhatsApp message with media: {}",
+            response.status()
+        );
+    }
+
+    Ok(())
+}
+
+// Function to send WhatsApp message via Twilio REST API
+async fn send_whatsapp_message(
+    state: &AppState,
+    to: &str,
+    message: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let url = format!(
+        "https://api.twilio.com/2010-04-01/Accounts/{}/Messages.json",
+        state.twilio_account_sid
+    );
+
+    let params = [
+        ("From", "whatsapp:+17246175462"), // Your Twilio WhatsApp number
+        ("To", to),
+        ("Body", message),
+    ];
+
+    let response = state
+        .http_client
+        .post(&url)
+        .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
+        .form(&params)
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        println!("Failed to send WhatsApp message: {}", response.status());
+    }
+
+    Ok(())
 }
