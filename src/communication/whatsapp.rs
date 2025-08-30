@@ -1,4 +1,5 @@
 use crate::configuration::Context;
+use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::query::QueryFulfilment;
 use async_trait::async_trait;
@@ -10,7 +11,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use reqwest::Client;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
@@ -34,7 +34,7 @@ struct AppState {
     file_base_url: String,
     twilio_account_sid: String,
     twilio_auth_token: String,
-    http_client: Client,
+    http_client: RetryableClient,
 }
 
 pub struct WhatsAppService {
@@ -44,7 +44,7 @@ pub struct WhatsAppService {
     file_base_url: String,
     twilio_account_sid: String,
     twilio_auth_token: String,
-    http_client: Client,
+    http_client: RetryableClient,
 }
 
 #[async_trait]
@@ -62,7 +62,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             file_base_url: context.config.whatsapp.file_base_url,
             twilio_account_sid,
             twilio_auth_token,
-            http_client: Client::new(),
+            http_client: RetryableClient::new(),
         }
     }
 
@@ -274,9 +274,12 @@ async fn download_and_process_image(
     // Download image from Twilio media URL
     let response = state
         .http_client
-        .get(media_url)
-        .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
-        .send()
+        .execute_with_retry(
+            state
+                .http_client
+                .get(media_url)
+                .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token)),
+        )
         .await
         .map_err(|e| WhatsAppError::ImageProcessingError(e.to_string()))?;
 
@@ -317,10 +320,13 @@ async fn send_whatsapp_message_with_media(
 
     let response = state
         .http_client
-        .post(&url)
-        .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
-        .form(&params)
-        .send()
+        .execute_with_retry(
+            state
+                .http_client
+                .post(&url)
+                .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
+                .form(&params),
+        )
         .await?;
 
     if !response.status().is_success() {
@@ -328,6 +334,11 @@ async fn send_whatsapp_message_with_media(
             "Failed to send WhatsApp message with media: {}",
             response.status()
         );
+        let error_msg = format!(
+            "❌ Error sending whatsapp message with media : {}, to:{}",
+            media_url, to
+        );
+        let _ = state.error_sender.try_send(error_msg);
     }
 
     Ok(())
@@ -352,14 +363,23 @@ async fn send_whatsapp_message(
 
     let response = state
         .http_client
-        .post(&url)
-        .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
-        .form(&params)
-        .send()
+        .execute_with_retry(
+            state
+                .http_client
+                .post(&url)
+                .basic_auth(&state.twilio_account_sid, Some(&state.twilio_auth_token))
+                .form(&params),
+        )
         .await?;
 
     if !response.status().is_success() {
-        println!("Failed to send WhatsApp message: {}", response.status());
+        let error_msg = format!(
+            "❌ Error sending whatsapp message - response state : {}, to:{}",
+            response.status(),
+            to
+        );
+        let _ = state.error_sender.try_send(error_msg);
+        error!("Failed to send WhatsApp message: {}", response.status());
     }
 
     Ok(())

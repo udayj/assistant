@@ -1,6 +1,7 @@
 use crate::communication::price_alert::PriceAlert;
 use crate::configuration::Context;
 use crate::core::cache::ExpirableCache;
+use crate::core::http::RetryableClient;
 use crate::core::service_manager::Error as ServiceManagerError;
 use crate::core::{service_manager::ServiceWithSender, Service};
 use async_trait::async_trait;
@@ -44,18 +45,24 @@ pub struct PriceService {
     pub price_channel: Option<mpsc::Sender<String>>,
     pub price_cache: ExpirableCache<String, f64>,
     pub last_alert_hour: Option<u32>,
+    pub client: RetryableClient,
 }
 
 #[async_trait]
 impl Service for PriceService {
     type Context = Context;
     async fn new(context: Context) -> Self {
+        let client = reqwest::Client::builder()
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+            .build()
+            .unwrap();
         Self {
             url_al: context.config.metal_pricing.al_url.to_string(),
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel: None,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
             last_alert_hour: None,
+            client: RetryableClient::with_retries(client, 2),
         }
     }
 
@@ -95,12 +102,17 @@ impl ServiceWithSender for PriceService {
     type Context = Context;
 
     async fn new(context: Context, price_channel: Option<mpsc::Sender<String>>) -> Self {
+        let client = reqwest::Client::builder()
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+            .build()
+            .unwrap();
         Self {
             url_al: context.config.metal_pricing.al_url.to_string(),
             url_cu: context.config.metal_pricing.cu_url.to_string(),
             price_channel,
             price_cache: ExpirableCache::new(2, Duration::from_secs(300)),
             last_alert_hour: None,
+            client: RetryableClient::with_retries(client, 3),
         }
     }
 
@@ -149,21 +161,19 @@ impl PriceService {
             return Ok(price.unwrap());
         }
 
-        let client = reqwest::Client::builder()
-        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-        .build()
-        .map_err(|_| PriceError::ClientError)?;
-
         let url = match metal.to_lowercase().as_str() {
             "aluminium" => &self.url_al,
             "copper" => &self.url_cu,
             _ => return Err(PriceError::InvalidMetalType),
         };
-        let response = client
-            .get(url)
-            .header("Accept", "text/html")
-            .header("Accept-Language", "en-US,en;q=0.9")
-            .send()
+        let response = self
+            .client
+            .execute_with_retry(
+                self.client
+                    .get(url)
+                    .header("Accept", "text/html")
+                    .header("Accept-Language", "en-US,en;q=0.9"),
+            )
             .await
             .map_err(|e| PriceError::GetUrlError(e.to_string()))?
             .text()

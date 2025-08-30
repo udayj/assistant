@@ -1,7 +1,7 @@
 use crate::configuration::Context;
+use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithReceiver};
 use async_trait::async_trait;
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
@@ -22,7 +22,7 @@ pub struct PriceAlertService {
     receiver: Option<Arc<Mutex<mpsc::Receiver<String>>>>,
     telegram_subscribers: Vec<i64>,
     // WhatsApp fields
-    whatsapp_client: Client,
+    whatsapp_client: RetryableClient,
     whatsapp_subscribers: Vec<String>,
     twilio_account_sid: String,
     twilio_auth_token: String,
@@ -45,7 +45,7 @@ impl ServiceWithReceiver for PriceAlertService {
             bot,
             receiver,
             telegram_subscribers: subscribers,
-            whatsapp_client: Client::new(),
+            whatsapp_client: RetryableClient::new(),
             whatsapp_subscribers: whatsapp_config.price_alert_subscribers.clone(),
             twilio_account_sid,
             twilio_auth_token,
@@ -120,10 +120,12 @@ impl PriceAlertService {
         });
 
         self.whatsapp_client
-            .post(&url)
-            .basic_auth(&self.twilio_account_sid, Some(&self.twilio_auth_token))
-            .form(&params)
-            .send()
+            .execute_with_retry(
+                self.whatsapp_client
+                    .post(&url)
+                    .basic_auth(&self.twilio_account_sid, Some(&self.twilio_auth_token))
+                    .form(&params),
+            )
             .await?;
 
         Ok(())

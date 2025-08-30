@@ -1,12 +1,11 @@
+use crate::core::http::RetryableClient;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
-use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 use std::env;
 use std::fs;
 use std::time::Duration;
 use thiserror::Error;
-use tokio::time::sleep;
 use tracing::{error, info};
 
 #[derive(Debug, Deserialize)]
@@ -37,17 +36,20 @@ pub enum LLMError {
     ClientError(String),
     #[error("System prompt construction error:{0}")]
     SystemPromptError(String),
-    #[error("API overloaded - all retries exhausted")]
+    #[error("API overloaded")]
     OverloadedError,
     #[error("Image processing error: {0}")]
     ImageProcessingError(String),
+    #[error("Groq error: {0}")]
+    GroqError(String),
 }
 
 #[derive(Debug)]
 pub struct ClaudeAI {
     system_prompt: String,
     api_key: String,
-    client: Client,
+    client: RetryableClient,
+    groq_api_key: Option<String>,
 }
 
 impl ClaudeAI {
@@ -56,23 +58,32 @@ impl ClaudeAI {
             .map_err(|e| LLMError::SystemPromptError(e.to_string()))?;
 
         let api_key = env::var("ANTHROPIC_API_KEY").map_err(|_| LLMError::EnvError)?;
-        let client = Client::builder()
-            .timeout(Duration::from_secs(30))
-            .build()
-            .map_err(|e| LLMError::ClientError(e.to_string()))?;
+        let groq_api_key = env::var("GROQ_API_KEY").ok();
+        let client = RetryableClient::new();
         Ok(Self {
             system_prompt: prompt,
             api_key,
             client,
+            groq_api_key,
         })
     }
 
     pub async fn parse_query(&self, query: &str) -> Result<Query, LLMError> {
-        const MAX_RETRIES: u32 = 3;
-        let mut last_error = None;
+        // Try Claude first with existing logic
+        match self.try_claude(query).await {
+            Ok(result) => Ok(result),
+            Err(e) => {
+                error!("Claude failed with error: {}, trying Groq fallback", e);
+                self.try_groq(query).await
+            }
+        }
+    }
+
+    pub async fn try_claude(&self, query: &str) -> Result<Query, LLMError> {
         let mut parse_retry_attempted = false;
 
-        for attempt in 0..MAX_RETRIES {
+        // Try once with potential parse retry
+        loop {
             let query_text = if parse_retry_attempted {
                 format!("Your previous response failed JSON parsing. Return ONLY valid JSON matching the exact schema. Original query: {}", query)
             } else {
@@ -83,41 +94,14 @@ impl ClaudeAI {
                 Ok(response) => match self.parse_response(&response) {
                     Ok(parsed_query) => return Ok(parsed_query),
                     Err(LLMError::ParseError) if !parse_retry_attempted => {
-                        error!(
-                            attempt = attempt + 1,
-                            "Parse error, will retry with enhanced prompt"
-                        );
+                        error!("Parse error, will retry with enhanced prompt");
                         parse_retry_attempted = true;
-                        last_error = Some(LLMError::ParseError);
                         continue;
                     }
                     Err(e) => return Err(e),
                 },
-                Err(e) => {
-                    last_error = Some(e);
-
-                    if attempt < MAX_RETRIES - 1 {
-                        let delay = Duration::from_millis(1000 * (2_u64.pow(attempt)));
-                        error!(
-                            "Claude API attempt {} failed, retrying in {:?}",
-                            attempt + 1,
-                            delay
-                        );
-                        sleep(delay).await;
-                    }
-                }
+                Err(e) => return Err(e),
             }
-        }
-
-        // All retries exhausted
-        match last_error {
-            Some(LLMError::ParseError) => {
-                error!("Parse error persisted after retry for: {}", query);
-                Err(LLMError::ParseError)
-            }
-            Some(LLMError::OverloadedError) => Err(LLMError::OverloadedError),
-            Some(e) => Err(e),
-            None => Err(LLMError::ClientError("Unknown error".to_string())),
         }
     }
 
@@ -125,30 +109,32 @@ impl ClaudeAI {
         info!("About to make HTTP request to Claude API");
         let response = self
             .client
-            .post("https://api.anthropic.com/v1/messages")
-            .timeout(Duration::from_secs(45))
-            .header("x-api-key", &self.api_key)
-            .header("anthropic-version", "2023-06-01")
-            .json(&json!({
-                "model": "claude-sonnet-4-20250514",
-                "temperature": 0.0,
-                "system": [
-                    {
-                        "type" : "text",
-                        "text" : self.system_prompt.as_str(),
-                        "cache_control": {
-                            "type": "ephemeral",
-                            "ttl": "1h"
-                        }
-                    }
-                ],
-                "max_tokens": 10240,
-                "messages": [{
-                    "role": "user",
-                    "content": query
-                }]
-            }))
-            .send()
+            .execute_with_retry(
+                self.client
+                    .post("https://api.anthropic.com/v1/messages")
+                    .timeout(Duration::from_secs(45))
+                    .header("x-api-key", &self.api_key)
+                    .header("anthropic-version", "2023-06-01")
+                    .json(&json!({
+                        "model": "claude-sonnet-4-20250514",
+                        "temperature": 0.0,
+                        "system": [
+                            {
+                                "type" : "text",
+                                "text" : self.system_prompt.as_str(),
+                                "cache_control": {
+                                    "type": "ephemeral",
+                                    "ttl": "1h"
+                                }
+                            }
+                        ],
+                        "max_tokens": 10240,
+                        "messages": [{
+                            "role": "user",
+                            "content": query
+                        }]
+                    })),
+            )
             .await
             .map_err(|e| LLMError::ClientError(e.to_string()))?;
 
@@ -197,5 +183,71 @@ impl ClaudeAI {
         })?;
 
         Ok(actual_query)
+    }
+}
+
+impl ClaudeAI {
+    async fn try_groq(&self, query: &str) -> Result<Query, LLMError> {
+        match self.understand_using_groq(query).await {
+            Ok(response) => self.parse_response(&response),
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn understand_using_groq(&self, query: &str) -> Result<serde_json::Value, LLMError> {
+        let groq_key = self
+            .groq_api_key
+            .as_ref()
+            .ok_or_else(|| LLMError::GroqError("GROQ_API_KEY not found".to_string()))?;
+
+        info!("Attempting Groq fallback");
+
+        let response = self
+            .client
+            .execute_with_retry(
+                self.client
+                    .post("https://api.groq.com/openai/v1/chat/completions")
+                    .header("Authorization", format!("Bearer {}", groq_key))
+                    .header("Content-Type", "application/json")
+                    .json(&json!({
+                        "model": "openai/gpt-oss-20b",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": self.system_prompt.as_str()
+                            },
+                            {
+                                "role": "user",
+                                "content": query
+                            }
+                        ],
+                        "temperature": 0.0,
+                        "max_completion_tokens": 8192,
+                        "include_reasoning": false
+                    })),
+            )
+            .await
+            .map_err(|e| LLMError::GroqError(e.to_string()))?;
+
+        let json_response: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| LLMError::GroqError(e.to_string()))?;
+
+        info!(json_response = ?json_response, "Raw grow response ");
+        // Extract content from Groq's response format
+        if let Some(choices) = json_response.get("choices").and_then(|c| c.as_array()) {
+            if let Some(first_choice) = choices.first() {
+                if let Some(message) = first_choice.get("message") {
+                    if let Some(content) = message.get("content").and_then(|c| c.as_str()) {
+                        return Ok(json!({ "content": [{ "text": content }] }));
+                    }
+                }
+            }
+        }
+
+        Err(LLMError::GroqError(
+            "Invalid Groq response format".to_string(),
+        ))
     }
 }
