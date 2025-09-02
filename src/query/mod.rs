@@ -11,6 +11,7 @@ use chrono::{Datelike, Local};
 use rand::prelude::*;
 use thiserror::Error;
 use tracing::info;
+use uuid::Uuid;
 
 #[derive(Error, Debug)]
 pub enum QueryError {
@@ -50,13 +51,16 @@ pub struct QueryFulfilment {
 impl QueryFulfilment {
     pub async fn new(context: Context) -> Result<Self, QueryError> {
         let price_service = PriceService::new(context.clone()).await;
-        let claude_ai = ClaudeAI::new(&context.config.claude.system_prompt)
-            .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
+        let claude_ai = ClaudeAI::new(
+            &context.config.claude.system_prompt,
+            context.database.clone(),
+        )
+        .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
         let quotation_service = QuotationService::new(context.config.pricelists.clone())
             .map_err(|e| QueryError::QuotationServiceInitializationError(e.to_string()))?;
         let pricelist_service = PriceListService::new(context.config.pdf_pricelists)
             .map_err(|e| QueryError::PriceListServiceInitializationError(e.to_string()))?;
-        let ocr_service = OcrService::new()
+        let ocr_service = OcrService::new(context.database.clone())
             .await
             .map_err(|_| QueryError::OcrInitializationError)?;
 
@@ -78,11 +82,13 @@ impl QueryFulfilment {
         &self,
         image_data: &[u8],
         user_text: &str,
+        user_id: Uuid,
+        session_id: Uuid,
     ) -> Result<Response, QueryError> {
         // Extract text from image
         let image_text = self
             .ocr_service
-            .extract_text_from_image(image_data.to_vec())
+            .extract_text_from_image(image_data.to_vec(), user_id, session_id)
             .await
             .map_err(|e| QueryError::OcrError(e.to_string()))?;
 
@@ -95,11 +101,17 @@ impl QueryFulfilment {
             };
         info!("formed combined query:{}", combined_query);
         // Use existing fulfillment logic
-        self.fulfil_query(&combined_query).await
+        self.fulfil_query(&combined_query, user_id, session_id)
+            .await
     }
 
-    pub async fn fulfil_query(&self, query: &str) -> Result<Response, QueryError> {
-        let query = self.get_query_type(query).await?;
+    pub async fn fulfil_query(
+        &self,
+        query: &str,
+        user_id: Uuid,
+        session_id: Uuid,
+    ) -> Result<Response, QueryError> {
+        let query = self.get_query_type(query, user_id, session_id).await?;
         let response = match query {
             Query::GetPriceList { brand, keywords } => {
                 match self.pricelist_service.find_pricelist(&brand, &keywords) {
@@ -199,10 +211,15 @@ impl QueryFulfilment {
         Ok(response)
     }
 
-    pub async fn get_query_type(&self, query: &str) -> Result<Query, QueryError> {
+    pub async fn get_query_type(
+        &self,
+        query: &str,
+        user_id: Uuid,
+        session_id: Uuid,
+    ) -> Result<Query, QueryError> {
         let query: Query = self
             .llm_service
-            .parse_query(query)
+            .parse_query(query, user_id, session_id)
             .await
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
         info!("parsed query successfully");

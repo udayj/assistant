@@ -1,6 +1,9 @@
 use serde::Deserialize;
 use std::fs;
+use std::sync::Arc;
 use thiserror::Error;
+
+use crate::database::DatabaseService;
 
 #[derive(Debug, Error)]
 pub enum ConfigError {
@@ -61,15 +64,20 @@ pub struct WhatsappConfig {
     pub template_sid: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Context {
     pub config: Config,
+    pub database: Arc<DatabaseService>,
 }
 
 impl Context {
     pub fn new(config_file: &str) -> Result<Self, ConfigError> {
+        let database = DatabaseService::new().map_err(|e| {
+            ConfigError::DeserializationError(format!("Database init failed: {}", e))
+        })?;
         Ok(Self {
             config: Config::new(config_file)?,
+            database: Arc::new(database),
         })
     }
 }

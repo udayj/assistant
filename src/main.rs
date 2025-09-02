@@ -15,8 +15,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
-    let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
     dotenv().ok();
+    let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
 
     let log_level = Level::from_str(&context.config.log_level).unwrap_or(Level::INFO);
     tracing_subscriber::registry()
