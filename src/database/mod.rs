@@ -60,6 +60,40 @@ pub struct DatabaseService {
     client: Postgrest,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ClaudeRates {
+    pub input_token: f64,
+    pub cache_hit_refresh: f64,
+    pub output_token: f64,
+    pub one_h_cache_writes: f64
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GroqRates {
+    pub input_token: f64,
+    pub output_token: f64,
+}
+
+impl Default for ClaudeRates {
+    fn default() -> Self {
+        Self {
+            input_token: 3.0,
+            cache_hit_refresh: 0.3,
+            output_token: 15.0,
+            one_h_cache_writes: 6.0
+        }
+    }
+}
+
+impl Default for GroqRates {
+    fn default() -> Self {
+        Self {
+            input_token: 0.1,
+            output_token: 0.5,
+        }
+    }
+}
+
 impl DatabaseService {
     pub fn new() -> Result<Self, DatabaseError> {
         let url = env::var("SUPABASE_URL")
@@ -317,6 +351,76 @@ impl DatabaseService {
         let total: f64 = costs.iter().filter_map(|c| c["cost_amount"].as_f64()).sum();
 
         Ok(total)
+    }
+}
+
+impl DatabaseService {
+    pub async fn get_claude_rates(&self) -> Result<ClaudeRates, DatabaseError> {
+        let response = self
+            .client
+            .from("pricing_rates")
+            .select("cost_type,unit_cost")
+            .eq("service_provider", "anthropic")
+            .execute()
+            .await;
+
+        match response {
+            Ok(resp) if resp.status() == 200 => {
+                let rates: Vec<serde_json::Value> = resp.json().await
+                    .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+                println!("resp:{:#?}", rates);
+                let mut claude_rates = ClaudeRates::default();
+                for rate in rates {
+                    let cost_type = rate["cost_type"].as_str().unwrap_or("");
+                    let unit_cost = rate["unit_cost"].as_str()
+                        .and_then(|s| s.parse::<f64>().ok())
+                        .unwrap_or(0.0);
+                    
+                    match cost_type {
+                        "input_token" => claude_rates.input_token = unit_cost,
+                        "output_token" => claude_rates.output_token = unit_cost,
+                        "cache_hit_refresh" => claude_rates.cache_hit_refresh = unit_cost,
+                        "1h_cache_writes" => claude_rates.one_h_cache_writes = unit_cost,
+                        _ => {}
+                    }
+                }
+                Ok(claude_rates)
+            }
+            _ => Ok(ClaudeRates::default())
+        }
+    }
+
+    pub async fn get_groq_rates(&self) -> Result<GroqRates, DatabaseError> {
+        let response = self
+            .client
+            .from("pricing_rates")
+            .select("cost_type,unit_cost")
+            .eq("service_provider", "groq")
+            .execute()
+            .await;
+
+        match response {
+            Ok(resp) if resp.status() == 200 => {
+                let rates: Vec<serde_json::Value> = resp.json().await
+                    .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+                
+                let mut groq_rates = GroqRates::default();
+                for rate in rates {
+                    let cost_type = rate["cost_type"].as_str().unwrap_or("");
+                    let unit_cost = rate["unit_cost"].as_str()
+                        .and_then(|s| s.parse::<f64>().ok())
+                        .unwrap_or(0.0);
+                    
+                    match cost_type {
+                        "input_token" => groq_rates.input_token = unit_cost,
+                        "output_token" => groq_rates.output_token = unit_cost,
+                        _ => {}
+                    }
+                }
+                Ok(groq_rates)
+            }
+            _ => Ok(GroqRates::default())
+        }
     }
 }
 

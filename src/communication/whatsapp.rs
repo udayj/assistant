@@ -148,7 +148,8 @@ async fn webhook_handler(
                     &state,
                     default_user_id,
                     default_session_id,
-                );
+                )
+                .await;
             }
             user
         }
@@ -177,10 +178,12 @@ async fn webhook_handler(
                 &state,
                 default_user_id,
                 default_session_id,
-            );
+            )
+            .await;
         }
         Err(_) => {
-            return send_text_response("System error", &state, default_user_id, default_session_id);
+            return send_text_response("System error", &state, default_user_id, default_session_id)
+                .await;
         }
     };
 
@@ -210,7 +213,8 @@ async fn webhook_handler(
             &state,
             user.id,
             session_id,
-        );
+        )
+        .await;
     }
 
     if let Some(media_url) = payload.get("MediaUrl0") {
@@ -223,7 +227,8 @@ async fn webhook_handler(
                 &state,
                 user.id,
                 session_id,
-            );
+            )
+            .await;
         }
 
         // Process all image queries asynchronously
@@ -322,6 +327,7 @@ async fn webhook_handler(
             user.id,
             session_id,
         )
+        .await
     } else {
         // Process all text queries asynchronously
         let state_clone = state.clone();
@@ -415,6 +421,7 @@ async fn webhook_handler(
             user.id,
             session_id,
         )
+        .await
     }
 }
 
@@ -490,33 +497,30 @@ async fn create_session_for_user(
         .unwrap_or_else(|_| Uuid::new_v4())
 }
 
-fn send_text_response(
+async fn send_text_response(
     message: &str,
     state: &AppState,
     user_id: Uuid,
     session_id: Uuid,
 ) -> Response<String> {
     // Log cost if state provided
-
-    let state_clone = state.clone();
     let message_len = message.len();
-    tokio::spawn(async move {
-        let _ = state_clone
-            .database
-            .log_cost_event(crate::database::CostEvent {
-                user_id: user_id,
-                query_session_id: session_id,
-                event_type: "whatsapp_outgoing".to_string(),
-                unit_cost: 0.005,
-                unit_type: "message".to_string(),
-                units_consumed: 1,
-                cost_amount: 0.005,
-                metadata: Some(serde_json::json!({"message_length": message_len})),
-                platform: "whatsapp".to_string(),
-                created_at: Utc::now(),
-            })
-            .await;
-    });
+    let response = state
+        .database
+        .log_cost_event(crate::database::CostEvent {
+            user_id: user_id,
+            query_session_id: session_id,
+            event_type: "whatsapp_outgoing".to_string(),
+            unit_cost: 0.005,
+            unit_type: "message".to_string(),
+            units_consumed: 1,
+            cost_amount: 0.005,
+            metadata: Some(serde_json::json!({"message_length": message_len})),
+            platform: "whatsapp".to_string(),
+            created_at: Utc::now(),
+        })
+        .await;
+    error!("Response from whatsapp logging:{:#?}", response);
 
     let twiml = format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
