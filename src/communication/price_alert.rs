@@ -9,6 +9,7 @@ use std::sync::Arc;
 use teloxide::prelude::*;
 use tokio::sync::{mpsc, Mutex};
 use tracing::error;
+use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceAlert {
@@ -92,6 +93,8 @@ impl PriceAlertService {
 
     async fn send_whatsapp_alerts(&self, alert: &PriceAlert) {
         for subscriber in &self.whatsapp_subscribers {
+           
+            tokio::time::sleep(Duration::from_secs(3)).await;
             if let Err(e) = self.send_whatsapp_template(alert, subscriber).await {
                 error!(subscriber = %subscriber, error = %e, "Failed to send WhatsApp alert");
             }

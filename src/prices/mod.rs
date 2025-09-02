@@ -67,6 +67,10 @@ impl Service for PriceService {
     }
 
     async fn run(mut self) -> Result<(), ServiceManagerError> {
+        let hour1 = 10_u32;
+        let minute1 = 28;
+        let hour2 = 15_u32;
+        let minute2 = 9;
         loop {
             let now_ist = Utc::now().with_timezone(&Kolkata);
             let hour = now_ist.hour();
@@ -74,8 +78,12 @@ impl Service for PriceService {
 
             // Check if we're in a valid time window and haven't sent alert this hour
             let should_send_alert = match hour {
-                10 if minute >= 30 && minute <= 32 => self.last_alert_hour != Some(10),
-                15 if minute >= 7 && minute <= 10 => self.last_alert_hour != Some(15),
+                _ if hour==hour1 && minute >= minute1 && minute <= minute1 + 2 => {
+                    self.last_alert_hour != Some(hour1)
+                }
+                _ if hour==hour2 && minute >= minute2 && minute <= minute2 + 2 => {
+                    self.last_alert_hour != Some(hour2)
+                }
                 _ => false,
             };
 

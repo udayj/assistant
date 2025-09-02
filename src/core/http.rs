@@ -80,7 +80,7 @@ impl RetryableClient {
                 tokio::time::sleep(delay).await;
             }
         }
-
+        error!("All retires failed - check server");
         Err(RetryError::AllRetriesFailed(
             last_error.unwrap_or_else(|| "Unknown error".to_string()),
         ))
