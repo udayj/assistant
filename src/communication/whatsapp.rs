@@ -20,7 +20,7 @@ use tokio::net::TcpListener;
 use tokio::sync::mpsc;
 use tower_http::cors::CorsLayer;
 use tracing::{error, info};
-use urlencoding::encode;
+use urlencoding::{decode, encode};
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -88,6 +88,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             .route("/health", get(health_check))
             .route("/webhook", post(webhook_handler))
             .route("/artifacts/{*filename}", get(serve_file))
+            .route("/assets/{*filename}", get(serve_assets_file))
             .layer(CorsLayer::permissive())
             .with_state(state);
 
@@ -432,13 +433,35 @@ async fn serve_file(
     State(state): State<AppState>,
     Path(filename): Path<String>,
 ) -> Result<Response<Body>, StatusCode> {
-    let file_path = format!("artifacts/{}", filename);
+    let decoded_filename = decode(&filename).map_err(|_| StatusCode::BAD_REQUEST)?;
+    let file_path = format!("artifacts/{}", decoded_filename);
     info!(file_path, %file_path, "File path");
     match tokio::fs::read(&file_path).await {
         Ok(contents) => Ok(Response::builder()
             .status(StatusCode::OK)
             .header("content-type", "application/pdf")
             //.header("content-type", "image/jpeg")
+            .body(Body::from(contents))
+            .unwrap()),
+        Err(e) => {
+            let error_msg = format!("❌ File Serve Error\n\nFile: {}\nError: {}", file_path, e);
+            let _ = state.error_sender.try_send(error_msg);
+            Err(StatusCode::NOT_FOUND)
+        }
+    }
+}
+
+async fn serve_assets_file(
+    State(state): State<AppState>,
+    Path(filename): Path<String>,
+) -> Result<Response<Body>, StatusCode> {
+    let decoded_filename = urlencoding::decode(&filename).map_err(|_| StatusCode::BAD_REQUEST)?;
+    let file_path = format!("assets/{}", decoded_filename);
+
+    match tokio::fs::read(&file_path).await {
+        Ok(contents) => Ok(Response::builder()
+            .status(StatusCode::OK)
+            .header("content-type", "application/pdf")
             .body(Body::from(contents))
             .unwrap()),
         Err(e) => {
