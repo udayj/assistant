@@ -88,7 +88,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             .route("/health", get(health_check))
             .route("/webhook", post(webhook_handler))
             .route("/artifacts/{*filename}", get(serve_file))
-            .route("/assets/{*filename}", get(serve_assets_file))
+            .route("/assets/pricelists/{*filename}", get(serve_assets_file))
             .layer(CorsLayer::permissive())
             .with_state(state);
 
@@ -253,7 +253,10 @@ async fn webhook_handler(
             {
                 Ok(response) => {
                     if let Some(file_path) = response.file {
-                        let encoded_path = encode(&file_path);
+                        let parts: Vec<&str> = file_path.split('/').collect();
+                        let encoded_parts: Vec<String> =
+                            parts.iter().map(|part| encode(part).to_string()).collect();
+                        let encoded_path = encoded_parts.join("/");
                         let file_url = format!("{}/{}", state_clone.file_base_url, encoded_path);
                         let _ = send_whatsapp_message_with_media(
                             &state_clone,
@@ -347,7 +350,10 @@ async fn webhook_handler(
             {
                 Ok(response) => {
                     if let Some(file_path) = response.file {
-                        let encoded_path = encode(&file_path);
+                        let parts: Vec<&str> = file_path.split('/').collect();
+                        let encoded_parts: Vec<String> =
+                            parts.iter().map(|part| encode(part).to_string()).collect();
+                        let encoded_path = encoded_parts.join("/");
                         let file_url = format!("{}/{}", state_clone.file_base_url, encoded_path);
                         info!(file_url, %file_url, "File url");
                         let _ = send_whatsapp_message_with_media(
@@ -456,7 +462,7 @@ async fn serve_assets_file(
     Path(filename): Path<String>,
 ) -> Result<Response<Body>, StatusCode> {
     let decoded_filename = decode(&filename).map_err(|_| StatusCode::BAD_REQUEST)?;
-    let file_path = format!("assets/{}", decoded_filename);
+    let file_path = format!("assets/pricelists/{}", decoded_filename);
     info!(file_path, %file_path, "File path");
     match tokio::fs::read(&file_path).await {
         Ok(contents) => Ok(Response::builder()
