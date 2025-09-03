@@ -1,15 +1,19 @@
 use crate::configuration::Context;
 use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithReceiver};
+use crate::database::CostEvent;
+use crate::database::DatabaseService;
 use async_trait::async_trait;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
 use std::sync::Arc;
+use std::time::Duration;
 use teloxide::prelude::*;
 use tokio::sync::{mpsc, Mutex};
 use tracing::error;
-use std::time::Duration;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceAlert {
@@ -29,6 +33,7 @@ pub struct PriceAlertService {
     twilio_auth_token: String,
     twilio_from_number: String,
     template_sid: String,
+    database: Arc<DatabaseService>,
 }
 
 #[async_trait]
@@ -52,6 +57,7 @@ impl ServiceWithReceiver for PriceAlertService {
             twilio_auth_token,
             twilio_from_number: whatsapp_config.twilio_from_number.clone(),
             template_sid: whatsapp_config.template_sid.clone(),
+            database: context.database.clone(),
         }
     }
 
@@ -93,7 +99,6 @@ impl PriceAlertService {
 
     async fn send_whatsapp_alerts(&self, alert: &PriceAlert) {
         for subscriber in &self.whatsapp_subscribers {
-           
             tokio::time::sleep(Duration::from_secs(3)).await;
             if let Err(e) = self.send_whatsapp_template(alert, subscriber).await {
                 error!(subscriber = %subscriber, error = %e, "Failed to send WhatsApp alert");
@@ -131,6 +136,26 @@ impl PriceAlertService {
             )
             .await?;
 
+        let marketing_user_id = Uuid::parse_str("00000000-0000-0000-0000-000000000001").unwrap();
+        let marketing_session_id = Uuid::new_v4();
+
+        let _ = self
+            .database
+            .log_cost_event(CostEvent {
+                user_id: marketing_user_id,
+                query_session_id: marketing_session_id,
+                event_type: "whatsapp_auto_message".to_string(),
+                unit_cost: 0.0157,
+                unit_type: "message".to_string(),
+                units_consumed: 1,
+                cost_amount: 0.0157,
+                metadata: Some(serde_json::json!({
+                    "phone_number": to,
+                })),
+                platform: "whatsapp".to_string(),
+                created_at: Utc::now(),
+            })
+            .await;
         Ok(())
     }
 }

@@ -20,6 +20,7 @@ use tokio::net::TcpListener;
 use tokio::sync::mpsc;
 use tower_http::cors::CorsLayer;
 use tracing::{error, info};
+use urlencoding::encode;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -251,7 +252,8 @@ async fn webhook_handler(
             {
                 Ok(response) => {
                     if let Some(file_path) = response.file {
-                        let file_url = format!("{}/{}", state_clone.file_base_url, file_path);
+                        let encoded_path = encode(&file_path);
+                        let file_url = format!("{}/{}", state_clone.file_base_url, encoded_path);
                         let _ = send_whatsapp_message_with_media(
                             &state_clone,
                             &from_clone,
@@ -344,7 +346,8 @@ async fn webhook_handler(
             {
                 Ok(response) => {
                     if let Some(file_path) = response.file {
-                        let file_url = format!("{}/{}", state_clone.file_base_url, file_path);
+                        let encoded_path = encode(&file_path);
+                        let file_url = format!("{}/{}", state_clone.file_base_url, encoded_path);
                         info!(file_url, %file_url, "File url");
                         let _ = send_whatsapp_message_with_media(
                             &state_clone,
@@ -520,7 +523,7 @@ async fn send_text_response(
             created_at: Utc::now(),
         })
         .await;
-    error!("Response from whatsapp logging:{:#?}", response);
+    info!("Response from whatsapp logging:{:#?}", response);
 
     let twiml = format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
