@@ -455,9 +455,9 @@ async fn serve_assets_file(
     State(state): State<AppState>,
     Path(filename): Path<String>,
 ) -> Result<Response<Body>, StatusCode> {
-    let decoded_filename = urlencoding::decode(&filename).map_err(|_| StatusCode::BAD_REQUEST)?;
+    let decoded_filename = decode(&filename).map_err(|_| StatusCode::BAD_REQUEST)?;
     let file_path = format!("assets/{}", decoded_filename);
-
+    info!(file_path, %file_path, "File path");
     match tokio::fs::read(&file_path).await {
         Ok(contents) => Ok(Response::builder()
             .status(StatusCode::OK)
