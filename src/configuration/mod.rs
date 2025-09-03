@@ -3,6 +3,7 @@ use std::fs;
 use std::sync::Arc;
 use thiserror::Error;
 
+use crate::communication::websocket::StockService;
 use crate::database::DatabaseService;
 
 #[derive(Debug, Error)]
@@ -68,16 +69,18 @@ pub struct WhatsappConfig {
 pub struct Context {
     pub config: Config,
     pub database: Arc<DatabaseService>,
+    pub stock_service: Arc<StockService>
 }
 
 impl Context {
-    pub fn new(config_file: &str) -> Result<Self, ConfigError> {
+    pub fn new(config_file: &str, stock_service: Arc<StockService>) -> Result<Self, ConfigError> {
         let database = DatabaseService::new().map_err(|e| {
             ConfigError::DeserializationError(format!("Database init failed: {}", e))
         })?;
         Ok(Self {
             config: Config::new(config_file)?,
             database: Arc::new(database),
+            stock_service
         })
     }
 }

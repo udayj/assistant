@@ -1,5 +1,6 @@
 use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
+use crate::communication::websocket::StockService;
 use crate::configuration::Context;
 use crate::core::Service;
 use crate::ocr::OcrService;
@@ -9,6 +10,7 @@ use crate::prices::PriceService;
 use crate::quotation::QuotationService;
 use chrono::{Datelike, Local};
 use rand::prelude::*;
+use std::sync::Arc;
 use thiserror::Error;
 use tracing::info;
 use uuid::Uuid;
@@ -46,6 +48,7 @@ pub struct QueryFulfilment {
     quotation_service: QuotationService,
     pricelist_service: PriceListService,
     ocr_service: OcrService,
+    stock_service: Arc<StockService>,
 }
 
 impl QueryFulfilment {
@@ -70,6 +73,7 @@ impl QueryFulfilment {
             quotation_service,
             pricelist_service,
             ocr_service,
+            stock_service: Arc::clone(&context.stock_service),
         })
     }
 
@@ -203,6 +207,16 @@ impl QueryFulfilment {
                 }
             }
 
+            Query::GetStock { query } => match self.stock_service.request_stock(query).await {
+                Ok(stock_info) => Response {
+                    text: stock_info,
+                    file: None,
+                },
+                Err(e) => Response {
+                    text: format!("Stock check failed: {}", e),
+                    file: None,
+                },
+            },
             _ => Response {
                 text: "Cannot fulfil this request at the moment".to_string(),
                 file: None,
