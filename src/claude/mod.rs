@@ -25,6 +25,7 @@ pub enum Query {
     GetProformaInvoice(QuotationRequest),
     GetPricesOnly(PriceOnlyRequest),
     UnsupportedQuery,
+    GetStock {query: String}
 }
 
 fn default_brand() -> String {

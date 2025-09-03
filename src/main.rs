@@ -1,6 +1,7 @@
 use assistant::communication::error_alert::ErrorAlertService;
 use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
+use assistant::communication::websocket::WebSocketService;
 use assistant::communication::whatsapp::WhatsAppService;
 use assistant::configuration::Context;
 use assistant::core::ServiceManager;
@@ -16,7 +17,13 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
     dotenv().ok();
-    let context = Context::new("config.json").map_err(|e| AppError::ConfigError(e.to_string()))?;
+    let websocket_service = WebSocketService::new().await;
+    let stock_service = Arc::new(websocket_service.get_stock_service().clone());
+    tokio::spawn(async move {
+        let _ = websocket_service.run().await;
+    });
+    let context = Context::new("config.json", stock_service)
+        .map_err(|e| AppError::ConfigError(e.to_string()))?;
 
     let log_level = Level::from_str(&context.config.log_level).unwrap_or(Level::INFO);
     tracing_subscriber::registry()
