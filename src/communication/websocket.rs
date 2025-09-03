@@ -124,14 +124,15 @@ impl WebSocketService {
     }
 }
 
-async fn websocket_handler(
+pub async fn websocket_handler(
     ws: WebSocketUpgrade,
     State(stock_service): State<StockService>,
 ) -> Response {
+    //let stock_service= (*state.stock_service).clone();
     ws.on_upgrade(move |socket| handle_tally_connection(socket, stock_service))
 }
 
-async fn handle_tally_connection(socket: WebSocket, stock_service: StockService) {
+pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockService) {
     let (mut ws_sender, mut ws_receiver) = socket.split();
     let (tx, mut rx) = mpsc::channel::<String>(100);
 

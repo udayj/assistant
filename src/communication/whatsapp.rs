@@ -1,9 +1,11 @@
+use crate::communication::websocket::StockService;
 use crate::configuration::Context;
 use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::database::DatabaseService;
 use crate::query::QueryFulfilment;
 use async_trait::async_trait;
+use axum::extract::WebSocketUpgrade;
 use axum::{
     body::Body,
     extract::{Form, Path, State},
@@ -32,7 +34,7 @@ pub enum WhatsAppError {
 }
 
 #[derive(Clone)]
-struct AppState {
+pub struct AppState {
     query_fulfilment: Arc<QueryFulfilment>,
     error_sender: mpsc::Sender<String>,
     file_base_url: String,
@@ -40,6 +42,7 @@ struct AppState {
     twilio_auth_token: String,
     http_client: RetryableClient,
     database: Arc<DatabaseService>,
+    pub stock_service: Arc<StockService>,
 }
 
 pub struct WhatsAppService {
@@ -51,6 +54,7 @@ pub struct WhatsAppService {
     twilio_auth_token: String,
     http_client: RetryableClient,
     database: Arc<DatabaseService>,
+    stock_service: Arc<StockService>,
 }
 
 #[async_trait]
@@ -70,6 +74,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             twilio_auth_token,
             http_client: RetryableClient::new(),
             database: context.database.clone(),
+            stock_service: context.stock_service.clone(),
         }
     }
 
@@ -82,6 +87,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             twilio_auth_token: self.twilio_auth_token,
             http_client: self.http_client,
             database: self.database,
+            stock_service: self.stock_service.clone(),
         };
 
         let app = Router::new()
@@ -89,6 +95,7 @@ impl ServiceWithErrorSender for WhatsAppService {
             .route("/webhook", post(webhook_handler))
             .route("/artifacts/{*filename}", get(serve_file))
             .route("/assets/pricelists/{*filename}", get(serve_assets_file))
+            .route("/ws", get(whatsapp_websocket_handler))
             .layer(CorsLayer::permissive())
             .with_state(state);
 
@@ -102,6 +109,15 @@ impl ServiceWithErrorSender for WhatsAppService {
             .await
             .map_err(|e| ServiceManagerError::new(&format!("HTTP server error: {}", e)))
     }
+}
+
+async fn whatsapp_websocket_handler(
+    ws: WebSocketUpgrade,
+    State(app_state): State<AppState>,
+) -> Response {
+    let stock_service = app_state.stock_service.as_ref().clone();
+    crate::communication::websocket::websocket_handler(ws, axum::extract::State(stock_service))
+        .await
 }
 
 async fn health_check() -> (StatusCode, &'static str) {
