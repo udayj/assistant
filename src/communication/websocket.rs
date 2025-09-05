@@ -16,7 +16,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, oneshot, Mutex};
-use tracing::info;
+use tracing::{error, info};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
@@ -135,16 +135,17 @@ pub async fn websocket_handler(
 }
 
 pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockService) {
-    let (mut ws_sender, mut ws_receiver) = socket.split();
+    let (ws_sender, mut ws_receiver) = socket.split();
     let (tx, mut rx) = mpsc::channel::<String>(100);
-
+    let ws_sender = Arc::new(Mutex::new(ws_sender));
     // Register this connection as THE Tally client
     *stock_service.tally_sender.lock().await = Some(tx);
     info!("Tally sender registered at:{}", get_local_time());
     // Handle outgoing messages to Tally
+    let sender_clone = Arc::clone(&ws_sender);
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            if ws_sender.send(Message::Text(msg.into())).await.is_err() {
+            if sender_clone.lock().await.send(Message::Text(msg.into())).await.is_err() {
                 break;
             }
         }
@@ -154,8 +155,16 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
     while let Some(msg) = ws_receiver.next().await {
         info!("Message received from tally at:{}", get_local_time());
         if let Ok(Message::Text(text)) = msg {
+            if text == "PING" {
+                info!("PING received from tally_client");
+                if ws_sender.lock().await.send(Message::Text("PONG".into())).await.is_err() {
+                    break; // Connection broken
+                }
+                continue;
+            }
             stock_service.handle_tally_response(&text).await;
         } else {
+            error!("Message:{:#?}", msg);
             info!("Connection disconnected at:{}", get_local_time());
             break;
         }
