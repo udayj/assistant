@@ -1,3 +1,4 @@
+use crate::prices::utils::get_local_time;
 use axum::{
     extract::{
         ws::{Message, WebSocket},
@@ -15,6 +16,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, oneshot, Mutex};
+use tracing::info;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
@@ -150,13 +152,16 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
 
     // Handle incoming responses from Tally
     while let Some(msg) = ws_receiver.next().await {
+        info!("Message received from tally at:{}", get_local_time());
         if let Ok(Message::Text(text)) = msg {
             stock_service.handle_tally_response(&text).await;
         } else {
+            info!("Connection disconnected at:{}", get_local_time());
             break;
         }
     }
 
     // Clean up on disconnect
+    info!("Tally sender cleaned at:{}", get_local_time());
     *stock_service.tally_sender.lock().await = None;
 }

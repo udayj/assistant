@@ -1,3 +1,6 @@
+use chrono::Utc;
+use chrono_tz::Asia::Kolkata;
+
 pub fn normalize_decimal(s: &str) -> String {
     match s.parse::<f64>() {
         Ok(num) => {
@@ -12,4 +15,9 @@ pub fn normalize_decimal(s: &str) -> String {
         }
         Err(_) => s.to_string(), // fallback to original if not a valid number
     }
+}
+
+pub fn get_local_time() -> String {
+    let now_ist = Utc::now().with_timezone(&Kolkata);
+    now_ist.format("%d/%m/%Y %I:%M %p").to_string()
 }
