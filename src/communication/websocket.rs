@@ -140,7 +140,7 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
 
     // Register this connection as THE Tally client
     *stock_service.tally_sender.lock().await = Some(tx);
-
+    info!("Tally sender registered at:{}", get_local_time());
     // Handle outgoing messages to Tally
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
