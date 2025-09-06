@@ -145,7 +145,13 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
     let sender_clone = Arc::clone(&ws_sender);
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            if sender_clone.lock().await.send(Message::Text(msg.into())).await.is_err() {
+            if sender_clone
+                .lock()
+                .await
+                .send(Message::Text(msg.into()))
+                .await
+                .is_err()
+            {
                 break;
             }
         }
@@ -157,7 +163,13 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
         if let Ok(Message::Text(text)) = msg {
             if text == "PING" {
                 info!("PING received from tally_client");
-                if ws_sender.lock().await.send(Message::Text("PONG".into())).await.is_err() {
+                if ws_sender
+                    .lock()
+                    .await
+                    .send(Message::Text("PONG".into()))
+                    .await
+                    .is_err()
+                {
                     break; // Connection broken
                 }
                 continue;
@@ -169,8 +181,4 @@ pub async fn handle_tally_connection(socket: WebSocket, stock_service: StockServ
             break;
         }
     }
-
-    // Clean up on disconnect
-    info!("Tally sender cleaned at:{}", get_local_time());
-    *stock_service.tally_sender.lock().await = None;
 }
