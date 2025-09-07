@@ -248,10 +248,11 @@ impl QueryFulfilment {
         };
 
         // Update the session with actual query type
-        let _ = self
+        let response = self
             .database
             .update_session_query_type(context.session_id, query_type)
             .await;
+        info!("Database query update response:{:#?}", response);
         Ok(query)
     }
 

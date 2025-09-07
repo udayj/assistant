@@ -553,19 +553,24 @@ impl DatabaseService {
         output_tokens: i32,
         model: &str,
     ) -> Result<(), DatabaseError> {
-        let metadata = serde_json::json!({
-            "model": model,
-            "input_tokens": input_tokens,
-            "cache_read_tokens": cache_read_tokens,
-            "cache_write_tokens": cache_write_tokens,
-            "output_tokens": output_tokens
-        });
 
         let rates = self.get_claude_rates().await.unwrap_or_default();
         let input_cost = (input_tokens as f64 * rates.input_token) / 1_000_000.0;
         let cache_read_cost = (cache_read_tokens as f64 * rates.cache_hit_refresh) / 1_000_000.0;
         let output_cost = (output_tokens as f64 * rates.output_token) / 1_000_000.0;
         let cache_write_cost = (cache_write_tokens as f64 * rates.one_h_cache_writes) / 1_000_000.0;
+
+        let metadata = serde_json::json!({
+            "model": model,
+            "input_tokens": input_tokens,
+            "cache_read_tokens": cache_read_tokens,
+            "cache_write_tokens": cache_write_tokens,
+            "output_tokens": output_tokens,
+            "input_cost": input_cost,
+            "cache_read_cost": cache_read_cost,
+            "output_cost": output_cost,
+            "cache_write_cost": cache_write_cost
+        });
 
         let total_cost = input_cost + cache_read_cost + cache_write_cost + output_cost;
 
@@ -574,7 +579,7 @@ impl DatabaseService {
         CostEventBuilder::new(context.clone(), "claude_api")
             .with_cost(total_cost, "per_1m_tokens", total_tokens)
             .with_metadata(metadata)
-            .log(self)
+            .log_total_cost(self)
             .await
     }
 
@@ -660,6 +665,23 @@ impl CostEventBuilder {
                 unit_type: self.unit_type,
                 units_consumed: self.units_consumed,
                 cost_amount: self.unit_cost * self.units_consumed as f64,
+                metadata: self.metadata,
+                platform: self.context.platform,
+                created_at: Utc::now(),
+            })
+            .await
+    }
+
+    pub async fn log_total_cost(self, database: &DatabaseService) -> Result<(), DatabaseError> {
+        database
+            .log_cost_event(CostEvent {
+                user_id: self.context.user_id,
+                query_session_id: self.context.session_id,
+                event_type: self.event_type,
+                unit_cost: self.unit_cost,
+                unit_type: self.unit_type,
+                units_consumed: self.units_consumed,
+                cost_amount: self.unit_cost,
                 metadata: self.metadata,
                 platform: self.context.platform,
                 created_at: Utc::now(),
