@@ -1,15 +1,15 @@
 use moka::sync::Cache;
-use std::time::Duration;
 use std::hash::Hash;
+use std::time::Duration;
 
 pub struct ExpirableCache<K, V> {
     cache: Cache<K, V>,
 }
 
-impl<K,V> ExpirableCache<K,V> 
-where 
-K: 'static + Eq + Hash + Send + Sync,
-V: Clone + Send + Sync + 'static
+impl<K, V> ExpirableCache<K, V>
+where
+    K: 'static + Eq + Hash + Send + Sync,
+    V: Clone + Send + Sync + 'static,
 {
     pub fn new(max_capacity: u64, ttl: Duration) -> Self {
         let cache = Cache::builder()

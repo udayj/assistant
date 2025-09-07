@@ -1,19 +1,19 @@
 use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
-use crate::stock::StockService;
 use crate::configuration::Context;
 use crate::core::Service;
+use crate::database::{DatabaseService, SessionContext};
 use crate::ocr::OcrService;
 use crate::pdf::{create_quotation_pdf, DocumentType};
 use crate::prices::price_list::PriceListService;
 use crate::prices::PriceService;
 use crate::quotation::QuotationService;
+use crate::stock::StockService;
 use chrono::{Datelike, Local};
 use rand::prelude::*;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::info;
-use uuid::Uuid;
 
 #[derive(Error, Debug)]
 pub enum QueryError {
@@ -49,6 +49,7 @@ pub struct QueryFulfilment {
     pricelist_service: PriceListService,
     ocr_service: OcrService,
     stock_service: Arc<StockService>,
+    database: Arc<DatabaseService>,
 }
 
 impl QueryFulfilment {
@@ -74,6 +75,7 @@ impl QueryFulfilment {
             pricelist_service,
             ocr_service,
             stock_service: Arc::clone(&context.stock_service),
+            database: context.database.clone(),
         })
     }
 
@@ -86,13 +88,12 @@ impl QueryFulfilment {
         &self,
         image_data: &[u8],
         user_text: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<Response, QueryError> {
         // Extract text from image
         let image_text = self
             .ocr_service
-            .extract_text_from_image(image_data.to_vec(), user_id, session_id)
+            .extract_text_from_image(image_data.to_vec(), context)
             .await
             .map_err(|e| QueryError::OcrError(e.to_string()))?;
 
@@ -105,17 +106,15 @@ impl QueryFulfilment {
             };
         info!("formed combined query:{}", combined_query);
         // Use existing fulfillment logic
-        self.fulfil_query(&combined_query, user_id, session_id)
-            .await
+        self.fulfil_query(&combined_query, context).await
     }
 
     pub async fn fulfil_query(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<Response, QueryError> {
-        let query = self.get_query_type(query, user_id, session_id).await?;
+        let query = self.get_query_type(query, context).await?;
         let response = match query {
             Query::GetPriceList { brand, keywords } => {
                 match self.pricelist_service.find_pricelist(&brand, &keywords) {
@@ -228,15 +227,31 @@ impl QueryFulfilment {
     pub async fn get_query_type(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<Query, QueryError> {
         let query: Query = self
             .llm_service
-            .parse_query(query, user_id, session_id)
+            .parse_query(query, context)
             .await
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
-        info!("parsed query successfully");
+        info!("Parsed query successfully");
+
+        // Update the session with the actual query type
+        let query_type = match &query {
+            Query::MetalPricing => "MetalPricing",
+            Query::GetPriceList { .. } => "GetPriceList",
+            Query::GetQuotation(_) => "GetQuotation",
+            Query::GetProformaInvoice(_) => "GetProformaInvoice",
+            Query::GetPricesOnly(_) => "GetPricesOnly",
+            Query::GetStock { .. } => "GetStock",
+            Query::UnsupportedQuery => "UnsupportedQuery",
+        };
+
+        // Update the session with actual query type
+        let _ = self
+            .database
+            .update_session_query_type(context.session_id, query_type)
+            .await;
         Ok(query)
     }
 

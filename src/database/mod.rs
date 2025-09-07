@@ -65,7 +65,7 @@ pub struct ClaudeRates {
     pub input_token: f64,
     pub cache_hit_refresh: f64,
     pub output_token: f64,
-    pub one_h_cache_writes: f64
+    pub one_h_cache_writes: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -74,13 +74,29 @@ pub struct GroqRates {
     pub output_token: f64,
 }
 
+#[derive(Debug, Clone)]
+pub struct SessionContext {
+    pub user_id: Uuid,
+    pub session_id: Uuid,
+    pub platform: String,
+    pub user_phone: Option<String>,
+    pub telegram_id: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct SessionResult {
+    pub success: bool,
+    pub error_message: Option<String>,
+    pub processing_time_ms: i32,
+}
+
 impl Default for ClaudeRates {
     fn default() -> Self {
         Self {
             input_token: 3.0,
             cache_hit_refresh: 0.3,
             output_token: 15.0,
-            one_h_cache_writes: 6.0
+            one_h_cache_writes: 6.0,
         }
     }
 }
@@ -366,16 +382,19 @@ impl DatabaseService {
 
         match response {
             Ok(resp) if resp.status() == 200 => {
-                let rates: Vec<serde_json::Value> = resp.json().await
+                let rates: Vec<serde_json::Value> = resp
+                    .json()
+                    .await
                     .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
                 println!("resp:{:#?}", rates);
                 let mut claude_rates = ClaudeRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"].as_str()
+                    let unit_cost = rate["unit_cost"]
+                        .as_str()
                         .and_then(|s| s.parse::<f64>().ok())
                         .unwrap_or(0.0);
-                    
+
                     match cost_type {
                         "input_token" => claude_rates.input_token = unit_cost,
                         "output_token" => claude_rates.output_token = unit_cost,
@@ -386,7 +405,7 @@ impl DatabaseService {
                 }
                 Ok(claude_rates)
             }
-            _ => Ok(ClaudeRates::default())
+            _ => Ok(ClaudeRates::default()),
         }
     }
 
@@ -401,16 +420,19 @@ impl DatabaseService {
 
         match response {
             Ok(resp) if resp.status() == 200 => {
-                let rates: Vec<serde_json::Value> = resp.json().await
+                let rates: Vec<serde_json::Value> = resp
+                    .json()
+                    .await
                     .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
-                
+
                 let mut groq_rates = GroqRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"].as_str()
+                    let unit_cost = rate["unit_cost"]
+                        .as_str()
                         .and_then(|s| s.parse::<f64>().ok())
                         .unwrap_or(0.0);
-                    
+
                     match cost_type {
                         "input_token" => groq_rates.input_token = unit_cost,
                         "output_token" => groq_rates.output_token = unit_cost,
@@ -419,8 +441,230 @@ impl DatabaseService {
                 }
                 Ok(groq_rates)
             }
-            _ => Ok(GroqRates::default())
+            _ => Ok(GroqRates::default()),
         }
+    }
+}
+
+impl DatabaseService {
+    pub async fn update_session_query_type(
+        &self,
+        session_id: Uuid,
+        query_type: &str,
+    ) -> Result<(), DatabaseError> {
+        let update_data = serde_json::json!({
+            "query_type": query_type
+        });
+
+        let response = self
+            .client
+            .from("query_sessions")
+            .update(update_data.to_string())
+            .eq("id", &session_id.to_string())
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        if !response.status().is_success() {
+            return Err(DatabaseError::QueryError(format!(
+                "Update query type failed with status: {}",
+                response.status()
+            )));
+        }
+
+        Ok(())
+    }
+
+    pub async fn create_session_with_context(
+        &self,
+        context: &SessionContext,
+        query_text: &str,
+        query_type: &str,
+    ) -> Result<Uuid, DatabaseError> {
+        let session = QuerySession {
+            id: context.session_id,
+            user_id: context.user_id,
+            query_text: query_text.to_string(),
+            query_type: query_type.to_string(),
+            response_type: "processing".to_string(),
+            error_message: None,
+            total_cost: 0.0,
+            processing_time_ms: None,
+            platform: context.platform.clone(),
+            created_at: Utc::now(),
+        };
+
+        self.create_session(session).await
+    }
+
+    pub async fn complete_session(
+        &self,
+        context: &SessionContext,
+        result: SessionResult,
+    ) -> Result<(), DatabaseError> {
+        let total_cost = self
+            .get_session_total_cost(context.session_id)
+            .await
+            .unwrap_or(0.0);
+
+        let response_type = if result.success { "success" } else { "error" };
+
+        self.update_session_result(
+            context.session_id,
+            response_type,
+            result.error_message,
+            total_cost,
+            result.processing_time_ms,
+        )
+        .await
+    }
+
+    pub async fn log_whatsapp_message(
+        &self,
+        context: &SessionContext,
+        outgoing: bool,
+        message_len: usize,
+        has_media: bool,
+    ) -> Result<(), DatabaseError> {
+        let event_type = if outgoing {
+            "whatsapp_outgoing"
+        } else {
+            "whatsapp_incoming"
+        };
+        let metadata = serde_json::json!({
+            "message_length": message_len,
+            "has_media": has_media,
+            "phone_number": context.user_phone
+        });
+
+        CostEventBuilder::new(context.clone(), event_type)
+            .with_cost(0.005, "message", 1)
+            .with_metadata(metadata)
+            .log(self)
+            .await
+    }
+
+    pub async fn log_claude_api_call(
+        &self,
+        context: &SessionContext,
+        input_tokens: i32,
+        cache_read_tokens: i32,
+        cache_write_tokens: i32,
+        output_tokens: i32,
+        model: &str,
+    ) -> Result<(), DatabaseError> {
+        let metadata = serde_json::json!({
+            "model": model,
+            "input_tokens": input_tokens,
+            "cache_read_tokens": cache_read_tokens,
+            "cache_write_tokens": cache_write_tokens,
+            "output_tokens": output_tokens
+        });
+
+        let rates = self.get_claude_rates().await.unwrap_or_default();
+        let input_cost = (input_tokens as f64 * rates.input_token) / 1_000_000.0;
+        let cache_read_cost = (cache_read_tokens as f64 * rates.cache_hit_refresh) / 1_000_000.0;
+        let output_cost = (output_tokens as f64 * rates.output_token) / 1_000_000.0;
+        let cache_write_cost = (cache_write_tokens as f64 * rates.one_h_cache_writes) / 1_000_000.0;
+
+        let total_cost = input_cost + cache_read_cost + cache_write_cost + output_cost;
+
+        let total_tokens = input_tokens + cache_read_tokens + cache_write_tokens + output_tokens;
+
+        CostEventBuilder::new(context.clone(), "claude_api")
+            .with_cost(total_cost, "per_1m_tokens", total_tokens)
+            .with_metadata(metadata)
+            .log(self)
+            .await
+    }
+
+    pub async fn log_textract_usage(
+        &self,
+        context: &SessionContext,
+        image_size_bytes: usize,
+    ) -> Result<(), DatabaseError> {
+        let metadata = serde_json::json!({
+            "image_size_bytes": image_size_bytes
+        });
+
+        CostEventBuilder::new(context.clone(), "textract_api")
+            .with_cost(0.0015, "per_page", 1)
+            .with_metadata(metadata)
+            .log(self)
+            .await
+    }
+}
+
+impl SessionContext {
+    pub fn new(user_id: Uuid, platform: &str) -> Self {
+        Self {
+            user_id,
+            session_id: Uuid::new_v4(),
+            platform: platform.to_string(),
+            user_phone: None,
+            telegram_id: None,
+        }
+    }
+
+    pub fn with_phone(mut self, phone: String) -> Self {
+        self.user_phone = Some(phone);
+        self
+    }
+
+    pub fn with_telegram_id(mut self, telegram_id: String) -> Self {
+        self.telegram_id = Some(telegram_id);
+        self
+    }
+}
+
+pub struct CostEventBuilder {
+    context: SessionContext,
+    event_type: String,
+    unit_cost: f64,
+    unit_type: String,
+    units_consumed: i32,
+    metadata: Option<serde_json::Value>,
+}
+
+impl CostEventBuilder {
+    pub fn new(context: SessionContext, event_type: &str) -> Self {
+        Self {
+            context,
+            event_type: event_type.to_string(),
+            unit_cost: 0.0,
+            unit_type: "unit".to_string(),
+            units_consumed: 1,
+            metadata: None,
+        }
+    }
+
+    pub fn with_cost(mut self, unit_cost: f64, unit_type: &str, units_consumed: i32) -> Self {
+        self.unit_cost = unit_cost;
+        self.unit_type = unit_type.to_string();
+        self.units_consumed = units_consumed;
+        self
+    }
+
+    pub fn with_metadata(mut self, metadata: serde_json::Value) -> Self {
+        self.metadata = Some(metadata);
+        self
+    }
+
+    pub async fn log(self, database: &DatabaseService) -> Result<(), DatabaseError> {
+        database
+            .log_cost_event(CostEvent {
+                user_id: self.context.user_id,
+                query_session_id: self.context.session_id,
+                event_type: self.event_type,
+                unit_cost: self.unit_cost,
+                unit_type: self.unit_type,
+                units_consumed: self.units_consumed,
+                cost_amount: self.unit_cost * self.units_consumed as f64,
+                metadata: self.metadata,
+                platform: self.context.platform,
+                created_at: Utc::now(),
+            })
+            .await
     }
 }
 

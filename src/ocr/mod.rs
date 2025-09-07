@@ -1,10 +1,8 @@
-use crate::database::CostEvent;
+use crate::database::SessionContext;
 use aws_config::BehaviorVersion;
 use aws_sdk_textract::{types::Document, Client as AWSClient};
-use chrono::Utc;
 use std::sync::Arc;
 use thiserror::Error;
-use uuid::Uuid;
 
 use crate::database::DatabaseService;
 
@@ -29,8 +27,7 @@ impl OcrService {
     pub async fn extract_text_from_image(
         &self,
         image_data: Vec<u8>,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<String, OcrError> {
         let image_data_len = image_data.len();
         let document = Document::builder()
@@ -57,22 +54,9 @@ impl OcrService {
             }
         }
 
-        let _ = &self
+        let _ = self
             .database
-            .log_cost_event(CostEvent {
-                user_id,
-                query_session_id: session_id,
-                event_type: "textract_api".to_string(),
-                unit_cost: 0.0015,
-                unit_type: "per_page".to_string(),
-                units_consumed: 1,
-                cost_amount: 0.0015,
-                metadata: Some(serde_json::json!({
-                    "image_size_bytes": image_data_len
-                })),
-                platform: "telegram".to_string(),
-                created_at: Utc::now(),
-            })
+            .log_textract_usage(context, image_data_len)
             .await;
         if extracted_text.trim().is_empty() {
             Ok("No readable text found".to_string())

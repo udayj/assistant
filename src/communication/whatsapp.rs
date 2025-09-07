@@ -3,6 +3,7 @@ use crate::configuration::Context;
 use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::database::DatabaseService;
+use crate::database::{SessionContext, SessionResult, User};
 use crate::query::QueryFulfilment;
 use crate::stock::StockService;
 use async_trait::async_trait;
@@ -15,7 +16,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
@@ -124,6 +124,8 @@ async fn health_check() -> (StatusCode, &'static str) {
     (StatusCode::OK, "OK")
 }
 
+// Main whatsapp webhook
+// This is also the end-point which gets pinged with an error payload from twilio
 async fn webhook_handler(
     State(state): State<AppState>,
     Form(payload): Form<HashMap<String, String>>,
@@ -137,102 +139,53 @@ async fn webhook_handler(
 
     // Define default IDs for unauthorized users
     let default_user_id = Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap();
-    let default_session_id = Uuid::new_v4();
-
+    let default_context =
+        SessionContext::new(default_user_id, "whatsapp").with_phone(phone.to_string());
     let user = match state.database.get_user_by_phone(phone).await {
         Ok(Some(user)) => {
             if !state.database.is_user_authorized(&user).await {
                 // Log cost for unauthorized user
                 let _ = state
                     .database
-                    .log_cost_event(crate::database::CostEvent {
-                        user_id: default_user_id,
-                        query_session_id: default_session_id,
-                        event_type: "whatsapp_incoming".to_string(),
-                        unit_cost: 0.005,
-                        unit_type: "message".to_string(),
-                        units_consumed: 1,
-                        cost_amount: 0.005,
-                        metadata: Some(
-                            serde_json::json!({"phone_number": phone, "unauthorized": true}),
-                        ),
-                        platform: "whatsapp".to_string(),
-                        created_at: Utc::now(),
-                    })
+                    .create_session_with_context(&default_context, &body, "unauthorized")
+                    .await;
+                let _ = state
+                    .database
+                    .log_whatsapp_message(&default_context, false, body.len(), false)
                     .await;
 
-                return send_text_response(
-                    "Access denied",
-                    &state,
-                    default_user_id,
-                    default_session_id,
-                )
-                .await;
+                return send_text_response("Access denied", &state, &default_context).await;
             }
             user
         }
         Ok(None) => {
             // Log cost for unknown user
+
             let _ = state
                 .database
-                .log_cost_event(crate::database::CostEvent {
-                    user_id: default_user_id,
-                    query_session_id: default_session_id,
-                    event_type: "whatsapp_incoming".to_string(),
-                    unit_cost: 0.005,
-                    unit_type: "message".to_string(),
-                    units_consumed: 1,
-                    cost_amount: 0.005,
-                    metadata: Some(
-                        serde_json::json!({"phone_number": phone, "unknown_user": true}),
-                    ),
-                    platform: "whatsapp".to_string(),
-                    created_at: Utc::now(),
-                })
+                .create_session_with_context(&default_context, &body, "unknown_user")
+                .await;
+            let _ = state
+                .database
+                .log_whatsapp_message(&default_context, false, body.len(), false)
                 .await;
 
-            return send_text_response(
-                "Access denied",
-                &state,
-                default_user_id,
-                default_session_id,
-            )
-            .await;
+            return send_text_response("Access denied", &state, &default_context).await;
         }
         Err(_) => {
-            return send_text_response("System error", &state, default_user_id, default_session_id)
-                .await;
+            return send_text_response("System error", &state, &default_context).await;
         }
     };
 
     let start_time = std::time::Instant::now();
-    let session_id = create_session_for_user(&state, &user, &body, "text_query").await;
+    let context = create_session_context(&state, &user, &body, "text_query").await;
     let _ = state
         .database
-        .log_cost_event(crate::database::CostEvent {
-            user_id: user.id,
-            query_session_id: session_id,
-            event_type: "whatsapp_incoming".to_string(),
-            unit_cost: 0.005,
-            unit_type: "message".to_string(),
-            units_consumed: 1,
-            cost_amount: 0.005,
-            metadata: Some(
-                serde_json::json!({"phone_number": phone, "message_length": body.len()}),
-            ),
-            platform: "whatsapp".to_string(),
-            created_at: Utc::now(),
-        })
+        .log_whatsapp_message(&context, false, body.len(), false)
         .await;
 
     if body.trim() == "/help" || body.trim() == "help" {
-        return send_text_response(
-            &QueryFulfilment::get_help_text(),
-            &state,
-            user.id,
-            session_id,
-        )
-        .await;
+        return send_text_response(&QueryFulfilment::get_help_text(), &state, &context).await;
     }
 
     if let Some(media_url) = payload.get("MediaUrl0") {
@@ -243,8 +196,7 @@ async fn webhook_handler(
             return send_text_response(
                 "Please send only images with your request",
                 &state,
-                user.id,
-                session_id,
+                &context,
             )
             .await;
         }
@@ -254,16 +206,14 @@ async fn webhook_handler(
         let from_clone = from.clone();
         let media_url_clone = media_url.clone();
         let body_clone = body.clone();
-        let user_clone = user.clone();
-        let session_clone = session_id.clone();
+        let context_clone = context.clone();
 
         tokio::spawn(async move {
             match download_and_process_image(
                 &state_clone,
                 &media_url_clone,
                 &body_clone,
-                user_clone.id,
-                session_clone,
+                &context_clone,
             )
             .await
             {
@@ -278,8 +228,7 @@ async fn webhook_handler(
                             &state_clone,
                             &from_clone,
                             &file_url,
-                            user_clone.id,
-                            session_clone,
+                            &context_clone,
                         )
                         .await;
                     } else {
@@ -287,26 +236,18 @@ async fn webhook_handler(
                             &state_clone,
                             &from_clone,
                             &response.text,
-                            user_clone.id,
-                            session_clone,
+                            &context_clone,
                         )
                         .await;
                     }
-                    let processing_time = start_time.elapsed().as_millis() as i32;
-                    let total_cost = state_clone
-                        .database
-                        .get_session_total_cost(session_id)
-                        .await
-                        .unwrap_or(0.0);
+                    let result = SessionResult {
+                        success: true,
+                        error_message: None,
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
                     let _ = state_clone
                         .database
-                        .update_session_result(
-                            session_id,
-                            "success",
-                            None,
-                            total_cost,
-                            processing_time,
-                        )
+                        .complete_session(&context_clone, result)
                         .await;
                 }
                 Err(e) => {
@@ -314,54 +255,39 @@ async fn webhook_handler(
                         "❌ WhatsApp Image Query Failed\nText: {}\nError: {}",
                         body_clone, e
                     );
-                    let processing_time = start_time.elapsed().as_millis() as i32;
-                    let total_cost = state_clone
-                        .database
-                        .get_session_total_cost(session_id)
-                        .await
-                        .unwrap_or(0.0);
+                    let result = SessionResult {
+                        success: false,
+                        error_message: Some(e.to_string()),
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
                     let _ = state_clone
                         .database
-                        .update_session_result(
-                            session_id,
-                            "error",
-                            Some(e.to_string()),
-                            total_cost,
-                            processing_time,
-                        )
+                        .complete_session(&context_clone, result)
                         .await;
                     let _ = state_clone.error_sender.try_send(error_msg);
                     let _ = send_whatsapp_message(
                         &state_clone,
                         &from_clone,
                         "Could not process image - please try again with clearer image and text",
-                        user_clone.id,
-                        session_clone,
+                        &context_clone,
                     )
                     .await;
                 }
             }
         });
 
-        send_text_response(
-            "Processing your request...please wait ⏳",
-            &state,
-            user.id,
-            session_id,
-        )
-        .await
+        send_text_response("Processing your request...please wait ⏳", &state, &context).await
     } else {
         // Process all text queries asynchronously
         let state_clone = state.clone();
         let from_clone = from.clone();
         let body_clone = body.clone();
-        let user_clone = user.clone();
-        let session_clone = session_id.clone();
+        let context_clone = context.clone();
 
         tokio::spawn(async move {
             match state_clone
                 .query_fulfilment
-                .fulfil_query(&body_clone, user_clone.id, session_clone)
+                .fulfil_query(&body_clone, &context_clone)
                 .await
             {
                 Ok(response) => {
@@ -376,8 +302,7 @@ async fn webhook_handler(
                             &state_clone,
                             &from_clone,
                             &file_url,
-                            user_clone.id,
-                            session_clone,
+                            &context_clone,
                         )
                         .await;
                     } else {
@@ -385,26 +310,18 @@ async fn webhook_handler(
                             &state_clone,
                             &from_clone,
                             &response.text,
-                            user_clone.id,
-                            session_clone,
+                            &context_clone,
                         )
                         .await;
                     }
-                    let processing_time = start_time.elapsed().as_millis() as i32;
-                    let total_cost = state_clone
-                        .database
-                        .get_session_total_cost(session_id)
-                        .await
-                        .unwrap_or(0.0);
+                    let result = SessionResult {
+                        success: true,
+                        error_message: None,
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
                     let _ = state_clone
                         .database
-                        .update_session_result(
-                            session_id,
-                            "success",
-                            None,
-                            total_cost,
-                            processing_time,
-                        )
+                        .complete_session(&context_clone, result)
                         .await;
                 }
                 Err(e) => {
@@ -412,42 +329,28 @@ async fn webhook_handler(
                         "❌ Background Processing Failed\nQuery: {}\nError: {}",
                         body_clone, e
                     );
-                    let processing_time = start_time.elapsed().as_millis() as i32;
-                    let total_cost = state_clone
-                        .database
-                        .get_session_total_cost(session_id)
-                        .await
-                        .unwrap_or(0.0);
+                    let result = SessionResult {
+                        success: false,
+                        error_message: Some(e.to_string()),
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
                     let _ = state_clone
                         .database
-                        .update_session_result(
-                            session_id,
-                            "error",
-                            Some(e.to_string()),
-                            total_cost,
-                            processing_time,
-                        )
+                        .complete_session(&context_clone, result)
                         .await;
                     let _ = state_clone.error_sender.try_send(error_msg);
                     let _ = send_whatsapp_message(
                         &state_clone,
                         &from_clone,
                         "Sorry, couldn't process your request. Please try again later.",
-                        user_clone.id,
-                        session_clone,
+                        &context_clone,
                     )
                     .await;
                 }
             }
         });
 
-        send_text_response(
-            "Processing your request...please wait ⏳",
-            &state,
-            user.id,
-            session_id,
-        )
-        .await
+        send_text_response("Processing your request...please wait ⏳", &state, &context).await
     }
 }
 
@@ -519,56 +422,38 @@ async fn _send_pdf_response(
         .unwrap())
 }
 
-async fn create_session_for_user(
+async fn create_session_context(
     state: &AppState,
-    user: &crate::database::User,
+    user: &User,
     query_text: &str,
     query_type: &str,
-) -> Uuid {
-    let session = crate::database::QuerySession {
-        id: Uuid::new_v4(),
-        user_id: user.id,
-        query_text: query_text.to_string(),
-        query_type: query_type.to_string(),
-        response_type: "processing".to_string(),
-        error_message: None,
-        total_cost: 0.0,
-        processing_time_ms: None,
-        platform: "whatsapp".to_string(),
-        created_at: Utc::now(),
-    };
+) -> SessionContext {
+    let phone = user
+        .phone_number
+        .as_ref()
+        .and_then(|p| p.strip_prefix("whatsapp:"))
+        .map(|p| p.to_string());
 
-    state
+    let context = SessionContext::new(user.id, "whatsapp").with_phone(phone.unwrap_or_default());
+
+    let _ = state
         .database
-        .create_session(session)
-        .await
-        .unwrap_or_else(|_| Uuid::new_v4())
+        .create_session_with_context(&context, query_text, query_type)
+        .await;
+
+    context
 }
 
 async fn send_text_response(
     message: &str,
     state: &AppState,
-    user_id: Uuid,
-    session_id: Uuid,
+    context: &SessionContext,
 ) -> Response<String> {
-    // Log cost if state provided
-    let message_len = message.len();
-    let response = state
+    // Log cost
+    let _ = state
         .database
-        .log_cost_event(crate::database::CostEvent {
-            user_id: user_id,
-            query_session_id: session_id,
-            event_type: "whatsapp_outgoing".to_string(),
-            unit_cost: 0.005,
-            unit_type: "message".to_string(),
-            units_consumed: 1,
-            cost_amount: 0.005,
-            metadata: Some(serde_json::json!({"message_length": message_len})),
-            platform: "whatsapp".to_string(),
-            created_at: Utc::now(),
-        })
+        .log_whatsapp_message(context, true, message.len(), false)
         .await;
-    info!("Response from whatsapp logging:{:#?}", response);
 
     let twiml = format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
@@ -591,8 +476,7 @@ async fn download_and_process_image(
     state: &AppState,
     media_url: &str,
     user_text: &str,
-    user_id: Uuid,
-    session_id: Uuid,
+    context: &SessionContext,
 ) -> Result<crate::communication::telegram::Response, WhatsAppError> {
     // Download image from Twilio media URL
     let response = state
@@ -620,7 +504,7 @@ async fn download_and_process_image(
     // Process through existing query fulfilment
     state
         .query_fulfilment
-        .fulfil_image_query(&image_data, user_text, user_id, session_id)
+        .fulfil_image_query(&image_data, user_text, &context)
         .await
         .map_err(|e| WhatsAppError::QueryFulfilmentInitError(e.to_string()))
 }
@@ -629,8 +513,7 @@ async fn send_whatsapp_message_with_media(
     state: &AppState,
     to: &str,
     media_url: &str,
-    user_id: Uuid,
-    session_id: Uuid,
+    context: &SessionContext,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let url = format!(
         "https://api.twilio.com/2010-04-01/Accounts/{}/Messages.json",
@@ -668,18 +551,7 @@ async fn send_whatsapp_message_with_media(
 
     let _ = state
         .database
-        .log_cost_event(crate::database::CostEvent {
-            user_id,
-            query_session_id: session_id,
-            event_type: "whatsapp_outgoing".to_string(),
-            unit_cost: 0.005,
-            unit_type: "message".to_string(),
-            units_consumed: 1,
-            cost_amount: 0.005,
-            metadata: Some(serde_json::json!({"has_media": true, "media_url": media_url})),
-            platform: "whatsapp".to_string(),
-            created_at: Utc::now(),
-        })
+        .log_whatsapp_message(context, true, 0, true)
         .await;
 
     Ok(())
@@ -690,8 +562,7 @@ async fn send_whatsapp_message(
     state: &AppState,
     to: &str,
     message: &str,
-    user_id: Uuid,
-    session_id: Uuid,
+    context: &SessionContext,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let url = format!(
         "https://api.twilio.com/2010-04-01/Accounts/{}/Messages.json",
@@ -727,18 +598,7 @@ async fn send_whatsapp_message(
 
     let _ = state
         .database
-        .log_cost_event(crate::database::CostEvent {
-            user_id,
-            query_session_id: session_id,
-            event_type: "whatsapp_outgoing".to_string(),
-            unit_cost: 0.005, // Service message
-            unit_type: "message".to_string(),
-            units_consumed: 1,
-            cost_amount: 0.005,
-            metadata: Some(serde_json::json!({"message_length": message.len()})),
-            platform: "whatsapp".to_string(),
-            created_at: Utc::now(),
-        })
+        .log_whatsapp_message(context, true, message.len(), false)
         .await;
     Ok(())
 }

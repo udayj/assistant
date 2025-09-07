@@ -78,10 +78,10 @@ impl Service for PriceService {
 
             // Check if we're in a valid time window and haven't sent alert this hour
             let should_send_alert = match hour {
-                _ if hour==hour1 && minute >= minute1 && minute <= minute1 + 2 => {
+                _ if hour == hour1 && minute >= minute1 && minute <= minute1 + 2 => {
                     self.last_alert_hour != Some(hour1)
                 }
-                _ if hour==hour2 && minute >= minute2 && minute <= minute2 + 2 => {
+                _ if hour == hour2 && minute >= minute2 && minute <= minute2 + 2 => {
                     self.last_alert_hour != Some(hour2)
                 }
                 _ => false,

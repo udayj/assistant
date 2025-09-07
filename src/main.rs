@@ -1,4 +1,3 @@
-use assistant::{communication::error_alert::ErrorAlertService, stock::StockService};
 use assistant::communication::price_alert::PriceAlertService;
 use assistant::communication::telegram::TelegramService;
 use assistant::communication::whatsapp::WhatsAppService;
@@ -6,6 +5,7 @@ use assistant::configuration::Context;
 use assistant::core::ServiceManager;
 use assistant::prices::PriceService;
 use assistant::AppError;
+use assistant::{communication::error_alert::ErrorAlertService, stock::StockService};
 use dotenvy::dotenv;
 use std::str::FromStr;
 use std::sync::Arc;

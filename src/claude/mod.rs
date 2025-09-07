@@ -1,8 +1,8 @@
 use crate::core::http::RetryableClient;
-use crate::database::CostEvent;
+use crate::database::CostEventBuilder;
 use crate::database::DatabaseService;
+use crate::database::SessionContext;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
-use chrono::Utc;
 use serde::Deserialize;
 use serde_json::json;
 use std::env;
@@ -11,7 +11,6 @@ use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
 use tracing::{error, info};
-use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub enum Query {
@@ -25,7 +24,9 @@ pub enum Query {
     GetProformaInvoice(QuotationRequest),
     GetPricesOnly(PriceOnlyRequest),
     UnsupportedQuery,
-    GetStock {query: String}
+    GetStock {
+        query: String,
+    },
 }
 
 fn default_brand() -> String {
@@ -78,15 +79,14 @@ impl ClaudeAI {
     pub async fn parse_query(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<Query, LLMError> {
         // Try Claude first with existing logic
-        match self.try_claude(query, user_id, session_id).await {
+        match self.try_claude(query, context).await {
             Ok(result) => Ok(result),
             Err(e) => {
                 error!("Claude failed with error: {}, trying Groq fallback", e);
-                self.try_groq(query, user_id, session_id).await
+                self.try_groq(query, context).await
             }
         }
     }
@@ -94,8 +94,7 @@ impl ClaudeAI {
     pub async fn try_claude(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<Query, LLMError> {
         let mut parse_retry_attempted = false;
 
@@ -107,10 +106,7 @@ impl ClaudeAI {
                 query.to_string()
             };
 
-            match self
-                .make_api_request(&query_text, user_id, session_id)
-                .await
-            {
+            match self.make_api_request(&query_text, context).await {
                 Ok(response) => match self.parse_response(&response) {
                     Ok(parsed_query) => return Ok(parsed_query),
                     Err(LLMError::ParseError) if !parse_retry_attempted => {
@@ -128,8 +124,7 @@ impl ClaudeAI {
     async fn make_api_request(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<serde_json::Value, LLMError> {
         info!("About to make HTTP request to Claude API");
         let response = self
@@ -214,40 +209,17 @@ impl ClaudeAI {
             .unwrap_or(0) as i32;
 
         // Get rates from database
-        let rates = self.database.get_claude_rates().await.unwrap_or_default();
-        let input_cost = (input_tokens as f64 * rates.input_token) / 1_000_000.0;
-        let cache_read_cost = (cache_read_tokens as f64 * rates.cache_hit_refresh) / 1_000_000.0;
-        let output_cost = (output_tokens as f64 * rates.output_token) / 1_000_000.0;
-        let cache_write_cost = (cache_write_tokens as f64 * rates.one_h_cache_writes) / 1_000_000.0;
-
-        let total_cost = input_cost + cache_read_cost + cache_write_cost + output_cost;
 
         let _ = self
             .database
-            .log_cost_event(CostEvent {
-                user_id,
-                query_session_id: session_id,
-                event_type: "claude_api".to_string(),
-                unit_cost: rates.input_token, // Store primary rate for reference
-                unit_type: "per_1m_tokens".to_string(),
-                units_consumed: input_tokens
-                    + cache_read_tokens
-                    + cache_write_tokens
-                    + output_tokens,
-                cost_amount: total_cost,
-                metadata: Some(serde_json::json!({
-                    "model": "claude-sonnet-4-20250514",
-                    "input_tokens": input_tokens,
-                    "cache_read_tokens": cache_read_tokens,
-                    "output_tokens": output_tokens,
-                    "input_cost": input_cost,
-                    "cache_read_cost": cache_read_cost,
-                    "cache_write_cost": cache_write_cost,
-                    "output_cost": output_cost
-                })),
-                platform: "telegram".to_string(),
-                created_at: Utc::now(),
-            })
+            .log_claude_api_call(
+                context,
+                input_tokens,
+                cache_read_tokens,
+                cache_write_tokens,
+                output_tokens,
+                "claude-sonnet-4-20250514",
+            )
             .await;
 
         Ok(json_response)
@@ -272,13 +244,8 @@ impl ClaudeAI {
 }
 
 impl ClaudeAI {
-    async fn try_groq(
-        &self,
-        query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
-    ) -> Result<Query, LLMError> {
-        match self.understand_using_groq(query, user_id, session_id).await {
+    async fn try_groq(&self, query: &str, context: &SessionContext) -> Result<Query, LLMError> {
+        match self.understand_using_groq(query, context).await {
             Ok(response) => self.parse_response(&response),
             Err(e) => Err(e),
         }
@@ -287,8 +254,7 @@ impl ClaudeAI {
     async fn understand_using_groq(
         &self,
         query: &str,
-        user_id: Uuid,
-        session_id: Uuid,
+        context: &SessionContext,
     ) -> Result<serde_json::Value, LLMError> {
         let groq_key = self
             .groq_api_key
@@ -354,28 +320,26 @@ impl ClaudeAI {
                         let output_cost =
                             (completion_tokens as f64 * rates.output_token) / 1_000_000.0;
                         let total_cost = input_cost + output_cost;
-                        let _ = self
-                            .database
-                            .log_cost_event(CostEvent {
-                                user_id,
-                                query_session_id: session_id,
-                                event_type: "groq_api".to_string(),
-                                unit_cost: rates.input_token,
-                                unit_type: "per_1m_tokens".to_string(),
-                                units_consumed: prompt_tokens + completion_tokens,
-                                cost_amount: total_cost,
-                                metadata: Some(serde_json::json!({
-                                    "model": "openai/gpt-oss-20b",
-                                    "prompt_tokens": prompt_tokens,
-                                    "completion_tokens": completion_tokens,
-                                    "input_cost": input_cost,
-                                    "output_cost": output_cost,
-                                    "fallback_call": true
-                                })),
-                                platform: "telegram".to_string(),
-                                created_at: Utc::now(),
-                            })
-                            .await;
+
+                        let metadata = serde_json::json!({
+                            "model": "openai/gpt-oss-20b",
+                            "prompt_tokens": prompt_tokens,
+                            "completion_tokens": completion_tokens,
+                            "input_cost": input_cost,
+                            "output_cost": output_cost,
+                            "fallback_call": true
+                        });
+
+                        CostEventBuilder::new(context.clone(), "groq_api")
+                            .with_cost(
+                                total_cost,
+                                "per_1m_tokens",
+                                prompt_tokens + completion_tokens,
+                            )
+                            .with_metadata(metadata)
+                            .log(&self.database)
+                            .await
+                            .map_err(|_| LLMError::GroqError("Failed to log cost".to_string()))?;
                         return Ok(json!({ "content": [{ "text": content }] }));
                     }
                 }
