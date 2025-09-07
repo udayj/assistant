@@ -3,8 +3,8 @@ use std::fs;
 use std::sync::Arc;
 use thiserror::Error;
 
-use crate::communication::websocket::StockService;
 use crate::database::DatabaseService;
+use crate::stock::StockService;
 
 #[derive(Debug, Error)]
 pub enum ConfigError {
@@ -69,7 +69,7 @@ pub struct WhatsappConfig {
 pub struct Context {
     pub config: Config,
     pub database: Arc<DatabaseService>,
-    pub stock_service: Arc<StockService>
+    pub stock_service: Arc<StockService>,
 }
 
 impl Context {
@@ -80,7 +80,7 @@ impl Context {
         Ok(Self {
             config: Config::new(config_file)?,
             database: Arc::new(database),
-            stock_service
+            stock_service,
         })
     }
 }

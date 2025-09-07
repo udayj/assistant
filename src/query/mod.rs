@@ -1,6 +1,6 @@
 use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
-use crate::communication::websocket::StockService;
+use crate::stock::StockService;
 use crate::configuration::Context;
 use crate::core::Service;
 use crate::ocr::OcrService;

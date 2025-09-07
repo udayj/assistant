@@ -1,9 +1,10 @@
-use crate::communication::websocket::StockService;
+use crate::communication::websocket::websocket_handler;
 use crate::configuration::Context;
 use crate::core::http::RetryableClient;
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::database::DatabaseService;
 use crate::query::QueryFulfilment;
+use crate::stock::StockService;
 use async_trait::async_trait;
 use axum::extract::WebSocketUpgrade;
 use axum::{
@@ -116,8 +117,7 @@ async fn whatsapp_websocket_handler(
     State(app_state): State<AppState>,
 ) -> Response {
     let stock_service = app_state.stock_service.as_ref().clone();
-    crate::communication::websocket::websocket_handler(ws, axum::extract::State(stock_service))
-        .await
+    websocket_handler(ws, axum::extract::State(stock_service)).await
 }
 
 async fn health_check() -> (StatusCode, &'static str) {

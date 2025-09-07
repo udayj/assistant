@@ -8,6 +8,7 @@ pub mod pdf;
 pub mod prices;
 pub mod query;
 pub mod quotation;
+pub mod stock;
 
 use thiserror::Error;
 
