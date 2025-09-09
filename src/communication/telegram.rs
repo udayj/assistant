@@ -347,6 +347,54 @@ impl TelegramService {
                     }
                 }
             }
+        } else if let Some(voice) = msg.voice() {
+            bot.send_message(chat_id, "Processing audio... please wait ⏳")
+                .await?;
+            let start_time = std::time::Instant::now();
+            let context = create_session_context(&user, &telegram_id);
+            if database
+                .create_session_with_context(&context, format!("Audio query").as_str(), "audio")
+                .await
+                .is_err()
+            {
+                let _ = error_sender.send(format!("Failed to create session")).await;
+                bot.send_message(chat_id, "System error").await?;
+                return Ok(());
+            }
+            match Self::process_voice_query(&bot, voice, &query_fulfilment, &context).await {
+                Ok(response) => {
+                    let result = SessionResult {
+                        success: true,
+                        error_message: None,
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
+                    let _ = database.complete_session(&context, result).await;
+                    bot.send_message(chat_id, response.text).await?;
+                    if let Some(file_path) = response.file {
+                        bot.send_document(chat_id, InputFile::file(&file_path))
+                            .await?;
+                        if !file_path.contains("assets") {
+                            let _ = fs::remove_file(&file_path);
+                        }
+                    }
+                }
+                Err(e) => {
+                    let error_msg = format!("❌ Audio Query Failed\n\nError: {}", e);
+                    let _ = error_sender.send(error_msg).await;
+                    let result = SessionResult {
+                        success: false,
+                        error_message: Some(e.to_string()),
+                        processing_time_ms: start_time.elapsed().as_millis() as i32,
+                    };
+                    let _ = database.complete_session(&context, result).await;
+                    bot.send_message(
+                        chat_id,
+                        "Could not process audio - please try again with clearer audio",
+                    )
+                    .await?;
+                }
+            }
+            return Ok(());
         } else if msg.document().is_some() {
             bot.send_message(chat_id, "I received a document! 📄")
                 .await?;
@@ -387,6 +435,30 @@ impl TelegramService {
         // Process through existing query fulfilment with image support
         query_fulfilment
             .fulfil_image_query(&image_data, caption, context)
+            .await
+            .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
+    }
+
+    async fn process_voice_query(
+        bot: &Bot,
+        voice: &teloxide::types::Voice,
+        query_fulfilment: &QueryFulfilment,
+        context: &SessionContext,
+    ) -> Result<Response, TelegramError> {
+        // Use voice.file.id for download
+        let file_info = bot.get_file(&voice.file.id).await.map_err(|e| {
+            TelegramError::ImageProcessingError(format!("Failed to get voice file info: {}", e))
+        })?;
+
+        let mut audio_data = Vec::new();
+        bot.download_file(&file_info.path, &mut audio_data)
+            .await
+            .map_err(|e| {
+                TelegramError::ImageProcessingError(format!("Failed to download voice: {}", e))
+            })?;
+
+        query_fulfilment
+            .fulfil_audio_query(&audio_data, context)
             .await
             .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
     }
