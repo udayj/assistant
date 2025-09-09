@@ -9,8 +9,10 @@ use crate::prices::price_list::PriceListService;
 use crate::prices::PriceService;
 use crate::quotation::QuotationService;
 use crate::stock::StockService;
+use crate::transcription::TranscriptionService;
 use chrono::{Datelike, Local};
 use rand::prelude::*;
+use std::env;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::info;
@@ -40,6 +42,12 @@ pub enum QueryError {
 
     #[error("PriceList Service Initialization Error: {0}")]
     PriceListServiceInitializationError(String),
+
+    #[error("Transcription Service Initialization Error: {0}")]
+    TranscriptionServiceInitializationError(String),
+
+    #[error("Audio transcription error: {0}")]
+    TranscriptionError(String),
 }
 
 pub struct QueryFulfilment {
@@ -50,6 +58,7 @@ pub struct QueryFulfilment {
     ocr_service: OcrService,
     stock_service: Arc<StockService>,
     database: Arc<DatabaseService>,
+    transcription_service: TranscriptionService,
 }
 
 impl QueryFulfilment {
@@ -67,6 +76,13 @@ impl QueryFulfilment {
         let ocr_service = OcrService::new(context.database.clone())
             .await
             .map_err(|_| QueryError::OcrInitializationError)?;
+        let groq_api_key = env::var("GROQ_API_KEY").map_err(|_| {
+            QueryError::TranscriptionServiceInitializationError(
+                "GROQ_API_KEY not found".to_string(),
+            )
+        })?;
+        let transcription_service =
+            TranscriptionService::new(groq_api_key, context.database.clone());
 
         Ok(Self {
             price_service,
@@ -76,12 +92,29 @@ impl QueryFulfilment {
             ocr_service,
             stock_service: Arc::clone(&context.stock_service),
             database: context.database.clone(),
+            transcription_service,
         })
     }
 
     pub fn get_help_text() -> String {
         std::fs::read_to_string("assets/help.txt")
             .unwrap_or_else(|_| "Could not understand query. Please rephrase".to_string())
+    }
+
+    pub async fn fulfil_audio_query(
+        &self,
+        audio_data: &[u8],
+        context: &SessionContext,
+    ) -> Result<Response, QueryError> {
+        // Transcribe audio to text
+        let transcribed_text = self
+            .transcription_service
+            .transcribe_audio(audio_data.to_vec(), context)
+            .await
+            .map_err(|e| QueryError::TranscriptionError(e.to_string()))?;
+
+        // Use existing text query flow
+        self.fulfil_query(&transcribed_text, context).await
     }
 
     pub async fn fulfil_image_query(
