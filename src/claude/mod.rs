@@ -337,7 +337,7 @@ impl ClaudeAI {
                                 prompt_tokens + completion_tokens,
                             )
                             .with_metadata(metadata)
-                            .log(&self.database)
+                            .log_total_cost(&self.database)
                             .await
                             .map_err(|_| LLMError::GroqError("Failed to log cost".to_string()))?;
                         return Ok(json!({ "content": [{ "text": content }] }));
