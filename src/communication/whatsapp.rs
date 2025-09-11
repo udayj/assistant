@@ -244,6 +244,7 @@ async fn webhook_handler(
                         success: true,
                         error_message: None,
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: response.query_metadata
                     };
                     let _ = state_clone
                         .database
@@ -259,6 +260,7 @@ async fn webhook_handler(
                         success: false,
                         error_message: Some(e.to_string()),
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: None
                     };
                     let _ = state_clone
                         .database
@@ -318,6 +320,7 @@ async fn webhook_handler(
                         success: true,
                         error_message: None,
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: response.query_metadata
                     };
                     let _ = state_clone
                         .database
@@ -333,6 +336,7 @@ async fn webhook_handler(
                         success: false,
                         error_message: Some(e.to_string()),
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: None
                     };
                     let _ = state_clone
                         .database

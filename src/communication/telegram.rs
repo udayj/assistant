@@ -34,6 +34,7 @@ pub struct TelegramService {
 pub struct Response {
     pub text: String,
     pub file: Option<String>,
+    pub query_metadata: Option<serde_json::Value>,
 }
 
 #[async_trait]
@@ -155,6 +156,7 @@ impl TelegramService {
                         success: true,
                         error_message: None,
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: response.query_metadata,
                     };
                     let _ = database.complete_session(&context, result).await;
                     bot.send_message(chat_id, response.text).await?;
@@ -177,6 +179,7 @@ impl TelegramService {
                         success: false,
                         error_message: Some(e.to_string()),
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: None,
                     };
                     let _ = database.complete_session(&context, result).await;
                     bot.send_message(
@@ -196,10 +199,12 @@ impl TelegramService {
                         "Hello! I'm your Price Assistant. Send me your price / quotation queries."
                             .to_string(),
                     file: None,
+                    query_metadata: None,
                 },
                 "/help" => Response {
                     text: QueryFulfilment::get_help_text(),
                     file: None,
+                    query_metadata: None,
                 },
                 text if text.starts_with("/approve_telegram ") => {
                     if database.is_admin(&telegram_id).await {
@@ -208,6 +213,7 @@ impl TelegramService {
                             Ok(true) => Response {
                                 text: format!("✅ Approved user: {}", target_id),
                                 file: None,
+                                query_metadata: None,
                             },
                             Ok(false) => Response {
                                 text: format!(
@@ -215,16 +221,19 @@ impl TelegramService {
                                     target_id
                                 ),
                                 file: None,
+                                query_metadata: None,
                             },
                             Err(e) => Response {
                                 text: format!("❌ Error approving user: {}", e),
                                 file: None,
+                                query_metadata: None,
                             },
                         }
                     } else {
                         Response {
                             text: "❌ Admin access required".to_string(),
                             file: None,
+                            query_metadata: None,
                         }
                     }
                 }
@@ -235,16 +244,19 @@ impl TelegramService {
                             Ok(_) => Response {
                                 text: format!("✅ Approved WhatsApp user: {}", phone),
                                 file: None,
+                                query_metadata: None,
                             },
                             Err(e) => Response {
                                 text: format!("❌ Error approving WhatsApp user: {}", e),
                                 file: None,
+                                query_metadata: None,
                             },
                         }
                     } else {
                         Response {
                             text: "❌ Admin access required".to_string(),
                             file: None,
+                            query_metadata: None,
                         }
                     }
                 }
@@ -256,6 +268,7 @@ impl TelegramService {
                                     Response {
                                         text: "No pending approvals".to_string(),
                                         file: None,
+                                        query_metadata: None,
                                     }
                                 } else {
                                     let mut msg = "📋 Pending Approvals:\n\n".to_string();
@@ -267,21 +280,52 @@ impl TelegramService {
                                     Response {
                                         text: msg,
                                         file: None,
+                                        query_metadata: None,
                                     }
                                 }
                             }
                             Err(e) => Response {
                                 text: format!("❌ Error fetching pending users: {}", e),
                                 file: None,
+                                query_metadata: None,
                             },
                         }
                     } else {
                         Response {
                             text: "❌ Admin access required".to_string(),
                             file: None,
+                            query_metadata: None,
                         }
                     }
                 }
+
+                text if text.starts_with("/llm ") => {
+                    if database.is_admin(&telegram_id).await {
+                        let model = text.strip_prefix("/llm ").unwrap().trim();
+                        match model {
+                            "claude" | "groq" => {
+                                query_fulfilment.set_primary_model(model);
+                                Response {
+                                    text: format!("✅ Primary LLM switched to: {}", model),
+                                    file: None,
+                                    query_metadata: None,
+                                }
+                            }
+                            _ => Response {
+                                text: "❌ Invalid model. Use: /llm claude or /llm groq".to_string(),
+                                file: None,
+                                query_metadata: None,
+                            }
+                        }
+                    } else {
+                        Response {
+                            text: "❌ Admin access required".to_string(),
+                            file: None,
+                        query_metadata: None,
+                        }
+                    }
+                }
+
                 text => {
                     let start_time = std::time::Instant::now();
                     let context = create_session_context(&user, &telegram_id);
@@ -300,6 +344,7 @@ impl TelegramService {
                                 success: true,
                                 error_message: None,
                                 processing_time_ms: start_time.elapsed().as_millis() as i32,
+                                query_metadata: response.query_metadata.clone(),
                             };
                             let _ = database.complete_session(&context, result).await;
                             response
@@ -312,22 +357,26 @@ impl TelegramService {
                                 success: false,
                                 error_message: Some(e.to_string()),
                                 processing_time_ms: start_time.elapsed().as_millis() as i32,
+                                query_metadata: None,
                             };
                             let _ = database.complete_session(&context, result).await;
                             match e {
                             QueryError::MetalPricingError(_) => Response {
                                 text: "Could not fetch metal prices - please try again later".to_string(),
-                                file: None
+                                file: None,
+                                query_metadata: None
                             },
                             QueryError::QuotationServiceError =>Response {
                                 text: "Error generating quotation - please check whether items are valid".to_string(),
-                                file: None
+                                file: None,
+                                query_metadata: None
                             },
                             QueryError::LLMError(_) => Response {
                                 text:QueryFulfilment::get_help_text().to_string(),
-                                file: None
+                                file: None,
+                                query_metadata: None
                             },
-                            _ => Response { text:"Could not service request - please try again later".to_string(), file: None }
+                            _ => Response { text:"Could not service request - please try again later".to_string(), file: None, query_metadata: None }
                             ,
                             }
                         }
@@ -367,6 +416,7 @@ impl TelegramService {
                         success: true,
                         error_message: None,
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: response.query_metadata
                     };
                     let _ = database.complete_session(&context, result).await;
                     bot.send_message(chat_id, response.text).await?;
@@ -385,6 +435,7 @@ impl TelegramService {
                         success: false,
                         error_message: Some(e.to_string()),
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
+                        query_metadata: None
                     };
                     let _ = database.complete_session(&context, result).await;
                     bot.send_message(

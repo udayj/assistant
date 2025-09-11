@@ -88,6 +88,7 @@ pub struct SessionResult {
     pub success: bool,
     pub error_message: Option<String>,
     pub processing_time_ms: i32,
+    pub query_metadata: Option<serde_json::Value>,
 }
 
 impl Default for ClaudeRates {
@@ -307,20 +308,23 @@ impl DatabaseService {
         error_message: Option<String>,
         total_cost: f64,
         processing_time: i32,
+        query_metadata: Option<serde_json::Value>,
     ) -> Result<(), DatabaseError> {
         let update_data = if let Some(err_msg) = error_message {
             serde_json::json!({
                 "response_type": response_type,
                 "error_message": err_msg,
                 "total_cost": total_cost,
-                "processing_time_ms": processing_time
+                "processing_time_ms": processing_time,
+                "metadata": query_metadata
             })
         } else {
             serde_json::json!({
                 "response_type": response_type,
                 "error_message": null,
                 "total_cost": total_cost,
-                "processing_time_ms": processing_time
+                "processing_time_ms": processing_time,
+                "metadata": query_metadata
             })
         };
 
@@ -515,6 +519,7 @@ impl DatabaseService {
             result.error_message,
             total_cost,
             result.processing_time_ms,
+            result.query_metadata,
         )
         .await
     }
@@ -553,7 +558,6 @@ impl DatabaseService {
         output_tokens: i32,
         model: &str,
     ) -> Result<(), DatabaseError> {
-
         let rates = self.get_claude_rates().await.unwrap_or_default();
         let input_cost = (input_tokens as f64 * rates.input_token) / 1_000_000.0;
         let cache_read_cost = (cache_read_tokens as f64 * rates.cache_hit_refresh) / 1_000_000.0;

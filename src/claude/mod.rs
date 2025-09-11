@@ -2,17 +2,18 @@ use crate::core::http::RetryableClient;
 use crate::database::CostEventBuilder;
 use crate::database::DatabaseService;
 use crate::database::SessionContext;
+use crate::query::RuntimeConfig;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
 use std::fs;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use thiserror::Error;
 use tracing::{error, info};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum Query {
     MetalPricing,
     GetPriceList {
@@ -57,10 +58,15 @@ pub struct ClaudeAI {
     client: RetryableClient,
     groq_api_key: Option<String>,
     database: Arc<DatabaseService>,
+    runtime_config: Arc<Mutex<RuntimeConfig>>,
 }
 
 impl ClaudeAI {
-    pub fn new(system_prompt_file: &str, database: Arc<DatabaseService>) -> Result<Self, LLMError> {
+    pub fn new(
+        system_prompt_file: &str,
+        database: Arc<DatabaseService>,
+        runtime_config: Arc<Mutex<RuntimeConfig>>,
+    ) -> Result<Self, LLMError> {
         let prompt = fs::read_to_string(system_prompt_file)
             .map_err(|e| LLMError::SystemPromptError(e.to_string()))?;
 
@@ -73,6 +79,7 @@ impl ClaudeAI {
             client,
             groq_api_key,
             database,
+            runtime_config,
         })
     }
 
@@ -81,13 +88,27 @@ impl ClaudeAI {
         query: &str,
         context: &SessionContext,
     ) -> Result<Query, LLMError> {
-        // Try Claude first with existing logic
-        match self.try_claude(query, context).await {
-            Ok(result) => Ok(result),
-            Err(e) => {
-                error!("Claude failed with error: {}, trying Groq fallback", e);
-                self.try_groq(query, context).await
-            }
+        let primary_model = {
+            let config = self.runtime_config.lock().unwrap();
+            config.primary_llm.clone()
+        };
+
+        match primary_model.as_str() {
+            "claude" => match self.try_claude(query, context).await {
+                Ok(result) => Ok(result),
+                Err(e) => {
+                    error!("Claude failed with error: {}, trying Groq fallback", e);
+                    self.try_groq(query, context).await
+                }
+            },
+            "groq" => match self.try_groq(query, context).await {
+                Ok(result) => Ok(result),
+                Err(e) => {
+                    error!("Groq failed with error: {}, trying Claude fallback", e);
+                    self.try_claude(query, context).await
+                }
+            },
+            _ => self.try_claude(query, context).await, // Default fallback
         }
     }
 
@@ -327,7 +348,6 @@ impl ClaudeAI {
                             "completion_tokens": completion_tokens,
                             "input_cost": input_cost,
                             "output_cost": output_cost,
-                            "fallback_call": true
                         });
 
                         CostEventBuilder::new(context.clone(), "groq_api")
