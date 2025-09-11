@@ -13,7 +13,7 @@ use crate::transcription::TranscriptionService;
 use chrono::{Datelike, Local};
 use rand::prelude::*;
 use std::env;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use thiserror::Error;
 use tracing::info;
 
@@ -59,14 +59,30 @@ pub struct QueryFulfilment {
     stock_service: Arc<StockService>,
     database: Arc<DatabaseService>,
     transcription_service: TranscriptionService,
+    runtime_config: Arc<Mutex<RuntimeConfig>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct RuntimeConfig {
+    pub primary_llm: String,
+}
+
+impl Default for RuntimeConfig {
+    fn default() -> Self {
+        Self {
+            primary_llm: "claude".to_string(),
+        }
+    }
 }
 
 impl QueryFulfilment {
     pub async fn new(context: Context) -> Result<Self, QueryError> {
+        let runtime_config = Arc::new(Mutex::new(RuntimeConfig::default()));
         let price_service = PriceService::new(context.clone()).await;
         let claude_ai = ClaudeAI::new(
             &context.config.claude.system_prompt,
             context.database.clone(),
+            runtime_config.clone()
         )
         .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
         let quotation_service = QuotationService::new(context.config.pricelists.clone())
@@ -83,7 +99,6 @@ impl QueryFulfilment {
         })?;
         let transcription_service =
             TranscriptionService::new(groq_api_key, context.database.clone());
-
         Ok(Self {
             price_service,
             llm_service: claude_ai,
@@ -93,12 +108,18 @@ impl QueryFulfilment {
             stock_service: Arc::clone(&context.stock_service),
             database: context.database.clone(),
             transcription_service,
+            runtime_config
         })
     }
 
     pub fn get_help_text() -> String {
         std::fs::read_to_string("assets/help.txt")
             .unwrap_or_else(|_| "Could not understand query. Please rephrase".to_string())
+    }
+
+    pub fn set_primary_model(&self, model: &str) {
+        let mut config = self.runtime_config.lock().unwrap();
+        config.primary_llm = model.to_string();
     }
 
     pub async fn fulfil_audio_query(
@@ -148,16 +169,19 @@ impl QueryFulfilment {
         context: &SessionContext,
     ) -> Result<Response, QueryError> {
         let query = self.get_query_type(query, context).await?;
+        let query_metadata = Some(serde_json::to_value(&query).unwrap_or(serde_json::Value::Null));
         let response = match query {
             Query::GetPriceList { brand, keywords } => {
                 match self.pricelist_service.find_pricelist(&brand, &keywords) {
                     Some(pdf_path) => Response {
                         text: "Pricelist".to_string(),
                         file: Some(pdf_path),
+                        query_metadata
                     },
                     None => Response {
                         text: "No matching pricelist found".to_string(),
                         file: None,
+                        query_metadata
                     },
                 }
             }
@@ -171,6 +195,7 @@ impl QueryFulfilment {
                 Response {
                     text: response_text,
                     file: None,
+                    query_metadata
                 }
             }
 
@@ -194,6 +219,7 @@ impl QueryFulfilment {
                     Response {
                         text: "Quotation created for given enquiry".to_string(),
                         file: Some(format!("artifacts/{}", filename)),
+                        query_metadata
                     }
                 }
             }
@@ -218,6 +244,7 @@ impl QueryFulfilment {
                     Response {
                         text: "Proforma Invoice created for given enquiry".to_string(),
                         file: Some(format!("artifacts/{}", filename)),
+                        query_metadata
                     }
                 }
             }
@@ -230,11 +257,13 @@ impl QueryFulfilment {
                         Response {
                             text: self.format_price_only_response(response),
                             file: None,
+                            query_metadata
                         }
                     }
                     _ => Response {
                         text: "No prices found for the requested items. Please check item/specifications".to_string(),
                         file: None,
+                        query_metadata
                     }
                 }
             }
@@ -243,15 +272,18 @@ impl QueryFulfilment {
                 Ok(stock_info) => Response {
                     text: stock_info,
                     file: None,
+                    query_metadata
                 },
                 Err(e) => Response {
                     text: format!("Stock check failed: {}", e),
                     file: None,
+                    query_metadata
                 },
             },
             _ => Response {
                 text: "Cannot fulfil this request at the moment".to_string(),
                 file: None,
+                query_metadata
             },
         };
         Ok(response)

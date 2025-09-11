@@ -1,5 +1,5 @@
 use crate::prices::utils::normalize_decimal;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub trait Description {
@@ -7,7 +7,7 @@ pub trait Description {
     fn get_brief_description(&self, extras: Vec<String>) -> String;
 }
 
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug, Serialize)]
 pub enum Product {
     Cable(Cable),
 }
@@ -27,7 +27,7 @@ impl Description for Product {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug, Serialize)]
 pub enum Cable {
     PowerControl(PowerControl),
 
@@ -88,7 +88,7 @@ impl Description for Cable {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub enum SolarType {
     BS,
     EN,
@@ -107,7 +107,7 @@ impl Description for SolarType {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub enum CoaxialType {
     RG6,
     RG11,
@@ -128,7 +128,7 @@ impl Description for CoaxialType {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub enum PowerControl {
     LT(LT),
     HT(HT),
@@ -153,7 +153,7 @@ impl Description for PowerControl {
         }
     }
 }
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub struct LT {
     pub conductor: Conductor,
     pub core_size: String,
@@ -259,7 +259,7 @@ impl Description for LT {
         )
     }
 }
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub struct HT {
     pub conductor: Conductor,
     pub voltage_grade: String,
@@ -290,7 +290,7 @@ impl Description for HT {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub struct Flexible {
     pub core_size: String,
     pub sqmm: String,
@@ -317,7 +317,7 @@ impl Description for Flexible {
         )
     }
 }
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub enum FlexibleType {
     FR,
     FRLSH,
@@ -341,7 +341,7 @@ impl Description for FlexibleType {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize)]
 pub enum Conductor {
     Copper,
     Aluminium,
