@@ -268,7 +268,10 @@ impl ClaudeAI {
     async fn try_groq(&self, query: &str, context: &SessionContext) -> Result<Query, LLMError> {
         match self.understand_using_groq(query, context).await {
             Ok(response) => self.parse_response(&response),
-            Err(e) => Err(e),
+            Err(e) => {
+                error!("Error:{:#?}", e.to_string());
+                Err(e)
+            },
         }
     }
 

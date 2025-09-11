@@ -5,6 +5,7 @@ use std::env;
 use thiserror::Error;
 use tracing::error;
 use uuid::Uuid;
+use tokio::sync::mpsc;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
@@ -451,6 +452,85 @@ impl DatabaseService {
 }
 
 impl DatabaseService {
+    async fn get_session_cost_events(&self, session_id: Uuid) -> Result<Vec<CostEvent>, DatabaseError> {
+        let response = self
+            .client
+            .from("cost_events")
+            .select("*")
+            .eq("query_session_id", &session_id.to_string())
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        let events: Vec<CostEvent> = response
+            .json()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        Ok(events)
+    }
+
+    async fn create_cost_notification(&self, context: &SessionContext, query_text: &str, total_cost: f64, processing_time: i32) -> String {
+        let cost_events = match self.get_session_cost_events(context.session_id).await {
+            Ok(events) => events,
+            Err(e) => {
+                error!("Failed to get cost events for session {}: {}", context.session_id, e);
+                return format!(
+                    "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: ${:.4}\n\nBreakdown: Unable to retrieve details",
+                    context.platform,
+                    if query_text.len() > 100 { format!("{}...", &query_text[..97]) } else { query_text.to_string() },
+                    total_cost
+                );
+            }
+        };
+
+        let truncated_query = if query_text.len() > 100 {
+            format!("{}...", &query_text[..97])
+        } else {
+            query_text.to_string()
+        };
+
+        let mut breakdown = String::new();
+        let mut claude_cost = 0.0;
+        let mut groq_cost = 0.0;
+        let mut groq_whisper_cost = 0.0;
+        let mut textract_cost = 0.0;
+        let mut platform_cost = 0.0;
+
+        for event in &cost_events {
+            match event.event_type.as_str() {
+                "claude_api" => claude_cost += event.cost_amount,
+                "groq_api" => groq_cost += event.cost_amount,
+                "groq_whisper" => groq_whisper_cost += event.cost_amount,
+                "textract_api" => textract_cost += event.cost_amount,
+                t if t.contains("whatsapp") || t.contains("telegram") => platform_cost += event.cost_amount,
+                _ => {}
+            }
+        }
+
+        if claude_cost > 0.0 {
+            breakdown.push_str(&format!("• Claude API: ${:.4}\n", claude_cost));
+        }
+        if groq_cost > 0.0 {
+            breakdown.push_str(&format!("• Groq API: ${:.4}\n", groq_cost));
+        }
+        if groq_whisper_cost > 0.0 {
+            breakdown.push_str(&format!("• Groq Whisper: ${:.4}\n", groq_whisper_cost));
+        }
+        if textract_cost > 0.0 {
+            breakdown.push_str(&format!("• Textract: ${:.4}\n", textract_cost));
+        }
+        if platform_cost > 0.0 {
+            let platform_name = context.platform.to_uppercase();
+            breakdown.push_str(&format!("• {}: ${:.4}\n", platform_name, platform_cost));
+        }
+
+        format!(
+            "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: ${:.4}\nProcessing Time: {} ms\n\nBreakdown:\n{}",
+            context.platform, truncated_query, total_cost, processing_time, breakdown
+        )
+    }
+
     pub async fn update_session_query_type(
         &self,
         session_id: Uuid,
@@ -522,6 +602,38 @@ impl DatabaseService {
             result.query_metadata,
         )
         .await
+    }
+
+    pub async fn complete_session_with_notification(
+        &self,
+        context: &SessionContext,
+        result: SessionResult,
+        query_text: &str,
+        error_sender: &mpsc::Sender<String>,
+    ) -> Result<(), DatabaseError> {
+        let total_cost = self
+            .get_session_total_cost(context.session_id)
+            .await
+            .unwrap_or(0.0);
+
+        let response_type = if result.success { "success" } else { "error" };
+
+        let update_result = self.update_session_result(
+            context.session_id,
+            response_type,
+            result.error_message,
+            total_cost,
+            result.processing_time_ms,
+            result.query_metadata,
+        )
+        .await;
+
+        if update_result.is_ok() && result.success {
+            let cost_message = self.create_cost_notification(context, query_text, total_cost, result.processing_time_ms).await;
+            let _ = error_sender.send(cost_message).await;
+        }
+
+        update_result
     }
 
     pub async fn log_whatsapp_message(

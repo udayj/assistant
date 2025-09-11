@@ -158,7 +158,8 @@ impl TelegramService {
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: response.query_metadata,
                     };
-                    let _ = database.complete_session(&context, result).await;
+                    let query_text = format!("Image query + caption:{}", caption);
+                    let _ = database.complete_session_with_notification(&context, result, &query_text, &error_sender).await;
                     bot.send_message(chat_id, response.text).await?;
                     if let Some(file_path) = response.file {
                         bot.send_document(chat_id, InputFile::file(&file_path))
@@ -181,7 +182,8 @@ impl TelegramService {
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: None,
                     };
-                    let _ = database.complete_session(&context, result).await;
+                    let query_text = format!("Image query + caption:{}", caption);
+                    let _ = database.complete_session_with_notification(&context, result, &query_text, &error_sender).await;
                     bot.send_message(
                         chat_id,
                         "Could not process image - please try again with clearer image and text",
@@ -346,7 +348,7 @@ impl TelegramService {
                                 processing_time_ms: start_time.elapsed().as_millis() as i32,
                                 query_metadata: response.query_metadata.clone(),
                             };
-                            let _ = database.complete_session(&context, result).await;
+                            let _ = database.complete_session_with_notification(&context, result, text, &error_sender).await;
                             response
                         }
                         Err(e) => {
@@ -359,7 +361,7 @@ impl TelegramService {
                                 processing_time_ms: start_time.elapsed().as_millis() as i32,
                                 query_metadata: None,
                             };
-                            let _ = database.complete_session(&context, result).await;
+                            let _ = database.complete_session_with_notification(&context, result, text, &error_sender).await;
                             match e {
                             QueryError::MetalPricingError(_) => Response {
                                 text: "Could not fetch metal prices - please try again later".to_string(),
@@ -418,7 +420,8 @@ impl TelegramService {
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: response.query_metadata
                     };
-                    let _ = database.complete_session(&context, result).await;
+                    let query_text = "Audio query";
+                    let _ = database.complete_session_with_notification(&context, result, query_text, &error_sender).await;
                     bot.send_message(chat_id, response.text).await?;
                     if let Some(file_path) = response.file {
                         bot.send_document(chat_id, InputFile::file(&file_path))
@@ -437,7 +440,8 @@ impl TelegramService {
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: None
                     };
-                    let _ = database.complete_session(&context, result).await;
+                    let query_text = "Audio query";
+                    let _ = database.complete_session_with_notification(&context, result, query_text, &error_sender).await;
                     bot.send_message(
                         chat_id,
                         "Could not process audio - please try again with clearer audio",

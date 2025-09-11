@@ -246,9 +246,10 @@ async fn webhook_handler(
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: response.query_metadata
                     };
+                    let query_text = format!("Image query: {}", body_clone);
                     let _ = state_clone
                         .database
-                        .complete_session(&context_clone, result)
+                        .complete_session_with_notification(&context_clone, result, &query_text, &state_clone.error_sender)
                         .await;
                 }
                 Err(e) => {
@@ -262,9 +263,10 @@ async fn webhook_handler(
                         processing_time_ms: start_time.elapsed().as_millis() as i32,
                         query_metadata: None
                     };
+                    let query_text = format!("Image query: {}", body_clone);
                     let _ = state_clone
                         .database
-                        .complete_session(&context_clone, result)
+                        .complete_session_with_notification(&context_clone, result, &query_text, &state_clone.error_sender)
                         .await;
                     let _ = state_clone.error_sender.try_send(error_msg);
                     let _ = send_whatsapp_message(
@@ -324,7 +326,7 @@ async fn webhook_handler(
                     };
                     let _ = state_clone
                         .database
-                        .complete_session(&context_clone, result)
+                        .complete_session_with_notification(&context_clone, result, &body_clone, &state_clone.error_sender)
                         .await;
                 }
                 Err(e) => {
@@ -340,7 +342,7 @@ async fn webhook_handler(
                     };
                     let _ = state_clone
                         .database
-                        .complete_session(&context_clone, result)
+                        .complete_session_with_notification(&context_clone, result, &body_clone, &state_clone.error_sender)
                         .await;
                     let _ = state_clone.error_sender.try_send(error_msg);
                     let _ = send_whatsapp_message(
