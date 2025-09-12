@@ -4,6 +4,7 @@ use crate::database::DatabaseService;
 use crate::database::SessionContext;
 use crate::query::RuntimeConfig;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
+use schemars::schema_for;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
@@ -12,6 +13,22 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use thiserror::Error;
 use tracing::{error, info};
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum ToolCall {
+    GetMetalPrices,
+    GetStockInfo {
+        query: String,
+    },
+    GenerateQuotation(QuotationRequest),
+    GenerateProforma(QuotationRequest),
+    GetPricesOnly(PriceOnlyRequest),
+    FindPriceList {
+        #[serde(default = "default_brand")]
+        brand: String,
+        keywords: Vec<String>,
+    },
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Query {
@@ -54,6 +71,7 @@ pub enum LLMError {
 
 pub struct ClaudeAI {
     system_prompt: String,
+    groq_system_prompt: String,
     api_key: String,
     client: RetryableClient,
     groq_api_key: Option<String>,
@@ -62,6 +80,72 @@ pub struct ClaudeAI {
 }
 
 impl ClaudeAI {
+    fn get_tool_definitions(&self) -> serde_json::Value {
+        let quotation_schema = schema_for!(QuotationRequest);
+        let price_only_schema = schema_for!(PriceOnlyRequest);
+
+        json!([
+            {
+                "name": "get_metal_prices",
+                "description": "Get current metal prices from MCX for copper and aluminum",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            },
+            {
+                "name": "get_stock_info",
+                "description": "Check stock availability for electrical items using Tally ERP",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Stock query string (e.g., '4 C x 2.5 2XWYL')"
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "generate_quotation",
+                "description": "Generate a PDF quotation for electrical items",
+                "input_schema": serde_json::to_value(&quotation_schema).unwrap()
+            },
+            {
+                "name": "generate_proforma",
+                "description": "Generate a PDF proforma invoice for electrical items",
+                "input_schema": serde_json::to_value(&quotation_schema).unwrap()
+            },
+            {
+                "name": "get_prices_only",
+                "description": "Get prices for electrical items without generating quotation PDF",
+                "input_schema": serde_json::to_value(&price_only_schema).unwrap()
+            },
+            {
+                "name": "find_price_list",
+                "description": "Find and return PDF pricelists for specific brands and categories",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "brand": {
+                            "type": "string",
+                            "default": "kei",
+                            "description": "Brand name (kei or polycab)"
+                        },
+                        "keywords": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Keywords to match pricelists (e.g., ['latest armoured', 'current cable'])"
+                        }
+                    },
+                    "required": ["keywords"]
+                }
+            }
+        ])
+    }
+
     pub fn new(
         system_prompt_file: &str,
         database: Arc<DatabaseService>,
@@ -70,11 +154,15 @@ impl ClaudeAI {
         let prompt = fs::read_to_string(system_prompt_file)
             .map_err(|e| LLMError::SystemPromptError(e.to_string()))?;
 
+        let groq_prompt = fs::read_to_string("assets/claude/groq_system_prompt.txt")
+            .map_err(|e| LLMError::SystemPromptError(e.to_string()))?;
+
         let api_key = env::var("ANTHROPIC_API_KEY").map_err(|_| LLMError::EnvError)?;
         let groq_api_key = env::var("GROQ_API_KEY").ok();
         let client = RetryableClient::new();
         Ok(Self {
             system_prompt: prompt,
+            groq_system_prompt: groq_prompt,
             api_key,
             client,
             groq_api_key,
@@ -170,6 +258,7 @@ impl ClaudeAI {
                             }
                         ],
                         "max_tokens": 10240,
+                        "tools": self.get_tool_definitions(),
                         "messages": [{
                             "role": "user",
                             "content": query
@@ -249,29 +338,72 @@ impl ClaudeAI {
     fn parse_response(&self, response: &serde_json::Value) -> Result<Query, LLMError> {
         info!(response = ?response, "raw response ");
 
-        let content_text = response["content"][0]["text"]
-            .as_str()
-            .ok_or(LLMError::ParseError)?;
+        let content_array = response["content"].as_array().ok_or(LLMError::ParseError)?;
 
-        info!(content = %content_text, "content");
+        // Look for tool_use in content blocks
+        for content_block in content_array {
+            if let Some(content_type) = content_block.get("type").and_then(|t| t.as_str()) {
+                if content_type == "tool_use" {
+                    return self.handle_tool_call(content_block);
+                }
+            }
+        }
 
-        let actual_query: Query = serde_json::from_str(content_text).map_err(|e| {
-            info!(error = ?e, "Error parsing ");
-            LLMError::ParseError
-        })?;
+        // If no tool use found, it's an unsupported query
+        Ok(Query::UnsupportedQuery)
+    }
 
-        Ok(actual_query)
+    fn handle_tool_call(&self, tool_content: &serde_json::Value) -> Result<Query, LLMError> {
+        let tool_name = tool_content["name"].as_str().ok_or(LLMError::ParseError)?;
+        let input = &tool_content["input"];
+
+        match tool_name {
+            "get_metal_prices" => Ok(Query::MetalPricing),
+            "get_stock_info" => {
+                let query = input["query"]
+                    .as_str()
+                    .ok_or(LLMError::ParseError)?
+                    .to_string();
+                Ok(Query::GetStock { query })
+            }
+            "generate_quotation" => {
+                let quotation_request: QuotationRequest =
+                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                Ok(Query::GetQuotation(quotation_request))
+            }
+            "generate_proforma" => {
+                let quotation_request: QuotationRequest =
+                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                Ok(Query::GetProformaInvoice(quotation_request))
+            }
+            "get_prices_only" => {
+                let price_request: PriceOnlyRequest =
+                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                Ok(Query::GetPricesOnly(price_request))
+            }
+            "find_price_list" => {
+                let brand = input["brand"].as_str().unwrap_or("kei").to_string();
+                let keywords: Vec<String> = input["keywords"]
+                    .as_array()
+                    .ok_or(LLMError::ParseError)?
+                    .iter()
+                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                    .collect();
+                Ok(Query::GetPriceList { brand, keywords })
+            }
+            _ => Ok(Query::UnsupportedQuery),
+        }
     }
 }
 
 impl ClaudeAI {
     async fn try_groq(&self, query: &str, context: &SessionContext) -> Result<Query, LLMError> {
         match self.understand_using_groq(query, context).await {
-            Ok(response) => self.parse_response(&response),
+            Ok(response) => self.parse_groq_response(&response),
             Err(e) => {
                 error!("Error:{:#?}", e.to_string());
                 Err(e)
-            },
+            }
         }
     }
 
@@ -299,7 +431,7 @@ impl ClaudeAI {
                         "messages": [
                             {
                                 "role": "system",
-                                "content": self.system_prompt.as_str()
+                                "content": self.groq_system_prompt.as_str()
                             },
                             {
                                 "role": "user",
@@ -372,5 +504,22 @@ impl ClaudeAI {
         Err(LLMError::GroqError(
             "Invalid Groq response format".to_string(),
         ))
+    }
+
+    fn parse_groq_response(&self, response: &serde_json::Value) -> Result<Query, LLMError> {
+        info!(response = ?response, "groq response parsing");
+
+        let content_text = response["content"][0]["text"]
+            .as_str()
+            .ok_or(LLMError::ParseError)?;
+
+        info!(content = %content_text, "groq content");
+
+        let actual_query: Query = serde_json::from_str(content_text).map_err(|e| {
+            info!(error = ?e, "Error parsing groq JSON");
+            LLMError::ParseError
+        })?;
+
+        Ok(actual_query)
     }
 }

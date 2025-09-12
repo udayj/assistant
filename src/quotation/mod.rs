@@ -2,6 +2,7 @@ use crate::{
     configuration::PriceListConfig,
     prices::item_prices::{Description, PriceList, PricingSystem, Product},
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -17,7 +18,7 @@ pub enum QuotationError {
     PricelistParseError,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct QuoteItem {
     pub product: Product,
     pub brand: String,
@@ -28,7 +29,7 @@ pub struct QuoteItem {
     pub quantity: f32,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct QuotationRequest {
     pub items: Vec<QuoteItem>,
     pub delivery_charges: f32,
@@ -36,12 +37,12 @@ pub struct QuotationRequest {
     pub terms_and_conditions: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct PriceOnlyRequest {
     pub items: Vec<PriceOnlyItem>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct PriceOnlyItem {
     pub product: Product,
     #[serde(default = "default_brand")]
