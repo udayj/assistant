@@ -70,7 +70,7 @@ pub struct RuntimeConfig {
 impl Default for RuntimeConfig {
     fn default() -> Self {
         Self {
-            primary_llm: "claude".to_string(),
+            primary_llm: "groq".to_string(),
         }
     }
 }
@@ -82,7 +82,7 @@ impl QueryFulfilment {
         let claude_ai = ClaudeAI::new(
             &context.config.claude.system_prompt,
             context.database.clone(),
-            runtime_config.clone()
+            runtime_config.clone(),
         )
         .map_err(|e| QueryError::LLMInitializationError(e.to_string()))?;
         let quotation_service = QuotationService::new(context.config.pricelists.clone())
@@ -108,7 +108,7 @@ impl QueryFulfilment {
             stock_service: Arc::clone(&context.stock_service),
             database: context.database.clone(),
             transcription_service,
-            runtime_config
+            runtime_config,
         })
     }
 
@@ -176,12 +176,12 @@ impl QueryFulfilment {
                     Some(pdf_path) => Response {
                         text: "Pricelist".to_string(),
                         file: Some(pdf_path),
-                        query_metadata
+                        query_metadata,
                     },
                     None => Response {
                         text: "No matching pricelist found".to_string(),
                         file: None,
-                        query_metadata
+                        query_metadata,
                     },
                 }
             }
@@ -195,7 +195,7 @@ impl QueryFulfilment {
                 Response {
                     text: response_text,
                     file: None,
-                    query_metadata
+                    query_metadata,
                 }
             }
 
@@ -219,7 +219,7 @@ impl QueryFulfilment {
                     Response {
                         text: "Quotation created for given enquiry".to_string(),
                         file: Some(format!("artifacts/{}", filename)),
-                        query_metadata
+                        query_metadata,
                     }
                 }
             }
@@ -244,7 +244,7 @@ impl QueryFulfilment {
                     Response {
                         text: "Proforma Invoice created for given enquiry".to_string(),
                         file: Some(format!("artifacts/{}", filename)),
-                        query_metadata
+                        query_metadata,
                     }
                 }
             }
@@ -272,18 +272,18 @@ impl QueryFulfilment {
                 Ok(stock_info) => Response {
                     text: stock_info,
                     file: None,
-                    query_metadata
+                    query_metadata,
                 },
                 Err(e) => Response {
                     text: format!("Stock check failed: {}", e),
                     file: None,
-                    query_metadata
+                    query_metadata,
                 },
             },
             _ => Response {
                 text: "Cannot fulfil this request at the moment".to_string(),
                 file: None,
-                query_metadata
+                query_metadata,
             },
         };
         Ok(response)
