@@ -54,7 +54,7 @@ pub struct QueryFulfilment {
     price_service: PriceService,
     llm_service: ClaudeAI,
     quotation_service: QuotationService,
-    pricelist_service: PriceListService,
+    pricelist_service: Arc<PriceListService>,
     ocr_service: OcrService,
     stock_service: Arc<StockService>,
     database: Arc<DatabaseService>,
@@ -79,7 +79,7 @@ impl QueryFulfilment {
     pub async fn new(context: Context) -> Result<Self, QueryError> {
         let runtime_config = Arc::new(Mutex::new(RuntimeConfig::default()));
         let price_service = PriceService::new(context.clone()).await;
-        let claude_ai = ClaudeAI::new(
+        let mut claude_ai = ClaudeAI::new(
             &context.config.claude.system_prompt,
             context.database.clone(),
             runtime_config.clone(),
@@ -89,6 +89,10 @@ impl QueryFulfilment {
             .map_err(|e| QueryError::QuotationServiceInitializationError(e.to_string()))?;
         let pricelist_service = PriceListService::new(context.config.pdf_pricelists)
             .map_err(|e| QueryError::PriceListServiceInitializationError(e.to_string()))?;
+        let pricelist_service_arc = Arc::new(pricelist_service);
+
+        // Set the pricelist service on the ClaudeAI instance for multi-step tool calling
+        claude_ai.set_pricelist_service(Arc::clone(&pricelist_service_arc));
         let ocr_service = OcrService::new(context.database.clone())
             .await
             .map_err(|_| QueryError::OcrInitializationError)?;
@@ -103,7 +107,7 @@ impl QueryFulfilment {
             price_service,
             llm_service: claude_ai,
             quotation_service,
-            pricelist_service,
+            pricelist_service: pricelist_service_arc,
             ocr_service,
             stock_service: Arc::clone(&context.stock_service),
             database: context.database.clone(),
@@ -309,6 +313,7 @@ impl QueryFulfilment {
             Query::GetProformaInvoice(_) => "GetProformaInvoice",
             Query::GetPricesOnly(_) => "GetPricesOnly",
             Query::GetStock { .. } => "GetStock",
+            Query::ListAvailablePricelists { .. } => "ListAvailablePricelists",
             Query::UnsupportedQuery => "UnsupportedQuery",
         };
 

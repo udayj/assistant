@@ -2,6 +2,7 @@ use crate::core::http::RetryableClient;
 use crate::database::CostEventBuilder;
 use crate::database::DatabaseService;
 use crate::database::SessionContext;
+use crate::prices::price_list::{AvailablePricelists, PriceListService};
 use crate::query::RuntimeConfig;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
 use schemars::schema_for;
@@ -28,6 +29,10 @@ pub enum ToolCall {
         brand: String,
         keywords: Vec<String>,
     },
+    ListAvailablePricelists {
+        #[serde(default)]
+        brand: Option<String>,
+    },
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -44,6 +49,10 @@ pub enum Query {
     UnsupportedQuery,
     GetStock {
         query: String,
+    },
+    ListAvailablePricelists {
+        #[serde(default)]
+        brand: Option<String>,
     },
 }
 
@@ -69,6 +78,15 @@ pub enum LLMError {
     GroqError(String),
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ToolResult {
+    AvailablePricelists(AvailablePricelists),
+}
+
+trait ToolExecutor {
+    fn execute_tool(&self, tool_name: &str, input: &serde_json::Value) -> Option<ToolResult>;
+}
+
 pub struct ClaudeAI {
     system_prompt: String,
     api_key: String,
@@ -76,6 +94,7 @@ pub struct ClaudeAI {
     groq_api_key: Option<String>,
     database: Arc<DatabaseService>,
     runtime_config: Arc<Mutex<RuntimeConfig>>,
+    pricelist_service: Option<Arc<PriceListService>>,
 }
 
 impl ClaudeAI {
@@ -141,6 +160,20 @@ impl ClaudeAI {
                     },
                     "required": ["keywords"]
                 }
+            },
+            {
+                "name": "list_available_pricelists",
+                "description": "List all available PDF pricelists with their keywords and metadata. Use this before find_price_list to see what's available.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "brand": {
+                            "type": "string",
+                            "description": "Optional brand filter (kei, polycab). If not specified, shows all brands."
+                        }
+                    },
+                    "required": []
+                }
             }
         ])
     }
@@ -182,7 +215,43 @@ impl ClaudeAI {
             groq_api_key,
             database,
             runtime_config,
+            pricelist_service: None,
         })
+    }
+
+    pub fn set_pricelist_service(&mut self, pricelist_service: Arc<PriceListService>) {
+        self.pricelist_service = Some(pricelist_service);
+    }
+
+    async fn continue_conversation_with_tool_result(
+        &self,
+        original_query: &str,
+        tool_result: ToolResult,
+        context: &SessionContext,
+    ) -> Result<Query, LLMError> {
+        let tool_result_text = match tool_result {
+            ToolResult::AvailablePricelists(pricelists) => {
+                serde_json::to_string_pretty(&pricelists)
+                    .unwrap_or_else(|_| "Error serializing pricelists".to_string())
+            }
+        };
+
+        let continued_query = format!(
+            "Available pricelists: {}\n\nOriginal user query: {}\n\nNow use find_price_list with appropriate keywords based on the available pricelists above.",
+            tool_result_text, original_query
+        );
+
+        // Continue with the same primary model preference
+        let primary_model = {
+            let config = self.runtime_config.lock().unwrap();
+            config.primary_llm.clone()
+        };
+
+        match primary_model.as_str() {
+            "claude" => Box::pin(self.try_claude(&continued_query, context)).await,
+            "groq" => Box::pin(self.try_groq(&continued_query, context)).await,
+            _ => Box::pin(self.try_claude(&continued_query, context)).await,
+        }
     }
 
     pub async fn parse_query(
@@ -230,7 +299,10 @@ impl ClaudeAI {
             };
 
             match self.make_api_request(&query_text, context).await {
-                Ok(response) => match self.parse_response(&response) {
+                Ok(response) => match self
+                    .parse_response_with_multistep(&response, query, context)
+                    .await
+                {
                     Ok(parsed_query) => return Ok(parsed_query),
                     Err(LLMError::ParseError) if !parse_retry_attempted => {
                         error!("Parse error, will retry with enhanced prompt");
@@ -349,7 +421,12 @@ impl ClaudeAI {
         Ok(json_response)
     }
 
-    fn parse_response(&self, response: &serde_json::Value) -> Result<Query, LLMError> {
+    async fn parse_response_with_multistep(
+        &self,
+        response: &serde_json::Value,
+        original_query: &str,
+        context: &SessionContext,
+    ) -> Result<Query, LLMError> {
         info!(response = ?response, "raw response ");
 
         let content_array = response["content"].as_array().ok_or(LLMError::ParseError)?;
@@ -358,7 +435,23 @@ impl ClaudeAI {
         for content_block in content_array {
             if let Some(content_type) = content_block.get("type").and_then(|t| t.as_str()) {
                 if content_type == "tool_use" {
-                    return self.handle_tool_call(content_block);
+                    let tool_name = content_block["name"].as_str().ok_or(LLMError::ParseError)?;
+                    let input = &content_block["input"];
+
+                    // Check if this is an information tool that requires multi-step handling
+                    if let Some(tool_result) = self.execute_tool(tool_name, input) {
+                        // This is an information tool - continue conversation with result
+                        return self
+                            .continue_conversation_with_tool_result(
+                                original_query,
+                                tool_result,
+                                context,
+                            )
+                            .await;
+                    } else {
+                        // This is an action tool - handle normally
+                        return self.handle_tool_call(content_block);
+                    }
                 }
             }
         }
@@ -405,6 +498,10 @@ impl ClaudeAI {
                     .collect();
                 Ok(Query::GetPriceList { brand, keywords })
             }
+            "list_available_pricelists" => {
+                let brand = input["brand"].as_str().map(|s| s.to_string());
+                Ok(Query::ListAvailablePricelists { brand })
+            }
             _ => Ok(Query::UnsupportedQuery),
         }
     }
@@ -413,7 +510,10 @@ impl ClaudeAI {
 impl ClaudeAI {
     async fn try_groq(&self, query: &str, context: &SessionContext) -> Result<Query, LLMError> {
         match self.understand_using_groq(query, context).await {
-            Ok(response) => self.parse_response(&response),
+            Ok(response) => {
+                self.parse_response_with_multistep(&response, query, context)
+                    .await
+            }
             Err(e) => {
                 error!("Error:{:#?}", e.to_string());
                 Err(e)
@@ -458,8 +558,7 @@ impl ClaudeAI {
                         "tools": tools,
                         "tool_choice": "auto",
                         "temperature": 0.0,
-                        "max_completion_tokens": 8192,
-                        "include_reasoning": false
+                        "max_completion_tokens": 8192
                     })),
             )
             .await
@@ -541,5 +640,23 @@ impl ClaudeAI {
         Err(LLMError::GroqError(
             "Invalid Groq response format".to_string(),
         ))
+    }
+}
+
+impl ToolExecutor for ClaudeAI {
+    fn execute_tool(&self, tool_name: &str, input: &serde_json::Value) -> Option<ToolResult> {
+        match tool_name {
+            "list_available_pricelists" => {
+                if let Some(pricelist_service) = &self.pricelist_service {
+                    let brand_filter = input["brand"].as_str();
+                    let result = pricelist_service.list_available_pricelists(brand_filter);
+                    info!("Available price lists:{:#?}", result);
+                    Some(ToolResult::AvailablePricelists(result))
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
     }
 }

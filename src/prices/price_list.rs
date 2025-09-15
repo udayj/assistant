@@ -1,4 +1,5 @@
 use crate::configuration::PdfPriceListConfig;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use thiserror::Error;
@@ -13,6 +14,18 @@ pub enum PriceListError {
 pub struct PdfPriceListEntry {
     pub pdf_path: String,
     pub keywords: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PriceListInfo {
+    pub brand: String,
+    pub pdf_path: String,
+    pub keywords: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AvailablePricelists {
+    pub pricelists: Vec<PriceListInfo>,
 }
 
 pub struct PriceListService {
@@ -53,5 +66,28 @@ impl PriceListService {
                 })
             })
             .map(|entry| entry.pdf_path.clone())
+    }
+
+    pub fn list_available_pricelists(&self, brand_filter: Option<&str>) -> AvailablePricelists {
+        let mut pricelists = Vec::new();
+
+        for (brand, entries) in &self.pricelists_by_brand {
+            // Apply brand filter if specified
+            if let Some(filter) = brand_filter {
+                if !brand.eq_ignore_ascii_case(filter) {
+                    continue;
+                }
+            }
+
+            for entry in entries {
+                pricelists.push(PriceListInfo {
+                    brand: brand.clone(),
+                    pdf_path: entry.pdf_path.clone(),
+                    keywords: entry.keywords.clone(),
+                });
+            }
+        }
+
+        AvailablePricelists { pricelists }
     }
 }
