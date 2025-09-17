@@ -48,6 +48,11 @@ impl LLMProvider for Claude {
                     }
                     Err(e) => return Err(e),
                 },
+                Err(LLMError::ParseError) if !parse_retry_attempted => {
+                    error!("API request ParseError, will retry with enhanced prompt");
+                    parse_retry_attempted = true;
+                    continue;
+                }
                 Err(e) => return Err(e),
             }
         }
@@ -123,6 +128,13 @@ impl Claude {
 
             return if error_type == "overloaded_error" {
                 Err(LLMError::OverloadedError)
+            } else if error_type == "invalid_request_error"
+                && (error_message.contains("input_schema")
+                    || error_message.contains("tool")
+                    || error_message.contains("JSON schema"))
+            {
+                error!("Claude tool validation failed, returning ParseError for retry");
+                Err(LLMError::ParseError)
             } else {
                 Err(LLMError::ClientError(format!(
                     "{}: {}",
