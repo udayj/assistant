@@ -489,10 +489,10 @@ impl DatabaseService {
                     context.session_id, e
                 );
                 return format!(
-                    "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: ${:.4}\n\nBreakdown: Unable to retrieve details",
+                    "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: Rs.{:.3}\n\nBreakdown: Unable to retrieve details",
                     context.platform,
                     if query_text.len() > 100 { format!("{}...", &query_text[..97]) } else { query_text.to_string() },
-                    total_cost
+                    total_cost * 90.0
                 );
             }
         };
@@ -524,26 +524,26 @@ impl DatabaseService {
         }
 
         if claude_cost > 0.0 {
-            breakdown.push_str(&format!("• Claude API: Rs.{:.3}\n", claude_cost * 0.90));
+            breakdown.push_str(&format!("• Claude API: Rs.{:.3}\n", claude_cost * 90.0));
         }
         if groq_cost > 0.0 {
-            breakdown.push_str(&format!("• Groq API: ${:.3}\n", groq_cost * 0.90));
+            breakdown.push_str(&format!("• Groq API: Rs.{:.3}\n", groq_cost * 90.0));
         }
         if groq_whisper_cost > 0.0 {
             breakdown.push_str(&format!(
-                "• Groq Whisper: ${:.3}\n",
-                groq_whisper_cost * 0.90
+                "• Groq Whisper: Rs.{:.3}\n",
+                groq_whisper_cost * 90.0
             ));
         }
         if textract_cost > 0.0 {
-            breakdown.push_str(&format!("• Textract: ${:.3}\n", textract_cost * 0.90));
+            breakdown.push_str(&format!("• Textract: Rs.{:.3}\n", textract_cost * 90.0));
         }
         if platform_cost > 0.0 {
             let platform_name = context.platform.to_uppercase();
             breakdown.push_str(&format!(
-                "• {}: ${:.3}\n",
+                "• {}: Rs.{:.3}\n",
                 platform_name,
-                platform_cost * 0.90
+                platform_cost * 90.0
             ));
         }
 
