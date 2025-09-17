@@ -76,6 +76,8 @@ mod tests {
                     loading_frls: 0.05,        // 5% FRLS loading
                     loading_pvc: 0.03,         // 3% PVC loading
                     quantity: 100.0,           // 100 meters
+                    user_base_price: None,
+                    markup: None,
                 },
                 QuoteItem {
                     product: Product::Cable(Cable::PowerControl(PowerControl::Flexible(
@@ -91,6 +93,8 @@ mod tests {
                     loading_frls: 0.0, // 7% FRLS loading
                     loading_pvc: 0.0,  // 2% PVC loading
                     quantity: 50.0,    // 50 meters
+                    user_base_price: None,
+                    markup: None,
                 },
             ],
             delivery_charges: 500.0,

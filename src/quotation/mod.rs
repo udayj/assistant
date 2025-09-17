@@ -27,6 +27,8 @@ pub struct QuoteItem {
     pub loading_frls: f32, // in percentage eg. 0.05 means 5%
     pub loading_pvc: f32,  // in percentage eg. 0.05 means 5%
     pub quantity: f32,
+    pub user_base_price: Option<f32>, // If provided, skip price lookup
+    pub markup: Option<f32>,          // Apply markup to user_base_price (eg. 0.015 means 1.5%)
 }
 
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
@@ -132,12 +134,27 @@ impl QuotationService {
 
         for item in request.items {
             info!(item = ?item, "Processing quotation item");
-            let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
-            info!(price = %listed_price, "Found item price");
-            let mut price = listed_price
-                * (1.0 - item.discount)
-                * (1.0 + item.loading_frls)
-                * (1.0 + item.loading_pvc);
+
+            let mut price = if let Some(user_price) = item.user_base_price {
+                // User provided price - apply only markup, skip all lookups/loadings/discounts
+                info!(user_price = %user_price, "Using user-provided price");
+                match item.markup {
+                    Some(markup) => {
+                        info!(markup = %markup, "Applying markup to user price");
+                        user_price * (1.0 + markup)
+                    }
+                    None => user_price,
+                }
+            } else {
+                // Existing price lookup logic with loadings/discounts
+                let listed_price = self.get_price(&item.product, &item.brand, &item.tag)?;
+                info!(price = %listed_price, "Found item price");
+                listed_price
+                    * (1.0 - item.discount)
+                    * (1.0 + item.loading_frls)
+                    * (1.0 + item.loading_pvc)
+            };
+
             price = (price * 100.0).round() / 100.0;
 
             let amount = price * item.quantity;
