@@ -481,6 +481,7 @@ impl DatabaseService {
         total_cost: f64,
         processing_time: i32,
     ) -> String {
+        let forex_rate = 90.0; // rough Rs. per $
         let cost_events = match self.get_session_cost_events(context.session_id).await {
             Ok(events) => events,
             Err(e) => {
@@ -492,7 +493,7 @@ impl DatabaseService {
                     "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: Rs.{:.3}\n\nBreakdown: Unable to retrieve details",
                     context.platform,
                     if query_text.len() > 100 { format!("{}...", &query_text[..97]) } else { query_text.to_string() },
-                    total_cost * 90.0
+                    total_cost * forex_rate
                 );
             }
         };
@@ -524,32 +525,38 @@ impl DatabaseService {
         }
 
         if claude_cost > 0.0 {
-            breakdown.push_str(&format!("• Claude API: Rs.{:.3}\n", claude_cost * 90.0));
+            breakdown.push_str(&format!(
+                "• Claude API: Rs.{:.3}\n",
+                claude_cost * forex_rate
+            ));
         }
         if groq_cost > 0.0 {
-            breakdown.push_str(&format!("• Groq API: Rs.{:.3}\n", groq_cost * 90.0));
+            breakdown.push_str(&format!("• Groq API: Rs.{:.3}\n", groq_cost * forex_rate));
         }
         if groq_whisper_cost > 0.0 {
             breakdown.push_str(&format!(
                 "• Groq Whisper: Rs.{:.3}\n",
-                groq_whisper_cost * 90.0
+                groq_whisper_cost * forex_rate
             ));
         }
         if textract_cost > 0.0 {
-            breakdown.push_str(&format!("• Textract: Rs.{:.3}\n", textract_cost * 90.0));
+            breakdown.push_str(&format!(
+                "• Textract: Rs.{:.3}\n",
+                textract_cost * forex_rate
+            ));
         }
         if platform_cost > 0.0 {
             let platform_name = context.platform.to_uppercase();
             breakdown.push_str(&format!(
                 "• {}: Rs.{:.3}\n",
                 platform_name,
-                platform_cost * 90.0
+                platform_cost * forex_rate
             ));
         }
 
         format!(
-            "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: ${:.4}\nProcessing Time: {} ms\n\nBreakdown:\n{}",
-            context.platform, truncated_query, total_cost, processing_time, breakdown
+            "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: Rs.{:.3}\nProcessing Time: {} ms\n\nBreakdown:\n{}",
+            context.platform, truncated_query, total_cost * forex_rate, processing_time, breakdown
         )
     }
 

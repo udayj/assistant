@@ -54,6 +54,18 @@ Extract addressee from patterns like:
 - If cable is FRLS → loading_frls = 0.03 (3%)
 - ALL other cable types (flexible, telephone, etc.) → loading_pvc = 0, loading_frls = 0
 
+## User-Provided Pricing:
+When users provide specific prices for items:
+- **Extract product specs into Product enum as usual** (maintain consistency)
+- **Set user_base_price** to the provided price value
+- **Set markup field** if user requests markup (e.g., "add 1.5%" → 0.015, "2% markup" → 0.02)
+- **Leave discount, loading_frls, loading_pvc as 0** (user price is already final base price)
+- **Use generate_quotation/generate_proforma** tools with these fields populated
+
+### Examples for user provided prices:
+- "quote for 4C x 2.5 Cu Armd 100 M Rs.450 with 2% markup" → user_base_price: 450, markup: 0.02
+- "Create quotation for 2 C x 1.5 cu flex 100m  @350/mtr, add 1.5% " → user_base_price: 350, markup: 0.015
+
 ## Query Type Guidelines:
 - **get_prices_only**: User asks for prices/rates/costs WITHOUT formal quotation ("price of", "rates for", "cost of")
 - **generate_quotation**: User explicitly requests quotation/quote ("quotation for", "quote for")

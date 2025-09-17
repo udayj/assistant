@@ -48,6 +48,11 @@ impl LLMProvider for Groq {
                     }
                     Err(e) => return Err(e),
                 },
+                Err(LLMError::ParseError) if !parse_retry_attempted => {
+                    error!("API request ParseError, will retry with enhanced prompt");
+                    parse_retry_attempted = true;
+                    continue;
+                }
                 Err(e) => return Err(e),
             }
         }
