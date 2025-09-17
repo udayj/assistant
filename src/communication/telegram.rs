@@ -135,7 +135,7 @@ impl TelegramService {
             bot.send_message(chat_id, "Processing request... please wait ⏳")
                 .await?;
             let start_time = std::time::Instant::now();
-            let context = create_session_context(&user, &telegram_id);
+            let mut context = create_session_context(&user, &telegram_id);
             if database
                 .create_session_with_context(
                     &context,
@@ -149,7 +149,7 @@ impl TelegramService {
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_image_query(&bot, photo, caption, &query_fulfilment, &context).await
+            match Self::process_image_query(&bot, photo, caption, &query_fulfilment, &mut context).await
             {
                 Ok(response) => {
                     let result = SessionResult {
@@ -330,7 +330,7 @@ impl TelegramService {
 
                 text => {
                     let start_time = std::time::Instant::now();
-                    let context = create_session_context(&user, &telegram_id);
+                    let mut context = create_session_context(&user, &telegram_id);
                     if database
                         .create_session_with_context(&context, text, "text")
                         .await
@@ -340,7 +340,7 @@ impl TelegramService {
                         bot.send_message(chat_id, "System error").await?;
                         return Ok(());
                     }
-                    match query_fulfilment.fulfil_query(text, &context).await {
+                    match query_fulfilment.fulfil_query(text, &mut context).await {
                         Ok(response) => {
                             let result = SessionResult {
                                 success: true,
@@ -402,7 +402,7 @@ impl TelegramService {
             bot.send_message(chat_id, "Processing audio... please wait ⏳")
                 .await?;
             let start_time = std::time::Instant::now();
-            let context = create_session_context(&user, &telegram_id);
+            let mut context = create_session_context(&user, &telegram_id);
             if database
                 .create_session_with_context(&context, format!("Audio query").as_str(), "audio")
                 .await
@@ -412,7 +412,7 @@ impl TelegramService {
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_voice_query(&bot, voice, &query_fulfilment, &context).await {
+            match Self::process_voice_query(&bot, voice, &query_fulfilment, &mut context).await {
                 Ok(response) => {
                     let result = SessionResult {
                         success: true,
@@ -468,7 +468,7 @@ impl TelegramService {
         photos: &[PhotoSize],
         caption: &str,
         query_fulfilment: &QueryFulfilment,
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Response, TelegramError> {
         // Get the largest photo size
         let photo = photos.iter().max_by_key(|p| p.width * p.height).ok_or(
@@ -498,7 +498,7 @@ impl TelegramService {
         bot: &Bot,
         voice: &teloxide::types::Voice,
         query_fulfilment: &QueryFulfilment,
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Response, TelegramError> {
         // Use voice.file.id for download
         let file_info = bot.get_file(&voice.file.id).await.map_err(|e| {

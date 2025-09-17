@@ -1,8 +1,8 @@
-pub mod claude;
 pub mod communication;
 pub mod configuration;
 pub mod core;
 pub mod database;
+pub mod llm;
 pub mod ocr;
 pub mod pdf;
 pub mod prices;

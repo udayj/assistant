@@ -206,14 +206,14 @@ async fn webhook_handler(
         let from_clone = from.clone();
         let media_url_clone = media_url.clone();
         let body_clone = body.clone();
-        let context_clone = context.clone();
+        let mut context_clone = context.clone();
 
         tokio::spawn(async move {
             match download_and_process_image(
                 &state_clone,
                 &media_url_clone,
                 &body_clone,
-                &context_clone,
+                &mut context_clone,
             )
             .await
             {
@@ -286,12 +286,12 @@ async fn webhook_handler(
         let state_clone = state.clone();
         let from_clone = from.clone();
         let body_clone = body.clone();
-        let context_clone = context.clone();
+        let mut context_clone = context.clone();
 
         tokio::spawn(async move {
             match state_clone
                 .query_fulfilment
-                .fulfil_query(&body_clone, &context_clone)
+                .fulfil_query(&body_clone, &mut context_clone)
                 .await
             {
                 Ok(response) => {
@@ -482,7 +482,7 @@ async fn download_and_process_image(
     state: &AppState,
     media_url: &str,
     user_text: &str,
-    context: &SessionContext,
+    context: &mut SessionContext,
 ) -> Result<crate::communication::telegram::Response, WhatsAppError> {
     // Download image from Twilio media URL
     let response = state
@@ -510,7 +510,7 @@ async fn download_and_process_image(
     // Process through existing query fulfilment
     state
         .query_fulfilment
-        .fulfil_image_query(&image_data, user_text, &context)
+        .fulfil_image_query(&image_data, user_text, context)
         .await
         .map_err(|e| WhatsAppError::QueryFulfilmentInitError(e.to_string()))
 }

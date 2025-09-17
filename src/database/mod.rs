@@ -3,9 +3,9 @@ use postgrest::Postgrest;
 use serde::{Deserialize, Serialize};
 use std::env;
 use thiserror::Error;
+use tokio::sync::mpsc;
 use tracing::error;
 use uuid::Uuid;
-use tokio::sync::mpsc;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
@@ -82,6 +82,7 @@ pub struct SessionContext {
     pub platform: String,
     pub user_phone: Option<String>,
     pub telegram_id: Option<String>,
+    pub last_model_used: Option<String>,
 }
 
 #[derive(Debug)]
@@ -452,7 +453,10 @@ impl DatabaseService {
 }
 
 impl DatabaseService {
-    async fn get_session_cost_events(&self, session_id: Uuid) -> Result<Vec<CostEvent>, DatabaseError> {
+    async fn get_session_cost_events(
+        &self,
+        session_id: Uuid,
+    ) -> Result<Vec<CostEvent>, DatabaseError> {
         let response = self
             .client
             .from("cost_events")
@@ -470,11 +474,20 @@ impl DatabaseService {
         Ok(events)
     }
 
-    async fn create_cost_notification(&self, context: &SessionContext, query_text: &str, total_cost: f64, processing_time: i32) -> String {
+    async fn create_cost_notification(
+        &self,
+        context: &SessionContext,
+        query_text: &str,
+        total_cost: f64,
+        processing_time: i32,
+    ) -> String {
         let cost_events = match self.get_session_cost_events(context.session_id).await {
             Ok(events) => events,
             Err(e) => {
-                error!("Failed to get cost events for session {}: {}", context.session_id, e);
+                error!(
+                    "Failed to get cost events for session {}: {}",
+                    context.session_id, e
+                );
                 return format!(
                     "💰 Query Cost Alert\n\nPlatform: {}\nQuery: {}\nTotal Cost: ${:.4}\n\nBreakdown: Unable to retrieve details",
                     context.platform,
@@ -503,26 +516,35 @@ impl DatabaseService {
                 "groq_api" => groq_cost += event.cost_amount,
                 "groq_whisper" => groq_whisper_cost += event.cost_amount,
                 "textract_api" => textract_cost += event.cost_amount,
-                t if t.contains("whatsapp") || t.contains("telegram") => platform_cost += event.cost_amount,
+                t if t.contains("whatsapp") || t.contains("telegram") => {
+                    platform_cost += event.cost_amount
+                }
                 _ => {}
             }
         }
 
         if claude_cost > 0.0 {
-            breakdown.push_str(&format!("• Claude API: ${:.4}\n", claude_cost));
+            breakdown.push_str(&format!("• Claude API: Rs.{:.3}\n", claude_cost * 0.90));
         }
         if groq_cost > 0.0 {
-            breakdown.push_str(&format!("• Groq API: ${:.4}\n", groq_cost));
+            breakdown.push_str(&format!("• Groq API: ${:.3}\n", groq_cost * 0.90));
         }
         if groq_whisper_cost > 0.0 {
-            breakdown.push_str(&format!("• Groq Whisper: ${:.4}\n", groq_whisper_cost));
+            breakdown.push_str(&format!(
+                "• Groq Whisper: ${:.3}\n",
+                groq_whisper_cost * 0.90
+            ));
         }
         if textract_cost > 0.0 {
-            breakdown.push_str(&format!("• Textract: ${:.4}\n", textract_cost));
+            breakdown.push_str(&format!("• Textract: ${:.3}\n", textract_cost * 0.90));
         }
         if platform_cost > 0.0 {
             let platform_name = context.platform.to_uppercase();
-            breakdown.push_str(&format!("• {}: ${:.4}\n", platform_name, platform_cost));
+            breakdown.push_str(&format!(
+                "• {}: ${:.3}\n",
+                platform_name,
+                platform_cost * 0.90
+            ));
         }
 
         format!(
@@ -618,18 +640,26 @@ impl DatabaseService {
 
         let response_type = if result.success { "success" } else { "error" };
 
-        let update_result = self.update_session_result(
-            context.session_id,
-            response_type,
-            result.error_message,
-            total_cost,
-            result.processing_time_ms,
-            result.query_metadata,
-        )
-        .await;
+        let update_result = self
+            .update_session_result(
+                context.session_id,
+                response_type,
+                result.error_message,
+                total_cost,
+                result.processing_time_ms,
+                result.query_metadata,
+            )
+            .await;
 
         if update_result.is_ok() && result.success {
-            let cost_message = self.create_cost_notification(context, query_text, total_cost, result.processing_time_ms).await;
+            let cost_message = self
+                .create_cost_notification(
+                    context,
+                    query_text,
+                    total_cost,
+                    result.processing_time_ms,
+                )
+                .await;
             let _ = error_sender.send(cost_message).await;
         }
 
@@ -724,6 +754,7 @@ impl SessionContext {
             platform: platform.to_string(),
             user_phone: None,
             telegram_id: None,
+            last_model_used: None,
         }
     }
 
