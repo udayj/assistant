@@ -1,8 +1,8 @@
-use crate::claude::{ClaudeAI, Query};
 use crate::communication::telegram::Response;
 use crate::configuration::Context;
 use crate::core::Service;
 use crate::database::{DatabaseService, SessionContext};
+use crate::llm::{LLMOrchestrator, Query};
 use crate::ocr::OcrService;
 use crate::pdf::{create_quotation_pdf, DocumentType};
 use crate::prices::price_list::PriceListService;
@@ -52,7 +52,7 @@ pub enum QueryError {
 
 pub struct QueryFulfilment {
     price_service: PriceService,
-    llm_service: ClaudeAI,
+    llm_service: LLMOrchestrator,
     quotation_service: QuotationService,
     pricelist_service: Arc<PriceListService>,
     ocr_service: OcrService,
@@ -79,7 +79,7 @@ impl QueryFulfilment {
     pub async fn new(context: Context) -> Result<Self, QueryError> {
         let runtime_config = Arc::new(Mutex::new(RuntimeConfig::default()));
         let price_service = PriceService::new(context.clone()).await;
-        let mut claude_ai = ClaudeAI::new(
+        let mut llm_service = LLMOrchestrator::new(
             &context.config.claude.system_prompt,
             context.database.clone(),
             runtime_config.clone(),
@@ -92,7 +92,7 @@ impl QueryFulfilment {
         let pricelist_service_arc = Arc::new(pricelist_service);
 
         // Set the pricelist service on the ClaudeAI instance for multi-step tool calling
-        claude_ai.set_pricelist_service(Arc::clone(&pricelist_service_arc));
+        llm_service.set_pricelist_service(Arc::clone(&pricelist_service_arc));
         let ocr_service = OcrService::new(context.database.clone())
             .await
             .map_err(|_| QueryError::OcrInitializationError)?;
@@ -105,7 +105,7 @@ impl QueryFulfilment {
             TranscriptionService::new(groq_api_key, context.database.clone());
         Ok(Self {
             price_service,
-            llm_service: claude_ai,
+            llm_service,
             quotation_service,
             pricelist_service: pricelist_service_arc,
             ocr_service,
@@ -129,7 +129,7 @@ impl QueryFulfilment {
     pub async fn fulfil_audio_query(
         &self,
         audio_data: &[u8],
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Response, QueryError> {
         // Transcribe audio to text
         let transcribed_text = self
@@ -146,7 +146,7 @@ impl QueryFulfilment {
         &self,
         image_data: &[u8],
         user_text: &str,
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Response, QueryError> {
         // Extract text from image
         let image_text = self
@@ -170,7 +170,7 @@ impl QueryFulfilment {
     pub async fn fulfil_query(
         &self,
         query: &str,
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Response, QueryError> {
         let query = self.get_query_type(query, context).await?;
         let query_metadata = Some(serde_json::to_value(&query).unwrap_or(serde_json::Value::Null));
@@ -296,7 +296,7 @@ impl QueryFulfilment {
     pub async fn get_query_type(
         &self,
         query: &str,
-        context: &SessionContext,
+        context: &mut SessionContext,
     ) -> Result<Query, QueryError> {
         let query: Query = self
             .llm_service
