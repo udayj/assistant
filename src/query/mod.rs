@@ -15,6 +15,7 @@ use rand::prelude::*;
 use std::env;
 use std::sync::{Arc, Mutex};
 use thiserror::Error;
+use tokio::sync::mpsc::Sender;
 use tracing::info;
 
 #[derive(Error, Debug)]
@@ -130,6 +131,7 @@ impl QueryFulfilment {
         &self,
         audio_data: &[u8],
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Response, QueryError> {
         // Transcribe audio to text
         let transcribed_text = self
@@ -139,7 +141,8 @@ impl QueryFulfilment {
             .map_err(|e| QueryError::TranscriptionError(e.to_string()))?;
 
         // Use existing text query flow
-        self.fulfil_query(&transcribed_text, context).await
+        self.fulfil_query(&transcribed_text, context, error_sender)
+            .await
     }
 
     pub async fn fulfil_image_query(
@@ -147,6 +150,7 @@ impl QueryFulfilment {
         image_data: &[u8],
         user_text: &str,
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Response, QueryError> {
         // Extract text from image
         let image_text = self
@@ -164,15 +168,18 @@ impl QueryFulfilment {
             };
         info!("formed combined query:{}", combined_query);
         // Use existing fulfillment logic
-        self.fulfil_query(&combined_query, context).await
+        self.fulfil_query(&combined_query, context, error_sender)
+            .await
     }
 
     pub async fn fulfil_query(
         &self,
         query: &str,
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Response, QueryError> {
-        let query = self.get_query_type(query, context).await?;
+        let original_query_str = query;
+        let query = self.get_query_type(query, context, error_sender).await?;
         let query_metadata = Some(serde_json::to_value(&query).unwrap_or(serde_json::Value::Null));
         let response = match query {
             Query::GetPriceList { brand, keywords } => {
@@ -290,6 +297,29 @@ impl QueryFulfilment {
                 query_metadata,
             },
         };
+
+        // Save conversation message if conversation_id is present
+        if let Some(conversation_id) = context.conversation_id {
+            let structured_response = self.llm_service.create_structured_response_for_storage(
+                &response.text,
+                response.query_metadata.as_ref(),
+            );
+
+            if let Err(e) = self
+                .database
+                .save_conversation_message(
+                    conversation_id,
+                    context.session_id,
+                    original_query_str,
+                    Some(structured_response),
+                )
+                .await
+            {
+                // Log error but don't fail the request
+                tracing::error!("Failed to save conversation message: {}", e);
+            }
+        }
+
         Ok(response)
     }
 
@@ -297,10 +327,11 @@ impl QueryFulfilment {
         &self,
         query: &str,
         context: &mut SessionContext,
+        error_sender: &tokio::sync::mpsc::Sender<String>,
     ) -> Result<Query, QueryError> {
         let query: Query = self
             .llm_service
-            .parse_query(query, context)
+            .parse_query(query, context, error_sender)
             .await
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
         info!("Parsed query successfully");

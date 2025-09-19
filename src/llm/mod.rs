@@ -1,5 +1,4 @@
-use crate::database::DatabaseService;
-use crate::database::SessionContext;
+use crate::database::{DatabaseService, SessionContext, StructuredResponse};
 use crate::prices::price_list::{AvailablePricelists, PriceListService};
 use crate::query::RuntimeConfig;
 use crate::quotation::{PriceOnlyRequest, QuotationRequest};
@@ -11,6 +10,7 @@ use std::env;
 use std::fs;
 use std::sync::{Arc, Mutex};
 use thiserror::Error;
+use tokio::sync::mpsc::Sender;
 use tracing::{error, info};
 
 pub mod llm_providers;
@@ -230,30 +230,66 @@ impl LLMOrchestrator {
         &self,
         query: &str,
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Query, LLMError> {
+        // Handle conversation context first - this is LLM's responsibility
+        let conversation_context = match self.handle_conversation_context(query, context).await {
+            Ok(ctx) => ctx,
+            Err(e) => {
+                tracing::error!("Failed to handle conversation context: {}", e);
+                let _ = error_sender
+                    .send(format!("Conversation context error: {}", e))
+                    .await;
+                None // Continue with fresh query
+            }
+        };
+
+        // Build query with conversation history if continuing conversation
+        let query_with_context = if let Some(conv_context) = conversation_context {
+            self.build_query_with_conversation_history(query, &conv_context)
+        } else {
+            query.to_string()
+        };
+
         let primary_model = {
             let config = self.runtime_config.lock().unwrap();
             config.primary_llm.clone()
         };
         context.last_model_used = Some(primary_model.clone());
         match primary_model.as_str() {
-            "claude" => match self.claude.try_parse(query, context, self).await {
+            "claude" => match self
+                .claude
+                .try_parse(&query_with_context, context, self)
+                .await
+            {
                 Ok(result) => Ok(result),
                 Err(e) => {
                     context.last_model_used = Some("groq".to_string());
                     error!("Claude failed with error: {}, trying Groq fallback", e);
-                    self.groq.try_parse(query, context, self).await
+                    self.groq
+                        .try_parse(&query_with_context, context, self)
+                        .await
                 }
             },
-            "groq" => match self.groq.try_parse(query, context, self).await {
+            "groq" => match self
+                .groq
+                .try_parse(&query_with_context, context, self)
+                .await
+            {
                 Ok(result) => Ok(result),
                 Err(e) => {
                     context.last_model_used = Some("claude".to_string());
                     error!("Groq failed with error: {}, trying Claude fallback", e);
-                    self.claude.try_parse(query, context, self).await
+                    self.claude
+                        .try_parse(&query_with_context, context, self)
+                        .await
                 }
             },
-            _ => self.claude.try_parse(query, context, self).await, // Default fallback
+            _ => {
+                self.claude
+                    .try_parse(&query_with_context, context, self)
+                    .await
+            } // Default fallback
         }
     }
 
@@ -339,6 +375,153 @@ impl LLMOrchestrator {
                 Ok(Query::ListAvailablePricelists { brand })
             }
             _ => Ok(Query::UnsupportedQuery),
+        }
+    }
+
+    // Handle conversation continuation - this is an LLM responsibility
+    pub async fn handle_conversation_context(
+        &self,
+        query: &str,
+        context: &mut SessionContext,
+    ) -> Result<Option<crate::database::ConversationContext>, LLMError> {
+        // Get database service from claude provider
+        let database = match &self.claude {
+            LLM::Claude(claude_provider) => &claude_provider.database,
+            _ => return Err(LLMError::ClientError("Database not available".to_string())),
+        };
+
+        // Check for existing conversation
+        let recent_conversation = database
+            .get_recent_conversation(context.user_id)
+            .await
+            .map_err(|e| LLMError::ClientError(e.to_string()))?;
+
+        let should_continue = if let Some(conv_context) = &recent_conversation {
+            if !conv_context.messages.is_empty() {
+                self.should_continue_conversation(query, &conv_context.messages, context)
+                    .await?
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+
+        // Set or create conversation ID and return context if continuing
+        if should_continue {
+            if let Some(conv_context) = recent_conversation {
+                context.conversation_id = Some(conv_context.conversation_id);
+                Ok(Some(conv_context))
+            } else {
+                Ok(None)
+            }
+        } else {
+            // Create new conversation
+            let new_conv_id = database
+                .create_conversation(context.user_id)
+                .await
+                .map_err(|e| LLMError::ClientError(e.to_string()))?;
+            context.conversation_id = Some(new_conv_id);
+            Ok(None)
+        }
+    }
+
+    // Build query with conversation history for LLM context
+    fn build_query_with_conversation_history(
+        &self,
+        current_query: &str,
+        conversation: &crate::database::ConversationContext,
+    ) -> String {
+        let mut context_messages = Vec::new();
+
+        // Add conversation history as context
+        for msg in &conversation.messages {
+            context_messages.push(format!("User query: {}", msg.user_query));
+
+            // Add assistant response if available
+            if let Some(response) = &msg.structured_response {
+                context_messages.push(format!(
+                    "What the assistant understood: {}",
+                    response.get_metadata()
+                ));
+            }
+        }
+
+        // Add current query
+        context_messages.push(format!("Current User Query: {}", current_query));
+
+        format!(
+            "Previous conversation:\n{}\n\nPlease respond to the latest user query considering the conversation context.",
+            context_messages.join("\n")
+        )
+    }
+
+    // Simple conversation decision using exact stored responses
+    async fn should_continue_conversation(
+        &self,
+        current_query: &str,
+        conversation_messages: &[crate::database::ConversationMessage],
+        context: &SessionContext,
+    ) -> Result<bool, LLMError> {
+        if conversation_messages.is_empty() {
+            return Ok(false);
+        }
+
+        // Build conversation history with exact stored responses
+        let mut history_parts = Vec::new();
+        for msg in conversation_messages {
+            history_parts.push(format!("User query: {}", msg.user_query));
+
+            if let Some(response) = &msg.structured_response {
+                // Send exact stored response to LLM - no extraction/summarization
+                history_parts.push(format!(
+                    "What the Assistant understood: {}",
+                    serde_json::to_string_pretty(&response.get_metadata())
+                        .unwrap_or_else(|_| "No response".to_string())
+                ));
+            }
+        }
+
+        let decision_prompt = format!(
+            "Previous conversation:\n{}\n\nNew query: \"{}\"\n\nIs this new query a refinement, correction, or follow-up to the previous conversation? Answer only: YES or NO - do not respond with anything else",
+            history_parts.join("\n"),
+            current_query
+        );
+        info!("Decision prompt:{:#?}", decision_prompt);
+        let decision_system_prompt = "You are a conversation classifier. Determine if a new query continues a previous conversation or starts a new topic. Only answer YES if the new query directly relates to, refines, corrects, or follows up on the previous conversation. Answer NO for completely new topics or unrelated queries or if unsure.";
+
+        // Use Groq decision call with same session context for accurate cost tracking
+        let groq_provider = match &self.groq {
+            LLM::Groq(groq) => groq,
+            _ => return Ok(false),
+        };
+
+        let response = groq_provider
+            .make_decision_call(decision_system_prompt, &decision_prompt, context)
+            .await?;
+
+        let decision_text = response
+            .get("content")
+            .and_then(|c| c.as_array())
+            .and_then(|arr| arr.first())
+            .and_then(|item| item.get("text"))
+            .and_then(|text| text.as_str())
+            .unwrap_or("NO");
+
+        Ok(decision_text.trim().to_uppercase() == "YES")
+    }
+
+    // Create structured response for storage - no serde_json::Value
+    pub fn create_structured_response_for_storage(
+        &self,
+        response_text: &str,
+        response_metadata: Option<&serde_json::Value>,
+    ) -> StructuredResponse {
+        StructuredResponse {
+            response_text: response_text.to_string(),
+            response_metadata: response_metadata
+                .map(|v| serde_json::to_string(v).unwrap_or_default()),
+            timestamp: chrono::Utc::now().to_rfc3339(),
         }
     }
 }

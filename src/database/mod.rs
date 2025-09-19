@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use thiserror::Error;
 use tokio::sync::mpsc;
-use tracing::error;
+use tracing::{error};
 use uuid::Uuid;
 
 #[derive(Error, Debug)]
@@ -83,6 +83,7 @@ pub struct SessionContext {
     pub user_phone: Option<String>,
     pub telegram_id: Option<String>,
     pub last_model_used: Option<String>,
+    pub conversation_id: Option<Uuid>,
 }
 
 #[derive(Debug)]
@@ -91,6 +92,36 @@ pub struct SessionResult {
     pub error_message: Option<String>,
     pub processing_time_ms: i32,
     pub query_metadata: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StructuredResponse {
+    pub response_text: String,
+    pub response_metadata: Option<String>, // JSON string
+    pub timestamp: String,
+}
+
+impl StructuredResponse {
+    pub fn get_metadata(&self) -> String {
+        let response = if let Some(metadata) = self.clone().response_metadata {
+            metadata
+        } else {
+            "".to_string()
+        };
+        response
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConversationContext {
+    pub conversation_id: Uuid,
+    pub messages: Vec<ConversationMessage>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConversationMessage {
+    pub user_query: String,
+    pub structured_response: Option<StructuredResponse>,
 }
 
 impl Default for ClaudeRates {
@@ -107,8 +138,8 @@ impl Default for ClaudeRates {
 impl Default for GroqRates {
     fn default() -> Self {
         Self {
-            input_token: 0.1,
-            output_token: 0.5,
+            input_token: 1.0,
+            output_token: 3.0,
         }
     }
 }
@@ -380,7 +411,7 @@ impl DatabaseService {
     pub async fn get_claude_rates(&self) -> Result<ClaudeRates, DatabaseError> {
         let response = self
             .client
-            .from("pricing_rates")
+            .from("cost_rate_history")
             .select("cost_type,unit_cost")
             .eq("service_provider", "anthropic")
             .execute()
@@ -396,10 +427,7 @@ impl DatabaseService {
                 let mut claude_rates = ClaudeRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"]
-                        .as_str()
-                        .and_then(|s| s.parse::<f64>().ok())
-                        .unwrap_or(0.0);
+                    let unit_cost = rate["unit_cost"].as_f64().unwrap_or(0.0);
 
                     match cost_type {
                         "input_token" => claude_rates.input_token = unit_cost,
@@ -418,12 +446,11 @@ impl DatabaseService {
     pub async fn get_groq_rates(&self) -> Result<GroqRates, DatabaseError> {
         let response = self
             .client
-            .from("pricing_rates")
+            .from("cost_rate_history")
             .select("cost_type,unit_cost")
-            .eq("service_provider", "groq")
+            .eq("service_provider", "groq_kimi_k2")
             .execute()
             .await;
-
         match response {
             Ok(resp) if resp.status() == 200 => {
                 let rates: Vec<serde_json::Value> = resp
@@ -434,10 +461,7 @@ impl DatabaseService {
                 let mut groq_rates = GroqRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"]
-                        .as_str()
-                        .and_then(|s| s.parse::<f64>().ok())
-                        .unwrap_or(0.0);
+                    let unit_cost = rate["unit_cost"].as_f64().unwrap_or(0.0);
 
                     match cost_type {
                         "input_token" => groq_rates.input_token = unit_cost,
@@ -507,6 +531,7 @@ impl DatabaseService {
         let mut breakdown = String::new();
         let mut claude_cost = 0.0;
         let mut groq_cost = 0.0;
+        let mut groq_decision_cost = 0.0;
         let mut groq_whisper_cost = 0.0;
         let mut textract_cost = 0.0;
         let mut platform_cost = 0.0;
@@ -515,6 +540,7 @@ impl DatabaseService {
             match event.event_type.as_str() {
                 "claude_api" => claude_cost += event.cost_amount,
                 "groq_api" => groq_cost += event.cost_amount,
+                "groq_decision" => groq_decision_cost += event.cost_amount,
                 "groq_whisper" => groq_whisper_cost += event.cost_amount,
                 "textract_api" => textract_cost += event.cost_amount,
                 t if t.contains("whatsapp") || t.contains("telegram") => {
@@ -533,6 +559,14 @@ impl DatabaseService {
         if groq_cost > 0.0 {
             breakdown.push_str(&format!("• Groq API: Rs.{:.3}\n", groq_cost * forex_rate));
         }
+
+        if groq_decision_cost > 0.0 {
+            breakdown.push_str(&format!(
+                "• Groq Decision API: Rs.{:.3}\n",
+                groq_decision_cost * forex_rate
+            ));
+        }
+
         if groq_whisper_cost > 0.0 {
             breakdown.push_str(&format!(
                 "• Groq Whisper: Rs.{:.3}\n",
@@ -751,6 +785,147 @@ impl DatabaseService {
             .log(self)
             .await
     }
+
+    // Conversation management methods
+    pub async fn get_recent_conversation(
+        &self,
+        user_id: Uuid,
+    ) -> Result<Option<ConversationContext>, DatabaseError> {
+        let twenty_four_hours_ago = Utc::now() - chrono::Duration::hours(24);
+
+        // First, get the most recent conversation for this user
+        let conv_response = self
+            .client
+            .from("conversations")
+            .select("id")
+            .eq("user_id", &user_id.to_string())
+            .gte("last_activity_at", twenty_four_hours_ago.to_rfc3339())
+            .order("last_activity_at.desc")
+            .limit(1)
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        if conv_response.status() == 406 {
+            return Ok(None); // No recent conversation
+        }
+
+        let conversations: Vec<serde_json::Value> = conv_response
+            .json()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        if conversations.is_empty() {
+            return Ok(None);
+        }
+
+        let conversation_id = Uuid::parse_str(conversations[0]["id"].as_str().ok_or(
+            DatabaseError::QueryError("Invalid conversation ID".to_string()),
+        )?)
+        .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        // Get ALL messages for this conversation
+        let messages_response = self
+            .client
+            .from("conversation_messages")
+            .select("user_query,structured_response")
+            .eq("conversation_id", &conversation_id.to_string())
+            .order("created_at.asc")
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        let message_data: Vec<serde_json::Value> = messages_response
+            .json()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        let mut messages = Vec::new();
+        for msg in message_data {
+            let structured_response = if let Some(response_data) = msg.get("structured_response") {
+                serde_json::from_value::<StructuredResponse>(response_data.clone()).ok()
+            } else {
+                None
+            };
+            messages.push(ConversationMessage {
+                user_query: msg["user_query"].as_str().unwrap_or("").to_string(),
+                structured_response,
+            });
+        }
+
+        Ok(Some(ConversationContext {
+            conversation_id,
+            messages,
+        }))
+    }
+
+    pub async fn create_conversation(&self, user_id: Uuid) -> Result<Uuid, DatabaseError> {
+        let new_conversation = serde_json::json!({
+            "user_id": user_id,
+            "created_at": Utc::now(),
+            "last_activity_at": Utc::now()
+        });
+
+        let response = self
+            .client
+            .from("conversations")
+            .insert(new_conversation.to_string())
+            .select("id")
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        let result: Vec<serde_json::Value> = response
+            .json()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        let conversation_id = result[0]["id"].as_str().ok_or(DatabaseError::QueryError(
+            "No conversation ID returned".to_string(),
+        ))?;
+
+        Uuid::parse_str(conversation_id).map_err(|e| DatabaseError::QueryError(e.to_string()))
+    }
+
+    pub async fn save_conversation_message(
+        &self,
+        conversation_id: Uuid,
+        session_id: Uuid,
+        user_query: &str,
+        structured_response: Option<StructuredResponse>,
+    ) -> Result<(), DatabaseError> {
+        let message = serde_json::json!({
+            "conversation_id": conversation_id,
+            "session_id": session_id,
+            "user_query": user_query,
+            "structured_response": structured_response,
+            "created_at": Utc::now()
+        });
+
+        let _response = self
+            .client
+            .from("conversation_messages")
+            .insert(message.to_string())
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        // Update conversation last_activity_at
+        let update_data = serde_json::json!({
+            "last_activity_at": Utc::now()
+        });
+
+        let _response = self
+            .client
+            .from("conversations")
+            .update(update_data.to_string())
+            .eq("id", &conversation_id.to_string())
+            .execute()
+            .await
+            .map_err(|e| DatabaseError::QueryError(e.to_string()))?;
+
+        Ok(())
+    }
 }
 
 impl SessionContext {
@@ -762,6 +937,7 @@ impl SessionContext {
             user_phone: None,
             telegram_id: None,
             last_model_used: None,
+            conversation_id: None,
         }
     }
 
@@ -772,6 +948,11 @@ impl SessionContext {
 
     pub fn with_telegram_id(mut self, telegram_id: String) -> Self {
         self.telegram_id = Some(telegram_id);
+        self
+    }
+
+    pub fn with_conversation_id(mut self, conversation_id: Uuid) -> Self {
+        self.conversation_id = Some(conversation_id);
         self
     }
 }
