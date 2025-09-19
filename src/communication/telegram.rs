@@ -1,6 +1,6 @@
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::database::DatabaseService;
-use crate::database::{SessionContext, SessionResult};
+use crate::database::{SessionContext, SessionResult, User};
 use crate::query::QueryError;
 use crate::{configuration::Context, query::QueryFulfilment};
 use async_trait::async_trait;
@@ -13,6 +13,7 @@ use teloxide::types::PhotoSize;
 use thiserror::Error;
 use tokio::sync::mpsc;
 use tracing::error;
+use tokio::sync::mpsc::Sender;
 
 #[derive(Debug, Error)]
 pub enum TelegramError {
@@ -149,7 +150,7 @@ impl TelegramService {
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_image_query(&bot, photo, caption, &query_fulfilment, &mut context).await
+            match Self::process_image_query(&bot, photo, caption, &query_fulfilment, &mut context, &error_sender).await
             {
                 Ok(response) => {
                     let result = SessionResult {
@@ -340,7 +341,7 @@ impl TelegramService {
                         bot.send_message(chat_id, "System error").await?;
                         return Ok(());
                     }
-                    match query_fulfilment.fulfil_query(text, &mut context).await {
+                    match query_fulfilment.fulfil_query(text, &mut context, &error_sender).await {
                         Ok(response) => {
                             let result = SessionResult {
                                 success: true,
@@ -412,7 +413,7 @@ impl TelegramService {
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_voice_query(&bot, voice, &query_fulfilment, &mut context).await {
+            match Self::process_voice_query(&bot, voice, &query_fulfilment, &mut context, &error_sender).await {
                 Ok(response) => {
                     let result = SessionResult {
                         success: true,
@@ -469,6 +470,7 @@ impl TelegramService {
         caption: &str,
         query_fulfilment: &QueryFulfilment,
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Response, TelegramError> {
         // Get the largest photo size
         let photo = photos.iter().max_by_key(|p| p.width * p.height).ok_or(
@@ -489,7 +491,7 @@ impl TelegramService {
 
         // Process through existing query fulfilment with image support
         query_fulfilment
-            .fulfil_image_query(&image_data, caption, context)
+            .fulfil_image_query(&image_data, caption, context, error_sender)
             .await
             .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
     }
@@ -499,6 +501,7 @@ impl TelegramService {
         voice: &teloxide::types::Voice,
         query_fulfilment: &QueryFulfilment,
         context: &mut SessionContext,
+        error_sender: &Sender<String>,
     ) -> Result<Response, TelegramError> {
         // Use voice.file.id for download
         let file_info = bot.get_file(&voice.file.id).await.map_err(|e| {
@@ -513,12 +516,12 @@ impl TelegramService {
             })?;
 
         query_fulfilment
-            .fulfil_audio_query(&audio_data, context)
+            .fulfil_audio_query(&audio_data, context, error_sender)
             .await
             .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
     }
 }
 
-fn create_session_context(user: &crate::database::User, telegram_id: &str) -> SessionContext {
+fn create_session_context(user: &User, telegram_id: &str) -> SessionContext {
     SessionContext::new(user.id, "telegram").with_telegram_id(telegram_id.to_string())
 }

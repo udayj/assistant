@@ -14,7 +14,7 @@ pub struct Claude {
     system_prompt: String,
     api_key: String,
     client: RetryableClient,
-    database: Arc<DatabaseService>,
+    pub database: Arc<DatabaseService>,
 }
 
 #[async_trait]

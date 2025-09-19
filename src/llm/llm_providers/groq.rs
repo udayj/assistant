@@ -70,6 +70,101 @@ impl Groq {
         }
     }
 
+    // Decision call with custom system prompt for conversation continuation
+    pub async fn make_decision_call(
+        &self,
+        system_prompt: &str,
+        user_prompt: &str,
+        context: &SessionContext,
+    ) -> Result<serde_json::Value, LLMError> {
+        info!("Making Groq decision call");
+
+        let response = self
+            .client
+            .execute_with_retry(
+                self.client
+                    .post("https://api.groq.com/openai/v1/chat/completions")
+                    .header("Authorization", format!("Bearer {}", self.api_key))
+                    .header("Content-Type", "application/json")
+                    .json(&serde_json::json!({
+                        "model": "moonshotai/kimi-k2-instruct-0905",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": system_prompt
+                            },
+                            {
+                                "role": "user",
+                                "content": user_prompt
+                            }
+                        ],
+                        "temperature": 0.0,
+                        "max_completion_tokens": 10
+                    })),
+            )
+            .await
+            .map_err(|e| LLMError::GroqError(e.to_string()))?;
+
+        let json_response: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| LLMError::GroqError(e.to_string()))?;
+
+        info!(json_response = ?json_response, "Raw groq decision response");
+
+        let usage = json_response.get("usage");
+        let prompt_tokens = usage
+            .and_then(|u| u.get("prompt_tokens"))
+            .and_then(|t| t.as_i64())
+            .unwrap_or(0) as i32;
+
+        let completion_tokens = usage
+            .and_then(|u| u.get("completion_tokens"))
+            .and_then(|t| t.as_i64())
+            .unwrap_or(0) as i32;
+
+        // Log costs for decision call
+        let rates= self.database.get_groq_rates().await.unwrap_or_default();
+        let input_cost = (prompt_tokens as f64 * rates.input_token) / 1_000_000.0;
+        let output_cost = (completion_tokens as f64 * rates.output_token) / 1_000_000.0;
+        let total_cost = input_cost + output_cost;
+
+        let metadata = serde_json::json!({
+            "model": "moonshotai/kimi-k2-instruct-0905",
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "input_cost": input_cost,
+            "output_cost": output_cost,
+            "call_type": "conversation_decision"
+        });
+
+        CostEventBuilder::new(context.clone(), "groq_decision")
+            .with_cost(
+                total_cost,
+                "per_1m_tokens",
+                prompt_tokens + completion_tokens,
+            )
+            .with_metadata(metadata)
+            .log_total_cost(&self.database)
+            .await
+            .map_err(|_| LLMError::GroqError("Failed to log cost".to_string()))?;
+
+        // Extract response in Claude-compatible format
+        if let Some(choices) = json_response.get("choices").and_then(|c| c.as_array()) {
+            if let Some(first_choice) = choices.first() {
+                if let Some(message) = first_choice.get("message") {
+                    if let Some(content) = message.get("content").and_then(|c| c.as_str()) {
+                        return Ok(serde_json::json!({
+                            "content": [{ "text": content }]
+                        }));
+                    }
+                }
+            }
+        }
+
+        Err(LLMError::GroqError("Invalid decision response format".to_string()))
+    }
+
     fn get_groq_tool_definitions(&self) -> serde_json::Value {
         let claude_tools = LLMOrchestrator::get_tool_definitions();
         let mut groq_tools = Vec::new();
@@ -107,7 +202,7 @@ impl Groq {
                     .header("Authorization", format!("Bearer {}", self.api_key))
                     .header("Content-Type", "application/json")
                     .json(&json!({
-                        "model": "moonshotai/kimi-k2-instruct",
+                        "model": "moonshotai/kimi-k2-instruct-0905",
                         "messages": [
                             {
                                 "role": "system",
@@ -164,7 +259,7 @@ impl Groq {
         let total_cost = input_cost + output_cost;
 
         let metadata = serde_json::json!({
-            "model": "moonshotai/kimi-k2-instruct",
+            "model": "moonshotai/kimi-k2-instruct-0905",
             "prompt_tokens": prompt_tokens,
             "completion_tokens": completion_tokens,
             "input_cost": input_cost,
