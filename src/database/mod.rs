@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use thiserror::Error;
 use tokio::sync::mpsc;
-use tracing::{error, info};
+use tracing::{error};
 use uuid::Uuid;
 
 #[derive(Error, Debug)]
@@ -427,10 +427,7 @@ impl DatabaseService {
                 let mut claude_rates = ClaudeRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"]
-                        .as_str()
-                        .and_then(|s| s.parse::<f64>().ok())
-                        .unwrap_or(0.0);
+                    let unit_cost = rate["unit_cost"].as_f64().unwrap_or(0.0);
 
                     match cost_type {
                         "input_token" => claude_rates.input_token = unit_cost,
@@ -454,10 +451,8 @@ impl DatabaseService {
             .eq("service_provider", "groq_kimi_k2")
             .execute()
             .await;
-        info!("getting groq rates");
         match response {
             Ok(resp) if resp.status() == 200 => {
-                info!("response :{:#?}", resp);
                 let rates: Vec<serde_json::Value> = resp
                     .json()
                     .await
@@ -466,10 +461,7 @@ impl DatabaseService {
                 let mut groq_rates = GroqRates::default();
                 for rate in rates {
                     let cost_type = rate["cost_type"].as_str().unwrap_or("");
-                    let unit_cost = rate["unit_cost"]
-                        .as_str()
-                        .and_then(|s| s.parse::<f64>().ok())
-                        .unwrap_or(0.0);
+                    let unit_cost = rate["unit_cost"].as_f64().unwrap_or(0.0);
 
                     match cost_type {
                         "input_token" => groq_rates.input_token = unit_cost,
@@ -477,7 +469,6 @@ impl DatabaseService {
                         _ => {}
                     }
                 }
-                info!("groq_rates:{:#?}", groq_rates);
                 Ok(groq_rates)
             }
             _ => Ok(GroqRates::default()),
@@ -570,7 +561,10 @@ impl DatabaseService {
         }
 
         if groq_decision_cost > 0.0 {
-            breakdown.push_str(&format!("• Groq Decision API: Rs.{:.3}\n", groq_cost * forex_rate));
+            breakdown.push_str(&format!(
+                "• Groq Decision API: Rs.{:.3}\n",
+                groq_decision_cost * forex_rate
+            ));
         }
 
         if groq_whisper_cost > 0.0 {

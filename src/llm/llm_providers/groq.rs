@@ -124,7 +124,7 @@ impl Groq {
             .unwrap_or(0) as i32;
 
         // Log costs for decision call
-        let rates= self.database.get_groq_rates().await.unwrap_or_default();
+        let rates = self.database.get_groq_rates().await.unwrap_or_default();
         let input_cost = (prompt_tokens as f64 * rates.input_token) / 1_000_000.0;
         let output_cost = (completion_tokens as f64 * rates.output_token) / 1_000_000.0;
         let total_cost = input_cost + output_cost;
@@ -162,7 +162,9 @@ impl Groq {
             }
         }
 
-        Err(LLMError::GroqError("Invalid decision response format".to_string()))
+        Err(LLMError::GroqError(
+            "Invalid decision response format".to_string(),
+        ))
     }
 
     fn get_groq_tool_definitions(&self) -> serde_json::Value {
