@@ -55,8 +55,8 @@ fn default_brand() -> String {
 
 #[derive(Error, Debug)]
 pub enum LLMError {
-    #[error("Cannot parse and deserialize llm response")]
-    ParseError,
+    #[error("Cannot parse and deserialize llm response {0}")]
+    ParseError(String),
     #[error("Cannot find api key in env")]
     EnvError,
     #[error("Claude client error: {0}")]
@@ -95,7 +95,7 @@ impl LLMOrchestrator {
         json!([
             {
                 "name": "get_metal_prices",
-                "description": "Get current metal prices from MCX for copper and aluminum",
+                "description": "Get current metal prices from MCX/online for copper and aluminum",
                 "input_schema": {
                     "type": "object",
                     "properties": {},
@@ -301,13 +301,17 @@ impl LLMOrchestrator {
     ) -> Result<Query, LLMError> {
         info!(response = ?response, "raw response ");
 
-        let content_array = response["content"].as_array().ok_or(LLMError::ParseError)?;
+        let content_array = response["content"]
+            .as_array()
+            .ok_or(LLMError::ParseError("No content returned".into()))?;
 
         // Look for tool_use in content blocks
         for content_block in content_array {
             if let Some(content_type) = content_block.get("type").and_then(|t| t.as_str()) {
                 if content_type == "tool_use" {
-                    let tool_name = content_block["name"].as_str().ok_or(LLMError::ParseError)?;
+                    let tool_name = content_block["name"]
+                        .as_str()
+                        .ok_or(LLMError::ParseError("Tool name not found".into()))?;
                     let input = &content_block["input"];
 
                     // Check if this is an information tool that requires multi-step handling
@@ -333,7 +337,9 @@ impl LLMOrchestrator {
     }
 
     fn handle_tool_call(&self, tool_content: &serde_json::Value) -> Result<Query, LLMError> {
-        let tool_name = tool_content["name"].as_str().ok_or(LLMError::ParseError)?;
+        let tool_name = tool_content["name"]
+            .as_str()
+            .ok_or(LLMError::ParseError("Tool name not found".into()))?;
         let input = &tool_content["input"];
 
         match tool_name {
@@ -341,30 +347,34 @@ impl LLMOrchestrator {
             "get_stock_info" => {
                 let query = input["query"]
                     .as_str()
-                    .ok_or(LLMError::ParseError)?
+                    .ok_or(LLMError::ParseError(
+                        "Query parameter not found for get_stock_info".into(),
+                    ))?
                     .to_string();
                 Ok(Query::GetStock { query })
             }
             "generate_quotation" => {
-                let quotation_request: QuotationRequest =
-                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                let quotation_request: QuotationRequest = serde_json::from_value(input.clone())
+                    .map_err(|_| LLMError::ParseError("Error parsing quotation request".into()))?;
                 Ok(Query::GetQuotation(quotation_request))
             }
             "generate_proforma" => {
-                let quotation_request: QuotationRequest =
-                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                let quotation_request: QuotationRequest = serde_json::from_value(input.clone())
+                    .map_err(|_| LLMError::ParseError("Error parsing proforma request".into()))?;
                 Ok(Query::GetProformaInvoice(quotation_request))
             }
             "get_prices_only" => {
-                let price_request: PriceOnlyRequest =
-                    serde_json::from_value(input.clone()).map_err(|_| LLMError::ParseError)?;
+                let price_request: PriceOnlyRequest = serde_json::from_value(input.clone())
+                    .map_err(|_| {
+                        LLMError::ParseError("Price only request cannot be parsed".into())
+                    })?;
                 Ok(Query::GetPricesOnly(price_request))
             }
             "find_price_list" => {
                 let brand = input["brand"].as_str().unwrap_or("kei").to_string();
                 let keywords: Vec<String> = input["keywords"]
                     .as_array()
-                    .ok_or(LLMError::ParseError)?
+                    .ok_or(LLMError::ParseError("No keywords found".into()))?
                     .iter()
                     .filter_map(|v| v.as_str().map(|s| s.to_string()))
                     .collect();

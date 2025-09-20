@@ -26,11 +26,11 @@ impl LLMProvider for Claude {
         llm_orchestrator: &LLMOrchestrator,
     ) -> Result<Query, LLMError> {
         let mut parse_retry_attempted = false;
-
+        let mut parse_error: String = "".into();
         // Try once with potential parse retry
         loop {
             let query_text = if parse_retry_attempted {
-                format!("Your previous response was not as per input schema. Return ONLY valid tool call with input matching the exact input schema. Original query: {}", query)
+                format!("Original query: {}\nYour response:{}\nYour previous response was not as per input schema. Return ONLY valid tool call with input matching the exact input schema.", query, parse_error)
             } else {
                 query.to_string()
             };
@@ -41,16 +41,18 @@ impl LLMProvider for Claude {
                     .await
                 {
                     Ok(parsed_query) => return Ok(parsed_query),
-                    Err(LLMError::ParseError) if !parse_retry_attempted => {
+                    Err(LLMError::ParseError(err)) if !parse_retry_attempted => {
                         error!("Parse error, will retry with enhanced prompt");
                         parse_retry_attempted = true;
+                        parse_error = err;
                         continue;
                     }
                     Err(e) => return Err(e),
                 },
-                Err(LLMError::ParseError) if !parse_retry_attempted => {
+                Err(LLMError::ParseError(err)) if !parse_retry_attempted => {
                     error!("API request ParseError, will retry with enhanced prompt");
                     parse_retry_attempted = true;
+                    parse_error = err;
                     continue;
                 }
                 Err(e) => return Err(e),
@@ -91,10 +93,6 @@ impl Claude {
                             {
                                 "type" : "text",
                                 "text" : self.system_prompt.as_str(),
-                                "cache_control": {
-                                    "type": "ephemeral",
-                                    "ttl": "1h"
-                                }
                             }
                         ],
                         "max_tokens": 10240,
@@ -134,7 +132,10 @@ impl Claude {
                     || error_message.contains("JSON schema"))
             {
                 error!("Claude tool validation failed, returning ParseError for retry");
-                Err(LLMError::ParseError)
+                return Err(LLMError::ParseError(
+                    serde_json::to_string(&json_response)
+                        .map_err(|_| LLMError::ParseError("".into()))?,
+                ));
             } else {
                 Err(LLMError::ClientError(format!(
                     "{}: {}",

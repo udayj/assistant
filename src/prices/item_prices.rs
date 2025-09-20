@@ -21,7 +21,6 @@ impl Description for Product {
     }
 
     fn get_brief_description(&self, extras: Vec<String>) -> String {
-        // NEW
         match self {
             Self::Cable(cable) => cable.get_brief_description(extras),
         }
@@ -30,8 +29,9 @@ impl Description for Product {
 
 #[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug, Serialize, JsonSchema)]
 pub enum Cable {
+    /// Use this variant for armoured / unarmoured / flexible cables
     PowerControl(PowerControl),
-
+    /// Use this variant for telephone cables
     Telephone {
         pair_size: String,
         conductor_mm: String,
@@ -110,8 +110,11 @@ impl Description for SolarType {
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
 pub enum CoaxialType {
+    /// RG6 type cables
     RG6,
+    /// RG11 type cables
     RG11,
+    /// RG59 type cables
     RG59,
 }
 
@@ -131,8 +134,11 @@ impl Description for CoaxialType {
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
 pub enum PowerControl {
+    /// For armoured/unarmoured cables - use this variant
     LT(LT),
+    /// For HT cables with voltages more than 1.1 KV use this variant
     HT(HT),
+    /// For all kinds of flexible cables use this
     Flexible(Flexible),
 }
 
@@ -146,7 +152,6 @@ impl Description for PowerControl {
     }
 
     fn get_brief_description(&self, extras: Vec<String>) -> String {
-        // NEW
         match self {
             Self::LT(lt_cable) => lt_cable.get_brief_description(extras),
             Self::HT(ht_cable) => ht_cable.get_brief_description(extras),
@@ -293,8 +298,10 @@ impl Description for HT {
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
 pub struct Flexible {
+    /// Core size eg. "3"
     pub core_size: String,
     pub sqmm: String,
+    /// Type of flexible cable eg. "FR" / "FRLSH" - do not apply any loading for flexible cables
     pub flexible_type: FlexibleType,
 }
 
@@ -309,7 +316,6 @@ impl Description for Flexible {
     }
 
     fn get_brief_description(&self, extras: Vec<String>) -> String {
-        // NEW
         format!(
             "{}C x {}mm² Cu Flex {}",
             self.core_size,
@@ -337,14 +343,15 @@ impl Description for FlexibleType {
     }
 
     fn get_brief_description(&self, extras: Vec<String>) -> String {
-        // NEW
         self.get_description(extras) // Same as full description
     }
 }
 
 #[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
 pub enum Conductor {
+    /// Type of conductor to be used for eg. "Cu" / "Copper"
     Copper,
+    /// Type of conductor to be used for eg. "Al" / "Aluminium"
     Aluminium,
 }
 
@@ -357,7 +364,6 @@ impl Description for Conductor {
     }
 
     fn get_brief_description(&self, _extras: Vec<String>) -> String {
-        // NEW
         match self {
             Self::Aluminium => "Al".to_string(),
             Self::Copper => "Cu".to_string(),
