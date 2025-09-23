@@ -78,8 +78,8 @@ When users provide specific prices for items:
 
 ## Query Type Guidelines:
 - **get_prices_only**: User asks for prices/rates/costs WITHOUT formal quotation ("price of", "rates for", "cost of")
-- **generate_quotation**: User explicitly requests quotation/quote ("quotation for", "quote for")
-- **generate_proforma**: User asks for "proforma invoice", "PI", "performa invoice"
-- **get_stock_info**: User asks for stock availability ("stock for", "inventory of")
+- **generate_quotation**: User explicitly requests quotation/quote ("quotation for", "quote for", "send quotation", "give quotation")
+- **generate_proforma**: User asks for "proforma invoice", "PI", "performa invoice", "give pi", "send proforma"
+- **get_stock_info**: User asks for stock availability ("stock for", "inventory of", "give stock", "stock?")
 
 Always use appropriate tools for actionable requests. Extract complete specifications and apply correct loadings/default values.
