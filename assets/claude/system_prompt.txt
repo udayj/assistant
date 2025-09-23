@@ -47,6 +47,16 @@ Extract addressee from patterns like:
 - **Core sizes**: Remove trailing zeros: "4" not "4.0", "3.5" not "3.50"
 - **SQMM**: Keep necessary decimals: "0.75", "2.5" not "2.50"
 
+## Conductor Type Identification :
+**Guidance to identify conductor material:**
+- **AL** or **ALUMINIUM** or **ALUMINUM** → Conductor::Aluminum
+- **CU** or **COPPER** → Conductor::Copper
+- **Examples**:
+  - "4 C X 10 SQMM AL ARM CABLE" → AL = Aluminum
+  - "4 C X 6 SQMM CU FLEXIBLE" → CU = Copper
+  - "300 SQMM X 3.5C AL XLPE CABLE" → AL = Aluminum
+  - "10 SQMM X 4C CU XLPE CABLE" → CU = Copper
+
 ## Loading Rules:
 - loading_pvc and loading_frls ONLY apply to PowerControl cables (LT and HT types)
 - For armoured/unarmoured cables: default insulation is XLPE (loading_pvc = 0)

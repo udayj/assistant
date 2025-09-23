@@ -452,7 +452,7 @@ impl LLMOrchestrator {
             if let Some(response) = &msg.structured_response {
                 context_messages.push(format!(
                     "What the assistant understood: {}",
-                    response.get_metadata()
+                    response.get_metadata() // Only using metadata not the response text for now
                 ));
             }
         }
