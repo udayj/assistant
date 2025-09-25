@@ -375,7 +375,7 @@ impl TelegramService {
                                 query_metadata: None
                             },
                             QueryError::LLMError(_) => Response {
-                                text:QueryFulfilment::get_help_text().to_string(),
+                                text:"Unable to understand query correctly".to_string(),
                                 file: None,
                                 query_metadata: None
                             },

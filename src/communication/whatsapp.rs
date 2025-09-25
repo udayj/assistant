@@ -367,10 +367,19 @@ async fn webhook_handler(
                         )
                         .await;
                     let _ = state_clone.error_sender.try_send(error_msg);
+                    let error_response = match e {
+                        crate::query::QueryError::MetalPricingError(_) =>
+                            "Could not fetch metal prices - please try again later",
+                        crate::query::QueryError::QuotationServiceError =>
+                            "Error generating quotation - please check whether items are valid",
+                        crate::query::QueryError::LLMError(_) =>
+                            "Unable to understand query correctly",
+                        _ => "Could not service request - please try again later",
+                    };
                     let _ = send_whatsapp_message(
                         &state_clone,
                         &from_clone,
-                        "Sorry, couldn't process your request. Please try again later.",
+                        error_response,
                         &context_clone,
                     )
                     .await;
