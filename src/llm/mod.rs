@@ -461,7 +461,7 @@ impl LLMOrchestrator {
         context_messages.push(format!("Current User Query: {}", current_query));
 
         format!(
-            "Previous conversation:\n{}\n\nPlease respond to the latest user query considering the conversation context.",
+            "Previous conversation:\n{}\n\nRespond to the latest user query considering the conversation context.",
             context_messages.join("\n")
         )
     }
@@ -498,7 +498,7 @@ impl LLMOrchestrator {
             current_query
         );
         info!("Decision prompt:{:#?}", decision_prompt);
-        let decision_system_prompt = "You are a conversation classifier. Determine if a new query continues a previous conversation or starts a new topic. Only answer YES if the new query directly relates to, refines, corrects, or follows up on the previous conversation. Answer NO for completely new topics or unrelated queries or if unsure.";
+        let decision_system_prompt = "You are a conversation classifier. Determine if a new query continues a previous conversation or starts a new topic. Only answer YES if the new query directly relates to, refines, corrects, or follows up on the previous conversation or points to an error in the previous response. Answer NO for completely new topics or unrelated queries or if even slightly unsure.";
 
         // Use Groq decision call with same session context for accurate cost tracking
         let groq_provider = match &self.groq {

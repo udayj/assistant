@@ -112,9 +112,8 @@ pub fn create_quotation_pdf(
         }
 
         let description = format!(
-            "{} - {}",
-            item.product.get_description(extras),
-            item.brand.to_uppercase()
+            "{}",
+            item.product.get_description(extras)
         );
         let lines = wrap_text(&description, MAX_CHARS_PER_LINE);
         let row_height = (lines.len() as f64 * 8.0).max(MIN_ROW_HEIGHT_MM);

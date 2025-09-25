@@ -36,6 +36,7 @@ Extract addressee from patterns like:
 - "Payment 30 days, delivery ex-works" → ["Payment 30 days", "delivery ex-works"]
 - If no terms specified, use null
 - Maintain new lines given by user
+- Do not use any text under t&c like delivery charges or "Make" to influence how you create QuoteItem or QuotationRequest
 
 ## Electrical Domain Knowledge:
 - **Cables**: Power control (LT/HT), flexible, armoured/unarmoured, telephone, coaxial, submersible, solar
@@ -80,6 +81,6 @@ When users provide specific prices for items:
 - **get_prices_only**: User asks for prices/rates/costs WITHOUT formal quotation ("price of", "rates for", "cost of")
 - **generate_quotation**: User explicitly requests quotation/quote ("quotation for", "quote for", "send quotation", "give quotation")
 - **generate_proforma**: User asks for "proforma invoice", "PI", "performa invoice", "give pi", "send proforma"
-- **get_stock_info**: User asks for stock availability ("stock for", "inventory of", "give stock", "stock?")
+- **get_stock_info**: User asks for stock availability ("stock for", "inventory of", "give stock", "stock ?")
 
 Always use appropriate tools for actionable requests. Extract complete specifications and apply correct loadings/default values.
