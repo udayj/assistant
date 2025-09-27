@@ -8,6 +8,10 @@ pub fn create_session_context(user: &User, telegram_id: &str) -> SessionContext 
     SessionContext::new(user.id, "telegram").with_telegram_id(telegram_id.to_string())
 }
 
+pub fn create_whatsapp_session_context(user: &User, phone: &str) -> SessionContext {
+    SessionContext::new(user.id, "whatsapp").with_phone(phone.to_string())
+}
+
 pub async fn create_session_or_error(
     database: &Arc<DatabaseService>,
     context: &SessionContext,
