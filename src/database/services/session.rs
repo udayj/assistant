@@ -409,7 +409,10 @@ mod tests {
             .insert_header("apikey", "test_key")
             .insert_header("Authorization", "Bearer test_key");
 
-        DatabaseService { client }
+        DatabaseService {
+            client,
+            admin_telegram_id: "test_admin".to_string(),
+        }
     }
 
     fn create_test_query_session(context: &SessionContext) -> QuerySession {

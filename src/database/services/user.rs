@@ -83,7 +83,7 @@ impl DatabaseService {
     }
 
     pub async fn is_admin(&self, telegram_id: &str) -> bool {
-        telegram_id == "2050924196"
+        telegram_id == self.admin_telegram_id
     }
 
     // Approve pending telegram user

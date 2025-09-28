@@ -54,6 +54,7 @@ pub struct PdfPriceListConfig {
 pub struct TelegramConfig {
     pub price_alert_subscribers: Vec<i64>,
     pub error_channel_id: i64,
+    pub admin_telegram_id: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -74,11 +75,12 @@ pub struct Context {
 
 impl Context {
     pub fn new(config_file: &str, stock_service: Arc<StockService>) -> Result<Self, ConfigError> {
-        let database = DatabaseService::new().map_err(|e| {
+        let config = Config::new(config_file)?;
+        let database = DatabaseService::new(config.telegram.admin_telegram_id.clone()).map_err(|e| {
             ConfigError::DeserializationError(format!("Database init failed: {}", e))
         })?;
         Ok(Self {
-            config: Config::new(config_file)?,
+            config,
             database: Arc::new(database),
             stock_service,
         })

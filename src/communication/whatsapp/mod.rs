@@ -13,7 +13,7 @@ use async_trait::async_trait;
 use axum::extract::WebSocketUpgrade;
 use axum::{
     extract::{Form, State},
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::Response,
     routing::{get, post},
     Router,
@@ -30,10 +30,12 @@ use uuid::Uuid;
 
 mod file_serve;
 pub mod message_sender;
+mod webhook_validation;
 mod whatsapp_helpers;
 
 use file_serve::{serve_assets_file, serve_file};
 use message_sender::send_text_response;
+use webhook_validation::validate_twilio_signature;
 use whatsapp_helpers::{
     convert_whatsapp_error_to_query_error, process_query_response, QueryProcessingParams,
 };
@@ -140,8 +142,41 @@ async fn health_check() -> (StatusCode, &'static str) {
 // This is also the end-point which gets pinged with an error payload from twilio
 async fn webhook_handler(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Form(payload): Form<HashMap<String, String>>,
 ) -> Response<String> {
+    // Validate webhook signature
+    if let Some(signature) = headers.get("X-Twilio-Signature") {
+        if let Ok(signature_str) = signature.to_str() {
+            let webhook_url = format!("{}/webhook", state.file_base_url);
+
+            if !validate_twilio_signature(
+                signature_str,
+                &webhook_url,
+                &payload,
+                &state.twilio_auth_token,
+            ) {
+                error!("Invalid webhook signature from Twilio");
+                return Response::builder()
+                    .status(StatusCode::FORBIDDEN)
+                    .body("Invalid signature".to_string())
+                    .unwrap();
+            }
+        } else {
+            error!("Invalid signature header format");
+            return Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body("Invalid signature format".to_string())
+                .unwrap();
+        }
+    } else {
+        error!("Missing X-Twilio-Signature header");
+        return Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .body("Missing signature".to_string())
+            .unwrap();
+    }
+
     info!("Webhook payload: {:?}", payload);
 
     let from = payload.get("From").unwrap_or(&"".to_string()).clone();
@@ -326,4 +361,64 @@ async fn download_and_process_image(
         .fulfil_image_query(&image_data, user_text, context, error_sender)
         .await
         .map_err(|e| WhatsAppError::QueryFulfilmentInitError(e.to_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::webhook_validation::validate_twilio_signature;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_invalid_signature_validation() {
+        let mut params = HashMap::new();
+        params.insert("From".to_string(), "whatsapp:+1234567890".to_string());
+        params.insert("Body".to_string(), "test".to_string());
+
+        let url = "https://test.com/webhook";
+        let auth_token = "test_token";
+        let signature = "sha1=fakesignature";
+
+        let result = validate_twilio_signature(signature, url, &params, auth_token);
+        assert!(!result); // Should be false for fake signature
+    }
+
+    #[test]
+    fn test_malformed_signature_validation() {
+        let mut params = HashMap::new();
+        params.insert("From".to_string(), "whatsapp:+1234567890".to_string());
+        params.insert("Body".to_string(), "test".to_string());
+
+        let url = "https://test.com/webhook";
+        let auth_token = "test_token";
+        let signature = "invalid!";
+
+        let result = validate_twilio_signature(signature, url, &params, auth_token);
+        assert!(!result); // Should be false for malformed signature
+    }
+
+    #[test]
+    fn test_valid_signature_generation() {
+        use base64::{engine::general_purpose, Engine as _};
+        use hmac::{Hmac, Mac};
+        use sha1::Sha1;
+
+        type HmacSha1 = Hmac<Sha1>;
+
+        let mut params = HashMap::new();
+        params.insert("From".to_string(), "whatsapp:+1234567890".to_string());
+        params.insert("Body".to_string(), "test".to_string());
+
+        let url = "https://test.com/webhook";
+        let auth_token = "test_token";
+
+        // Generate valid signature manually
+        let data = format!("{}BodytestFromwhatsapp:+1234567890", url);
+        let mut mac = HmacSha1::new_from_slice(auth_token.as_bytes()).unwrap();
+        mac.update(data.as_bytes());
+        let signature_bytes = mac.finalize().into_bytes();
+        let valid_signature = format!("sha1={}", general_purpose::STANDARD.encode(signature_bytes));
+
+        let result = validate_twilio_signature(&valid_signature, url, &params, auth_token);
+        assert!(result); // Should be true for correctly generated signature
+    }
 }

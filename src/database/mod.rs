@@ -13,7 +13,7 @@ mod tests {
     #[tokio::test]
     async fn test_database_connection() {
         dotenv().ok();
-        let db = DatabaseService::new().expect("Failed to create database service");
+        let db = DatabaseService::new("test_admin_id".to_string()).expect("Failed to create database service");
 
         // Test user lookup (should return None for non-existent user)
         let result = db.get_user_by_phone("+999999999999").await;
