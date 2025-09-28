@@ -1,6 +1,11 @@
+use crate::communication::error_handler::create_error_response;
+use crate::communication::session_helpers::{
+    complete_session_with_error, complete_session_with_success, create_session_context,
+    create_session_or_error,
+};
 use crate::core::service_manager::{Error as ServiceManagerError, ServiceWithErrorSender};
 use crate::database::DatabaseService;
-use crate::database::{SessionContext, SessionResult, User};
+use crate::database::SessionContext;
 use crate::query::QueryError;
 use crate::{configuration::Context, query::QueryFulfilment};
 use async_trait::async_trait;
@@ -12,8 +17,8 @@ use teloxide::types::InputFile;
 use teloxide::types::PhotoSize;
 use thiserror::Error;
 use tokio::sync::mpsc;
-use tracing::error;
 use tokio::sync::mpsc::Sender;
+use tracing::error;
 
 #[derive(Debug, Error)]
 pub enum TelegramError {
@@ -137,30 +142,34 @@ impl TelegramService {
                 .await?;
             let start_time = std::time::Instant::now();
             let mut context = create_session_context(&user, &telegram_id);
-            if database
-                .create_session_with_context(
-                    &context,
-                    format!("Image query + caption:{}", caption).as_str(),
-                    "image",
-                )
+            let query_text = format!("Image query + caption:{}", caption);
+            if create_session_or_error(&database, &context, &query_text, "image", &error_sender)
                 .await
                 .is_err()
             {
-                let _ = error_sender.send(format!("Failed to create session")).await;
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_image_query(&bot, photo, caption, &query_fulfilment, &mut context, &error_sender).await
+            match Self::process_image_query(
+                &bot,
+                photo,
+                caption,
+                &query_fulfilment,
+                &mut context,
+                &error_sender,
+            )
+            .await
             {
                 Ok(response) => {
-                    let result = SessionResult {
-                        success: true,
-                        error_message: None,
-                        processing_time_ms: start_time.elapsed().as_millis() as i32,
-                        query_metadata: response.query_metadata,
-                    };
-                    let query_text = format!("Image query + caption:{}", caption);
-                    let _ = database.complete_session_with_notification(&context, result, &query_text, &error_sender).await;
+                    complete_session_with_success(
+                        &database,
+                        &context,
+                        &response,
+                        &query_text,
+                        start_time,
+                        &error_sender,
+                    )
+                    .await;
                     bot.send_message(chat_id, response.text).await?;
                     if let Some(file_path) = response.file {
                         bot.send_document(chat_id, InputFile::file(&file_path))
@@ -172,24 +181,24 @@ impl TelegramService {
                     }
                 }
                 Err(e) => {
-                    let error_msg = format!(
-                        "❌ Image Query Failed\n\nCaption: {}\nError: {}",
-                        caption, e
-                    );
-                    let _ = error_sender.send(error_msg).await;
-                    let result = SessionResult {
-                        success: false,
-                        error_message: Some(e.to_string()),
-                        processing_time_ms: start_time.elapsed().as_millis() as i32,
-                        query_metadata: None,
+                    // Convert TelegramError to QueryError for consistent error handling
+                    let query_error = match e {
+                        TelegramError::ImageProcessingError(_) => {
+                            QueryError::OcrError(e.to_string())
+                        }
+                        _ => QueryError::LLMError(e.to_string()),
                     };
-                    let query_text = format!("Image query + caption:{}", caption);
-                    let _ = database.complete_session_with_notification(&context, result, &query_text, &error_sender).await;
-                    bot.send_message(
-                        chat_id,
-                        "Could not process image - please try again with clearer image and text",
+                    complete_session_with_error(
+                        &database,
+                        &context,
+                        &query_error,
+                        &query_text,
+                        start_time,
+                        &error_sender,
                     )
-                    .await?;
+                    .await;
+                    let error_response = create_error_response(&query_error);
+                    bot.send_message(chat_id, error_response.text).await?;
                 }
             }
             return Ok(());
@@ -318,13 +327,13 @@ impl TelegramService {
                                 text: "❌ Invalid model. Use: /llm claude or /llm groq".to_string(),
                                 file: None,
                                 query_metadata: None,
-                            }
+                            },
                         }
                     } else {
                         Response {
                             text: "❌ Admin access required".to_string(),
                             file: None,
-                        query_metadata: None,
+                            query_metadata: None,
                         }
                     }
                 }
@@ -332,56 +341,40 @@ impl TelegramService {
                 text => {
                     let start_time = std::time::Instant::now();
                     let mut context = create_session_context(&user, &telegram_id);
-                    if database
-                        .create_session_with_context(&context, text, "text")
+                    if create_session_or_error(&database, &context, text, "text", &error_sender)
                         .await
                         .is_err()
                     {
-                        let _ = error_sender.send(format!("Failed to create session")).await;
                         bot.send_message(chat_id, "System error").await?;
                         return Ok(());
                     }
-                    match query_fulfilment.fulfil_query(text, &mut context, &error_sender).await {
+                    match query_fulfilment
+                        .fulfil_query(text, &mut context, &error_sender)
+                        .await
+                    {
                         Ok(response) => {
-                            let result = SessionResult {
-                                success: true,
-                                error_message: None,
-                                processing_time_ms: start_time.elapsed().as_millis() as i32,
-                                query_metadata: response.query_metadata.clone(),
-                            };
-                            let _ = database.complete_session_with_notification(&context, result, text, &error_sender).await;
+                            complete_session_with_success(
+                                &database,
+                                &context,
+                                &response,
+                                text,
+                                start_time,
+                                &error_sender,
+                            )
+                            .await;
                             response
                         }
                         Err(e) => {
-                            let error_msg =
-                                format!("❌ Query Failed\n\nQuery: {}\nError: {}", text, e);
-                            let _ = error_sender.send(error_msg).await;
-                            let result = SessionResult {
-                                success: false,
-                                error_message: Some(e.to_string()),
-                                processing_time_ms: start_time.elapsed().as_millis() as i32,
-                                query_metadata: None,
-                            };
-                            let _ = database.complete_session_with_notification(&context, result, text, &error_sender).await;
-                            match e {
-                            QueryError::MetalPricingError(_) => Response {
-                                text: "Could not fetch metal prices - please try again later".to_string(),
-                                file: None,
-                                query_metadata: None
-                            },
-                            QueryError::QuotationServiceError =>Response {
-                                text: "Error generating quotation - please check whether items are valid".to_string(),
-                                file: None,
-                                query_metadata: None
-                            },
-                            QueryError::LLMError(_) => Response {
-                                text:QueryFulfilment::get_help_text().to_string(),
-                                file: None,
-                                query_metadata: None
-                            },
-                            _ => Response { text:"Could not service request - please try again later".to_string(), file: None, query_metadata: None }
-                            ,
-                            }
+                            complete_session_with_error(
+                                &database,
+                                &context,
+                                &e,
+                                text,
+                                start_time,
+                                &error_sender,
+                            )
+                            .await;
+                            create_error_response(&e)
                         }
                     }
                 }
@@ -404,25 +397,33 @@ impl TelegramService {
                 .await?;
             let start_time = std::time::Instant::now();
             let mut context = create_session_context(&user, &telegram_id);
-            if database
-                .create_session_with_context(&context, format!("Audio query").as_str(), "audio")
+            let query_text = "Audio query";
+            if create_session_or_error(&database, &context, query_text, "audio", &error_sender)
                 .await
                 .is_err()
             {
-                let _ = error_sender.send(format!("Failed to create session")).await;
                 bot.send_message(chat_id, "System error").await?;
                 return Ok(());
             }
-            match Self::process_voice_query(&bot, voice, &query_fulfilment, &mut context, &error_sender).await {
+            match Self::process_voice_query(
+                &bot,
+                voice,
+                &query_fulfilment,
+                &mut context,
+                &error_sender,
+            )
+            .await
+            {
                 Ok(response) => {
-                    let result = SessionResult {
-                        success: true,
-                        error_message: None,
-                        processing_time_ms: start_time.elapsed().as_millis() as i32,
-                        query_metadata: response.query_metadata
-                    };
-                    let query_text = "Audio query";
-                    let _ = database.complete_session_with_notification(&context, result, query_text, &error_sender).await;
+                    complete_session_with_success(
+                        &database,
+                        &context,
+                        &response,
+                        query_text,
+                        start_time,
+                        &error_sender,
+                    )
+                    .await;
                     bot.send_message(chat_id, response.text).await?;
                     if let Some(file_path) = response.file {
                         bot.send_document(chat_id, InputFile::file(&file_path))
@@ -433,21 +434,24 @@ impl TelegramService {
                     }
                 }
                 Err(e) => {
-                    let error_msg = format!("❌ Audio Query Failed\n\nError: {}", e);
-                    let _ = error_sender.send(error_msg).await;
-                    let result = SessionResult {
-                        success: false,
-                        error_message: Some(e.to_string()),
-                        processing_time_ms: start_time.elapsed().as_millis() as i32,
-                        query_metadata: None
+                    // Convert TelegramError to QueryError for consistent error handling
+                    let query_error = match e {
+                        TelegramError::ImageProcessingError(_) => {
+                            QueryError::TranscriptionError(e.to_string())
+                        }
+                        _ => QueryError::LLMError(e.to_string()),
                     };
-                    let query_text = "Audio query";
-                    let _ = database.complete_session_with_notification(&context, result, query_text, &error_sender).await;
-                    bot.send_message(
-                        chat_id,
-                        "Could not process audio - please try again with clearer audio",
+                    complete_session_with_error(
+                        &database,
+                        &context,
+                        &query_error,
+                        query_text,
+                        start_time,
+                        &error_sender,
                     )
-                    .await?;
+                    .await;
+                    let error_response = create_error_response(&query_error);
+                    bot.send_message(chat_id, error_response.text).await?;
                 }
             }
             return Ok(());
@@ -520,8 +524,4 @@ impl TelegramService {
             .await
             .map_err(|e| TelegramError::ImageProcessingError(e.to_string()))
     }
-}
-
-fn create_session_context(user: &User, telegram_id: &str) -> SessionContext {
-    SessionContext::new(user.id, "telegram").with_telegram_id(telegram_id.to_string())
 }

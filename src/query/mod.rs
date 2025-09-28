@@ -14,6 +14,7 @@ use chrono::{Datelike, Local};
 use rand::prelude::*;
 use std::env;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 use thiserror::Error;
 use tokio::sync::mpsc::Sender;
 use tracing::info;
@@ -329,11 +330,17 @@ impl QueryFulfilment {
         context: &mut SessionContext,
         error_sender: &tokio::sync::mpsc::Sender<String>,
     ) -> Result<Query, QueryError> {
+        let start_time = Instant::now();
         let query: Query = self
             .llm_service
             .parse_query(query, context, error_sender)
             .await
             .map_err(|e| QueryError::LLMError(e.to_string()))?;
+        let elapsed = start_time.elapsed();
+
+        let timing_message = format!("LLM query parsing took: {:.2}s", elapsed.as_secs_f32());
+        let _ = error_sender.send(timing_message).await;
+
         info!("Parsed query successfully");
 
         // Update the session with the actual query type

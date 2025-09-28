@@ -5,7 +5,7 @@ use crate::quotation::{PriceOnlyRequest, QuotationRequest};
 use async_trait::async_trait;
 use schemars::schema_for;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{json, Value};
 use std::env;
 use std::fs;
 use std::sync::{Arc, Mutex};
@@ -85,12 +85,12 @@ pub struct LLMOrchestrator {
     groq: LLM,
     runtime_config: Arc<Mutex<RuntimeConfig>>,
     pricelist_service: Option<Arc<PriceListService>>,
+    quotation_schema: Value,
+    price_only_schema: Value
 }
 
 impl LLMOrchestrator {
-    pub fn get_tool_definitions() -> serde_json::Value {
-        let quotation_schema = schema_for!(QuotationRequest);
-        let price_only_schema = schema_for!(PriceOnlyRequest);
+    pub fn get_tool_definitions(&self) -> serde_json::Value {
 
         json!([
             {
@@ -119,17 +119,17 @@ impl LLMOrchestrator {
             {
                 "name": "generate_quotation",
                 "description": "Generate a PDF quotation for electrical items",
-                "input_schema": serde_json::to_value(&quotation_schema).unwrap()
+                "input_schema": self.quotation_schema
             },
             {
                 "name": "generate_proforma",
                 "description": "Generate a PDF proforma invoice for electrical items",
-                "input_schema": serde_json::to_value(&quotation_schema).unwrap()
+                "input_schema": self.quotation_schema
             },
             {
                 "name": "get_prices_only",
                 "description": "Get prices for electrical items without generating quotation PDF",
-                "input_schema": serde_json::to_value(&price_only_schema).unwrap()
+                "input_schema": self.price_only_schema
             },
             {
                 "name": "find_price_list",
@@ -184,11 +184,15 @@ impl LLMOrchestrator {
             groq_api_key.as_str(),
             Arc::clone(&database),
         );
+        let quotation_schema = serde_json::to_value(schema_for!(QuotationRequest)).expect("Error creating quotation schema");
+        let price_only_schema = serde_json::to_value(schema_for!(PriceOnlyRequest)).expect("Error creating price only schema");
         Ok(Self {
             claude: LLM::Claude(claude),
             groq: LLM::Groq(groq),
             runtime_config,
             pricelist_service: None,
+            quotation_schema,
+            price_only_schema
         })
     }
 

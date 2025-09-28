@@ -35,7 +35,7 @@ impl LLMProvider for Claude {
                 query.to_string()
             };
 
-            match self.make_api_request(&query_text, context).await {
+            match self.make_api_request(&query_text, context, llm_orchestrator).await {
                 Ok(response) => match llm_orchestrator
                     .parse_response_with_multistep(&response, query, context)
                     .await
@@ -76,6 +76,7 @@ impl Claude {
         &self,
         query: &str,
         context: &SessionContext,
+        llm_orchestrator: &LLMOrchestrator,
     ) -> Result<serde_json::Value, LLMError> {
         info!("About to make HTTP request to Claude API");
         let response = self
@@ -97,7 +98,7 @@ impl Claude {
                         ],
                         "max_tokens": 10240,
                         "tool_choice": {"type": "any"},
-                        "tools": LLMOrchestrator::get_tool_definitions(),
+                        "tools": llm_orchestrator.get_tool_definitions(),
                         "messages": [{
                             "role": "user",
                             "content": query

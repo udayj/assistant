@@ -1,17 +1,7 @@
+use super::types::*;
+use super::Description;
 use crate::prices::utils::normalize_decimal;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-pub trait Description {
-    fn get_description(&self, extras: Vec<String>) -> String;
-    fn get_brief_description(&self, extras: Vec<String>) -> String;
-}
-
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum Product {
-    Cable(Cable),
-}
 
 impl Description for Product {
     fn get_description(&self, extras: Vec<String>) -> String {
@@ -25,26 +15,6 @@ impl Description for Product {
             Self::Cable(cable) => cable.get_brief_description(extras),
         }
     }
-}
-
-#[derive(PartialEq, Eq, Hash, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum Cable {
-    /// Use this variant for armoured / unarmoured / flexible cables
-    PowerControl(PowerControl),
-    /// Use this variant for telephone cables
-    Telephone {
-        pair_size: String,
-        conductor_mm: String,
-    },
-    Coaxial(CoaxialType),
-    Submersible {
-        core_size: String,
-        sqmm: String,
-    },
-    Solar {
-        solar_type: SolarType,
-        sqmm: String,
-    },
 }
 
 impl Description for Cable {
@@ -89,12 +59,6 @@ impl Description for Cable {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum SolarType {
-    BS,
-    EN,
-}
-
 impl Description for SolarType {
     fn get_description(&self, _extras: Vec<String>) -> String {
         match self {
@@ -106,16 +70,6 @@ impl Description for SolarType {
     fn get_brief_description(&self, extras: Vec<String>) -> String {
         self.get_description(extras) // Same as full description
     }
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum CoaxialType {
-    /// RG6 type cables
-    RG6,
-    /// RG11 type cables
-    RG11,
-    /// RG59 type cables
-    RG59,
 }
 
 impl Description for CoaxialType {
@@ -130,16 +84,6 @@ impl Description for CoaxialType {
     fn get_brief_description(&self, extras: Vec<String>) -> String {
         self.get_description(extras) // Same as full description
     }
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum PowerControl {
-    /// For armoured/unarmoured cables - use this variant
-    LT(LT),
-    /// For HT cables with voltages more than 1.1 KV use this variant
-    HT(HT),
-    /// For all kinds of flexible cables use this
-    Flexible(Flexible),
 }
 
 impl Description for PowerControl {
@@ -158,13 +102,6 @@ impl Description for PowerControl {
             Self::Flexible(flexible_cable) => flexible_cable.get_brief_description(extras),
         }
     }
-}
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub struct LT {
-    pub conductor: Conductor,
-    pub core_size: String,
-    pub sqmm: String,
-    pub armoured: bool,
 }
 
 impl Description for LT {
@@ -265,13 +202,6 @@ impl Description for LT {
         )
     }
 }
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub struct HT {
-    pub conductor: Conductor,
-    pub voltage_grade: String,
-    pub core_size: String,
-    pub sqmm: String,
-}
 
 impl Description for HT {
     fn get_description(&self, extras: Vec<String>) -> String {
@@ -296,15 +226,6 @@ impl Description for HT {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub struct Flexible {
-    /// Core size eg. "3"
-    pub core_size: String,
-    pub sqmm: String,
-    /// Type of flexible cable eg. "FR" / "FRLSH" - do not apply any loading for flexible cables
-    pub flexible_type: FlexibleType,
-}
-
 impl Description for Flexible {
     fn get_description(&self, extras: Vec<String>) -> String {
         format!(
@@ -324,13 +245,6 @@ impl Description for Flexible {
         )
     }
 }
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum FlexibleType {
-    FR,
-    FRLSH,
-    HRFR,
-    ZHFR,
-}
 
 impl Description for FlexibleType {
     fn get_description(&self, _extras: Vec<String>) -> String {
@@ -345,14 +259,6 @@ impl Description for FlexibleType {
     fn get_brief_description(&self, extras: Vec<String>) -> String {
         self.get_description(extras) // Same as full description
     }
-}
-
-#[derive(Eq, Hash, PartialEq, Deserialize, Clone, Debug, Serialize, JsonSchema)]
-pub enum Conductor {
-    /// Type of conductor to be used for eg. "Cu" / "Copper"
-    Copper,
-    /// Type of conductor to be used for eg. "Al" / "Aluminium"
-    Aluminium,
 }
 
 impl Description for Conductor {
@@ -445,23 +351,6 @@ impl Flexible {
     }
 }
 
-#[derive(Deserialize, Clone, Debug)]
-pub struct PriceList {
-    tags: Vec<String>,
-    prices: Vec<Prices>,
-}
-
-#[derive(Deserialize, Clone, Debug)]
-pub struct Prices {
-    product: Product,
-    price: f32,
-}
-
-pub struct PricingSystem {
-    tags: Vec<String>,
-    prices: HashMap<Product, f32>,
-}
-
 // for a given user query we try to find the price list corresponding to required brand and matching tags
 // then we iterate through the price lists
 
@@ -500,16 +389,29 @@ mod pricelist_tests {
 
     #[test]
     fn test_pricelist_deserialization() {
-        let test_cases = vec!["assets/processed_pricelists/kei_multicore.json"];
-        for pricelist_path in test_cases {
-            let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(pricelist_path);
-            let json_content = fs::read_to_string(path)
-                .unwrap_or_else(|_| panic!("Failed to read file: {}", pricelist_path));
+        let processed_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/processed_pricelists");
+        let entries = fs::read_dir(&processed_dir)
+            .unwrap_or_else(|_| panic!("Failed to read directory: {:?}", processed_dir));
+
+        let mut json_files = Vec::new();
+        for entry in entries {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.extension().and_then(|s| s.to_str()) == Some("json") {
+                json_files.push(path);
+            }
+        }
+
+        assert!(!json_files.is_empty(), "No JSON pricelists found in processed_pricelists directory");
+
+        for pricelist_path in json_files {
+            let json_content = fs::read_to_string(&pricelist_path)
+                .unwrap_or_else(|_| panic!("Failed to read file: {:?}", pricelist_path));
 
             let pricelist: PriceList = serde_json::from_str(&json_content)
-                .unwrap_or_else(|e| panic!("Failed to deserialize {}: {}", pricelist_path, e));
+                .unwrap_or_else(|e| panic!("Failed to deserialize {:?}: {}", pricelist_path, e));
 
-            println!("✅ Successfully deserialized: {}", pricelist_path);
+            println!("✅ Successfully deserialized: {:?}", pricelist_path.file_name().unwrap());
 
             // Basic validation
             assert!(!pricelist.tags.is_empty(), "Tags should not be empty");

@@ -196,7 +196,8 @@
         "price_alert_subscribers": [
             2050924196
         ],
-        "error_channel_id": 2050924196
+        "error_channel_id": 2050924196,
+        "admin_telegram_id": "2050924196"
     },
     "whatsapp": {
         "webhook_port": 8080,

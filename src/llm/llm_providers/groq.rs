@@ -35,7 +35,7 @@ impl LLMProvider for Groq {
                 query.to_string()
             };
 
-            match self.make_api_request(&query_text, context).await {
+            match self.make_api_request(&query_text, context, llm_orchestrator).await {
                 Ok(response) => match llm_orchestrator
                     .parse_response_with_multistep(&response, query, context)
                     .await
@@ -169,8 +169,8 @@ impl Groq {
         ))
     }
 
-    fn get_groq_tool_definitions(&self) -> serde_json::Value {
-        let claude_tools = LLMOrchestrator::get_tool_definitions();
+    fn get_groq_tool_definitions(&self, llm_orchestrator: &LLMOrchestrator) -> serde_json::Value {
+        let claude_tools = llm_orchestrator.get_tool_definitions();
         let mut groq_tools = Vec::new();
 
         for tool in claude_tools.as_array().unwrap() {
@@ -192,10 +192,11 @@ impl Groq {
         &self,
         query: &str,
         context: &SessionContext,
+        llm_orchestrator: &LLMOrchestrator
     ) -> Result<serde_json::Value, LLMError> {
         info!("Attempting Groq API call");
 
-        let tools = self.get_groq_tool_definitions();
+        let tools = self.get_groq_tool_definitions(llm_orchestrator);
         //info!(tools = ?tools, "Groq tool definitions");
 
         let response = self

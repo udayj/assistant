@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum DatabaseError {
     #[error("Database connection error: {0}")]
     ConnectionError(String),
