@@ -19,6 +19,7 @@ const TO_SECTION_LINE_SPACING: f64 = 5.0;
 const SECOND_PAGE_START_Y: f64 = 230.0;
 const TC_SECTION_LINE_SPACING: f64 = 5.0;
 const MAX_TOTALS_SECTION_HEIGHT: f64 = 28.0;
+const FOOTER_Y_MM: f64 = 5.0;
 
 #[derive(Debug, Clone, Copy)]
 pub enum DocumentType {
@@ -132,7 +133,7 @@ pub fn create_quotation_pdf(
             current_y = SECOND_PAGE_START_Y;
 
             // Add header to new page
-            add_image_only_to_page(&current_layer)?;
+            add_image_only_to_page(&current_layer, &font)?;
 
             // Add table headers on new page
             add_table_headers(
@@ -201,7 +202,7 @@ pub fn create_quotation_pdf(
             let (new_page, new_layer) =
                 doc.add_page(Mm(PAGE_WIDTH_MM), Mm(PAGE_HEIGHT_MM), "Layer");
             current_layer = doc.get_page(new_page).get_layer(new_layer);
-            add_image_only_to_page(&current_layer)?;
+            add_image_only_to_page(&current_layer, &font)?;
             current_y = SECOND_PAGE_START_Y; // Start high on new page
         } else {
             current_y -= 5.0; // Space after totals on same page
@@ -216,7 +217,7 @@ pub fn create_quotation_pdf(
     Ok(())
 }
 
-fn add_image_only_to_page(layer: &PdfLayerReference) -> Result<(), Box<dyn std::error::Error>> {
+fn add_image_only_to_page(layer: &PdfLayerReference, font: &IndirectFontRef) -> Result<(), Box<dyn std::error::Error>> {
     // Load and add header image only
     let img_info = ImageReader::open("assets/header.jpg")?.decode()?.to_rgb8();
     let (width_px, height_px) = (img_info.width() as f32, img_info.height() as f32);
@@ -237,6 +238,10 @@ fn add_image_only_to_page(layer: &PdfLayerReference) -> Result<(), Box<dyn std::
     };
 
     img.add_to_layer(layer.clone(), transform);
+
+    // Add marketing footer
+    add_marketing_footer(layer, font);
+
     Ok(())
 }
 
@@ -304,6 +309,9 @@ fn add_header_to_page(
         _ => {}
     }
     layer.use_text(introduction_text, 10.0, Mm(MARGIN_MM), Mm(current_y), font);
+
+    // Add marketing footer
+    add_marketing_footer(layer, font);
 
     Ok(())
 }
@@ -569,6 +577,33 @@ fn get_text_width(text: &str) -> f64 {
     // Approximate text width calculation (you might want to use a more accurate method)
     // This is a rough estimation based on character count
     text.len() as f64 * 2.5 // Adjust multiplier based on your font size
+}
+
+fn add_marketing_footer(layer: &PdfLayerReference, font: &IndirectFontRef) {
+    let grey_color = Color::Rgb(Rgb::new(0.5, 0.5, 0.5, None)); // 50% grey
+    let blue_color = Color::Rgb(Rgb::new(0.27, 0.51, 0.71, None)); // Steel blue (70, 130, 180)
+
+    let prefix_text = "Prepared using ";
+    let emphasis_text = "AGL Intelligent Commercial Automation";
+
+    // Calculate text widths more accurately for 8pt font
+    let prefix_width = prefix_text.len() as f64 * 1.4; // Better estimate for 8pt font
+    let emphasis_width = emphasis_text.len() as f64 * 1.4;
+    let total_width = prefix_width + emphasis_width;
+
+    // Center the entire text block
+    let start_x = (PAGE_WIDTH_MM - total_width) / 2.0;
+
+    // Add grey prefix text
+    layer.set_fill_color(grey_color);
+    layer.use_text(prefix_text, 8.0, Mm(start_x), Mm(FOOTER_Y_MM), font);
+
+    // Add blue emphasis text (positioned after prefix text)
+    layer.set_fill_color(blue_color);
+    layer.use_text(emphasis_text, 8.0, Mm(start_x + prefix_width), Mm(FOOTER_Y_MM), font);
+
+    // Reset to black color for any subsequent text
+    layer.set_fill_color(Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)));
 }
 
 #[cfg(test)]
