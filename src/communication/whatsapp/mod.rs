@@ -24,7 +24,6 @@ use thiserror::Error;
 use tokio::net::TcpListener;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::Sender;
-use tower_http::cors::CorsLayer;
 use tracing::{error, info};
 use uuid::Uuid;
 
@@ -111,7 +110,6 @@ impl ServiceWithErrorSender for WhatsAppService {
             .route("/artifacts/{*filename}", get(serve_file))
             .route("/assets/pricelists/{*filename}", get(serve_assets_file))
             .route("/ws", get(whatsapp_websocket_handler))
-            .layer(CorsLayer::permissive())
             .with_state(state);
 
         let listener = TcpListener::bind(format!("0.0.0.0:{}", self.port))
